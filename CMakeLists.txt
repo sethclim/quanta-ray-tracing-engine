@@ -7,6 +7,7 @@ set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
 set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
 
 add_subdirectory(../dependencies/glfw glfw)
+add_subdirectory(../dependencies/glm glm)
 
 add_subdirectory(quanta)
 add_subdirectory(app)
