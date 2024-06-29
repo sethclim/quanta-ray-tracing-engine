@@ -16,7 +16,7 @@ static VkDebugReportCallbackEXT g_DebugReport = VK_NULL_HANDLE;
 static VkPipelineCache g_PipelineCache = VK_NULL_HANDLE;
 static VkDescriptorPool g_DescriptorPool = VK_NULL_HANDLE;
 static VkCommandPool commandPool = VK_NULL_HANDLE;
-static  std::vector<VkCommandBuffer> commandBuffers;
+static std::vector<VkCommandBuffer> commandBuffers;
 
 #ifdef NDEBUG
 const bool enableValidationLayers = false;
@@ -48,7 +48,7 @@ public:
         // bool                ClearEnable;
         // VkClearValue        ClearValue;
         // uint32_t            FrameIndex;             // Current frame being rendered to (0 <= FrameIndex < FrameInFlightCount)
-         uint32_t              ImageCount;             // Number of simultaneous in-flight frames (returned by vkGetSwapchainImagesKHR, usually derived from min_image_count)
+        uint32_t ImageCount; // Number of simultaneous in-flight frames (returned by vkGetSwapchainImagesKHR, usually derived from min_image_count)
         // uint32_t            SemaphoreCount;         // Number of simultaneous in-flight frames + 1, to be able to use it in vkAcquireNextImageKHR
         // uint32_t            SemaphoreIndex;         // Current set of swapchain wait semaphores we're using (needs to be distinct from per frame data)
         // ImGui_ImplVulkanH_Frame* Frames;
@@ -85,6 +85,80 @@ public:
         std::vector<VkPresentModeKHR> presentModes;
     };
 
+    static void SetupVulkan(
+        const char **extensions,
+        uint32_t extensions_count,
+        VulkanBackend::Quanta_ImplVulkanH_RenderContext &context,
+        std::vector<VkImage> &swapChainImages,
+        VkFormat &swapChainImageFormat,
+        VkExtent2D &swapChainExtent,
+        std::vector<VkImageView> &swapChainImageViews,
+        std::vector<VkFramebuffer> &swapChainFramebuffers)
+    {
+        createInstance(extensions, extensions_count);
+        createSurface(context);
+        pickPhysicalDevice(context);
+        createLogicalDevice(context);
+        createSwapChain(context, swapChainImages, swapChainImageFormat, swapChainExtent);
+        createImageViews(swapChainImageFormat, swapChainImages, swapChainImageViews);
+        createRenderPass(context, swapChainImageFormat);
+        createGraphicsPipeline(context);
+        createFramebuffers(context, swapChainExtent, swapChainImageViews, swapChainFramebuffers);
+        createCommandPool(context);
+        createCommandBuffers(context);
+        createSyncObjects(context);
+    }
+
+    static void drawFrame(Quanta_ImplVulkanH_RenderContext &context, std::vector<VkFramebuffer> &swapChainFramebuffers, VkExtent2D &swapChainExtent)
+    {
+        vkWaitForFences(g_Device, 1, &context.inFlightFences[context.currentFrame], VK_TRUE, UINT64_MAX);
+        vkResetFences(g_Device, 1, &context.inFlightFences[context.currentFrame]);
+
+        uint32_t imageIndex;
+        vkAcquireNextImageKHR(g_Device, context.Swapchain, UINT64_MAX, context.imageAvailableSemaphores[context.currentFrame], VK_NULL_HANDLE, &imageIndex);
+
+        vkResetCommandBuffer(commandBuffers[context.currentFrame], /*VkCommandBufferResetFlagBits*/ 0);
+        recordCommandBuffer(context, commandBuffers[context.currentFrame], imageIndex, swapChainFramebuffers, swapChainExtent);
+
+        VkSubmitInfo submitInfo{};
+        submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+
+        VkSemaphore waitSemaphores[] = {context.imageAvailableSemaphores[context.currentFrame]};
+        VkPipelineStageFlags waitStages[] = {VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT};
+        submitInfo.waitSemaphoreCount = 1;
+        submitInfo.pWaitSemaphores = waitSemaphores;
+        submitInfo.pWaitDstStageMask = waitStages;
+
+        submitInfo.commandBufferCount = 1;
+        submitInfo.pCommandBuffers = &commandBuffers[context.currentFrame];
+
+        VkSemaphore signalSemaphores[] = {context.renderFinishedSemaphores[context.currentFrame]};
+        submitInfo.signalSemaphoreCount = 1;
+        submitInfo.pSignalSemaphores = signalSemaphores;
+
+        if (vkQueueSubmit(g_GraphicsQueue, 1, &submitInfo, context.inFlightFences[context.currentFrame]) != VK_SUCCESS)
+        {
+            throw std::runtime_error("failed to submit draw command buffer!");
+        }
+
+        VkPresentInfoKHR presentInfo{};
+        presentInfo.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
+
+        presentInfo.waitSemaphoreCount = 1;
+        presentInfo.pWaitSemaphores = signalSemaphores;
+
+        VkSwapchainKHR swapChains[] = {context.Swapchain};
+        presentInfo.swapchainCount = 1;
+        presentInfo.pSwapchains = swapChains;
+
+        presentInfo.pImageIndices = &imageIndex;
+
+        vkQueuePresentKHR(g_PresentQueue, &presentInfo);
+
+        context.currentFrame = (context.currentFrame + 1) % MAX_FRAMES_IN_FLIGHT;
+    }
+
+private:
     static void createInstance(const char **glfwExtensions, uint32_t extensions_count)
     {
         std::vector<const char *> extensions(glfwExtensions, glfwExtensions + extensions_count);
@@ -217,7 +291,7 @@ public:
     }
 
     static void createSwapChain(Quanta_ImplVulkanH_RenderContext &context,
-                                std::vector<VkImage>& swapChainImages,
+                                std::vector<VkImage> &swapChainImages,
                                 VkFormat &swapChainImageFormat,
                                 VkExtent2D &swapChainExtent)
     {
@@ -278,7 +352,7 @@ public:
         swapChainExtent = extent;
     }
 
-    static void createImageViews(VkFormat &swapChainImageFormat, std::vector<VkImage>& swapChainImages, std::vector<VkImageView>& swapChainImageViews)
+    static void createImageViews(VkFormat &swapChainImageFormat, std::vector<VkImage> &swapChainImages, std::vector<VkImageView> &swapChainImageViews)
     {
         swapChainImageViews.resize(swapChainImages.size());
 
@@ -460,7 +534,7 @@ public:
         vkDestroyShaderModule(g_Device, vertShaderModule, nullptr);
     }
 
-    static void createFramebuffers(Quanta_ImplVulkanH_RenderContext &context, VkExtent2D &swapChainExtent, std::vector<VkImageView>& swapChainImageViews, std::vector<VkFramebuffer>& swapChainFramebuffers)
+    static void createFramebuffers(Quanta_ImplVulkanH_RenderContext &context, VkExtent2D &swapChainExtent, std::vector<VkImageView> &swapChainImageViews, std::vector<VkFramebuffer> &swapChainFramebuffers)
     {
         swapChainFramebuffers.resize(swapChainImageViews.size());
 
@@ -510,12 +584,13 @@ public:
         allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
         allocInfo.commandBufferCount = (uint32_t)commandBuffers.size();
 
-        if (vkAllocateCommandBuffers(g_Device, &allocInfo, commandBuffers.data()) != VK_SUCCESS) {
+        if (vkAllocateCommandBuffers(g_Device, &allocInfo, commandBuffers.data()) != VK_SUCCESS)
+        {
             throw std::runtime_error("failed to allocate command buffers!");
         }
     }
 
-    static void recordCommandBuffer(Quanta_ImplVulkanH_RenderContext &context, VkCommandBuffer& commandBuffer, uint32_t imageIndex, std::vector<VkFramebuffer>& swapChainFramebuffers, VkExtent2D &swapChainExtent)
+    static void recordCommandBuffer(Quanta_ImplVulkanH_RenderContext &context, VkCommandBuffer &commandBuffer, uint32_t imageIndex, std::vector<VkFramebuffer> &swapChainFramebuffers, VkExtent2D &swapChainExtent)
     {
         VkCommandBufferBeginInfo beginInfo{};
         beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
@@ -577,65 +652,17 @@ public:
         fenceInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
         fenceInfo.flags = VK_FENCE_CREATE_SIGNALED_BIT;
 
-        for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
+        for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
+        {
             if (vkCreateSemaphore(g_Device, &semaphoreInfo, nullptr, &context.imageAvailableSemaphores[i]) != VK_SUCCESS ||
                 vkCreateSemaphore(g_Device, &semaphoreInfo, nullptr, &context.renderFinishedSemaphores[i]) != VK_SUCCESS ||
-                vkCreateFence(g_Device, &fenceInfo, nullptr, &context.inFlightFences[i]) != VK_SUCCESS) {
+                vkCreateFence(g_Device, &fenceInfo, nullptr, &context.inFlightFences[i]) != VK_SUCCESS)
+            {
                 throw std::runtime_error("failed to create synchronization objects for a frame!");
             }
         }
     }
 
-    static void drawFrame(Quanta_ImplVulkanH_RenderContext& context, std::vector<VkFramebuffer>& swapChainFramebuffers, VkExtent2D& swapChainExtent)
-    {
-        vkWaitForFences(g_Device, 1, &context.inFlightFences[context.currentFrame], VK_TRUE, UINT64_MAX);
-        vkResetFences(g_Device, 1, &context.inFlightFences[context.currentFrame]);
-
-        uint32_t imageIndex;
-        vkAcquireNextImageKHR(g_Device, context.Swapchain, UINT64_MAX, context.imageAvailableSemaphores[context.currentFrame], VK_NULL_HANDLE, &imageIndex);
-
-        vkResetCommandBuffer(commandBuffers[context.currentFrame], /*VkCommandBufferResetFlagBits*/ 0);
-        recordCommandBuffer(context, commandBuffers[context.currentFrame], imageIndex, swapChainFramebuffers, swapChainExtent);
-
-        VkSubmitInfo submitInfo{};
-        submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
-
-        VkSemaphore waitSemaphores[] = { context.imageAvailableSemaphores[context.currentFrame]};
-        VkPipelineStageFlags waitStages[] = {VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT};
-        submitInfo.waitSemaphoreCount = 1;
-        submitInfo.pWaitSemaphores = waitSemaphores;
-        submitInfo.pWaitDstStageMask = waitStages;
-
-        submitInfo.commandBufferCount = 1;
-        submitInfo.pCommandBuffers = &commandBuffers[context.currentFrame];
-
-        VkSemaphore signalSemaphores[] = {context.renderFinishedSemaphores[context.currentFrame]};
-        submitInfo.signalSemaphoreCount = 1;
-        submitInfo.pSignalSemaphores = signalSemaphores;
-
-        if (vkQueueSubmit(g_GraphicsQueue, 1, &submitInfo, context.inFlightFences[context.currentFrame]) != VK_SUCCESS)
-        {
-            throw std::runtime_error("failed to submit draw command buffer!");
-        }
-
-        VkPresentInfoKHR presentInfo{};
-        presentInfo.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
-
-        presentInfo.waitSemaphoreCount = 1;
-        presentInfo.pWaitSemaphores = signalSemaphores;
-
-        VkSwapchainKHR swapChains[] = {context.Swapchain};
-        presentInfo.swapchainCount = 1;
-        presentInfo.pSwapchains = swapChains;
-
-        presentInfo.pImageIndices = &imageIndex;
-
-        vkQueuePresentKHR(g_PresentQueue, &presentInfo);
-
-        context.currentFrame = (context.currentFrame + 1) % MAX_FRAMES_IN_FLIGHT;
-    }
-
-private:
     static VkSurfaceFormatKHR chooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR> &availableFormats)
     {
         for (const auto &availableFormat : availableFormats)

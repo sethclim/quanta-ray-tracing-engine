@@ -10,30 +10,6 @@ static std::vector<std::vector<std::function<void()>>> s_ResourceFreeQueue;
 
 static uint32_t s_CurrentFrameIndex = 0;
 
-static void SetupVulkan(
-	const char **extensions,
-	uint32_t extensions_count,
-	VulkanBackend::Quanta_ImplVulkanH_RenderContext& context,
-	std::vector<VkImage>& swapChainImages,
-	VkFormat& swapChainImageFormat,
-	VkExtent2D& swapChainExtent,
-	std::vector<VkImageView>& swapChainImageViews,
-	std::vector<VkFramebuffer>& swapChainFramebuffers)
-{
-	VulkanBackend::createInstance(extensions, extensions_count);
-	VulkanBackend::createSurface(context);
-	VulkanBackend::pickPhysicalDevice(context);
-	VulkanBackend::createLogicalDevice(context);
-	VulkanBackend::createSwapChain(context, swapChainImages, swapChainImageFormat, swapChainExtent);
-	VulkanBackend::createImageViews(swapChainImageFormat, swapChainImages, swapChainImageViews);
-	VulkanBackend::createRenderPass(context, swapChainImageFormat);
-	VulkanBackend::createGraphicsPipeline(context);
-	VulkanBackend::createFramebuffers(context, swapChainExtent, swapChainImageViews, swapChainFramebuffers);
-	VulkanBackend::createCommandPool(context);
-	VulkanBackend::createCommandBuffers(context);
-	VulkanBackend::createSyncObjects(context);
-}
-
 Application::Application()
 {
 	Init();
@@ -65,7 +41,7 @@ void Application::Init()
 		&m_Quanta_ImplVulkanH_RenderContext.Width,
 		&m_Quanta_ImplVulkanH_RenderContext.Height);
 
-	SetupVulkan(
+	VulkanBackend::SetupVulkan(
 		extensions,
 		extensions_count,
 		m_Quanta_ImplVulkanH_RenderContext,
