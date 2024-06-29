@@ -1,3 +1,6 @@
+#ifndef WINDOWCONTROLLER_H
+#define WINDOWCONTROLLER_H
+
 #include "Singleton.hpp"
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
@@ -12,11 +15,7 @@ public:
 
     GLFWwindow *GetWindow()
     {
-        if (m_Window == nullptr)
-        {
-            NewWindow();
-        }
-        return m_Window;
+        return m_WindowHandle;
     }
 
     void NewWindow();
@@ -24,5 +23,7 @@ public:
     glm::vec2 GetSize();
 
 private:
-    GLFWwindow *m_Window;
+    GLFWwindow *m_WindowHandle;
 };
+
+#endif

@@ -4,29 +4,31 @@
 
 WindowController::WindowController()
 {
-	m_Window = nullptr;
+	m_WindowHandle = nullptr;
 }
 
 WindowController::~WindowController()
 {
-	if (m_Window != nullptr)
+	if (m_WindowHandle != nullptr)
 	{
 		glfwTerminate();
-		m_Window = nullptr;
+		m_WindowHandle = nullptr;
 	}
 }
 
 void WindowController::NewWindow()
 {
+
 	M_ASSERT(glfwInit(), "Failed To Initialize GLFW"); // Initialize GLFW
+	glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
 
 	//Open a window and create its OpenGL context
-	glfwWindowHint(GLFW_SAMPLES, 4);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+	//glfwWindowHint(GLFW_SAMPLES, 4);
+	//glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+	//glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 
-	M_ASSERT((m_Window = glfwCreateWindow(1024, 768, "A sample scene", NULL, NULL)) != nullptr, "Failed to open GLFW window.");
-	glfwMakeContextCurrent(m_Window);
+	M_ASSERT((m_WindowHandle = glfwCreateWindow(1024, 768, "A sample scene", NULL, NULL)) != nullptr, "Failed to open GLFW window.");
+	glfwMakeContextCurrent(m_WindowHandle);
 }
 
 Resolution WindowController::GetResolution()
@@ -39,6 +41,6 @@ Resolution WindowController::GetResolution()
 glm::vec2 WindowController::GetSize()
 {
 	int width, height;
-	glfwGetWindowSize(m_Window, &width, &height);
+	glfwGetWindowSize(m_WindowHandle, &width, &height);
 	return glm::vec2(width, height);
 }

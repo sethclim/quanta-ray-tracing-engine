@@ -1,33 +1,150 @@
 #include "Application.hpp"
 
+// static ImGui_ImplVulkanH_Window g_MainWindowData;
+static int g_MinImageCount = 2;
+static bool g_SwapChainRebuild = false;
+
+// Per-frame-in-flight
+static std::vector<std::vector<VkCommandBuffer>> s_AllocatedCommandBuffers;
+static std::vector<std::vector<std::function<void()>>> s_ResourceFreeQueue;
+
+static uint32_t s_CurrentFrameIndex = 0;
+
+static void SetupVulkan(
+	const char **extensions,
+	uint32_t extensions_count,
+	VulkanBackend::Quanta_ImplVulkanH_RenderContext& context,
+	std::vector<VkImage>& swapChainImages,
+	VkFormat& swapChainImageFormat,
+	VkExtent2D& swapChainExtent,
+	std::vector<VkImageView>& swapChainImageViews,
+	std::vector<VkFramebuffer>& swapChainFramebuffers)
+{
+	VulkanBackend::createInstance(extensions, extensions_count);
+	VulkanBackend::createSurface(context);
+	VulkanBackend::pickPhysicalDevice(context);
+	VulkanBackend::createLogicalDevice(context);
+	VulkanBackend::createSwapChain(context, swapChainImages, swapChainImageFormat, swapChainExtent);
+	VulkanBackend::createImageViews(swapChainImageFormat, swapChainImages, swapChainImageViews);
+	VulkanBackend::createRenderPass(context, swapChainImageFormat);
+	VulkanBackend::createGraphicsPipeline(context);
+	VulkanBackend::createFramebuffers(context, swapChainExtent, swapChainImageViews, swapChainFramebuffers);
+	VulkanBackend::createCommandPool(context);
+	VulkanBackend::createCommandBuffers(context);
+	VulkanBackend::createSyncObjects(context);
+}
+
+Application::Application()
+{
+	Init();
+}
+
+Application::~Application()
+{
+	Shutdown();
+}
+
+void Application::Init()
+{
+	// Setup GLFW window
+	glfwSetErrorCallback(glfw_error_callback);
+
+	WindowController::GetInstance().NewWindow();
+
+	// Setup Vulkan
+	if (!glfwVulkanSupported())
+	{
+		std::cerr << "GLFW: Vulkan not supported!\n";
+		return;
+	}
+	uint32_t extensions_count = 0;
+	const char **extensions = glfwGetRequiredInstanceExtensions(&extensions_count);
+
+	glfwGetFramebufferSize(
+		WindowController::GetInstance().GetWindow(),
+		&m_Quanta_ImplVulkanH_RenderContext.Width,
+		&m_Quanta_ImplVulkanH_RenderContext.Height);
+
+	SetupVulkan(
+		extensions,
+		extensions_count,
+		m_Quanta_ImplVulkanH_RenderContext,
+		swapChainImages,
+		swapChainImageFormat,
+		swapChainExtent,
+		swapChainImageViews,
+		swapChainFramebuffers);
+
+	/*ImGui_ImplVulkanH_Window *wd = &g_MainWindowData;*/
+	// SetupVulkanWindow(wd, surface, w, h);
+
+	// s_AllocatedCommandBuffers.resize(wd->ImageCount);
+	// s_ResourceFreeQueue.resize(wd->ImageCount);
+}
+
 void Application::Run()
 {
-    double t = 0.0;
+	double t = 0.0;
 
-    const double fpsLimit = 1.0 / 60.0;
+	const double fpsLimit = 1.0 / 60.0;
 
-    while (glfwGetKey(WindowController::GetInstance().GetWindow(), GLFW_KEY_ESCAPE) != GLFW_PRESS && glfwWindowShouldClose(WindowController::GetInstance().GetWindow()) == 0)
-    {
-        // PROCESS INPUT
-        double newTime = glfwGetTime();
-        double frameTime = newTime - m_LastFrameTime;
-        m_LastFrameTime = newTime;
+	m_Running = true;
 
-        float deltaTime = std::min(frameTime, fpsLimit);
+	while (glfwWindowShouldClose(WindowController::GetInstance().GetWindow()) == 0 && m_Running)
+	{
+		// PROCESS INPUT
+		double newTime = glfwGetTime();
+		double frameTime = newTime - m_LastFrameTime;
+		m_LastFrameTime = newTime;
 
-        /*     m_gameController->ProcessInput(deltaTime);*/
-        // m_gameController->Update(deltaTime);
+		float deltaTime = std::min(frameTime, fpsLimit);
 
-        // Utilities::FPSCounter::CalculateFrameRate();
+		/*     m_gameController->ProcessInput(deltaTime);*/
+		// m_gameController->Update(deltaTime);
 
-        // RENDER
-        //glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        /*      m_gameController->Render();*/
+		// Utilities::FPSCounter::CalculateFrameRate();
 
-        glfwSwapBuffers(WindowController::GetInstance().GetWindow());
+		// RENDER
+		// glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		/*      m_gameController->Render();*/
 
-        glfwPollEvents();
-    }
+		// glfwSwapBuffers(WindowController::GetInstance().GetWindow());
 
-    // m_gameController->CleanUp();
+		glfwPollEvents();
+		VulkanBackend::drawFrame(m_Quanta_ImplVulkanH_RenderContext, swapChainFramebuffers, swapChainExtent);
+	}
+
+	// m_gameController->CleanUp();
+}
+
+void Application::Close()
+{
+	m_Running = false;
+}
+
+void Application::Shutdown()
+{
+	// Cleanup
+	VkResult err = vkDeviceWaitIdle(g_Device);
+	check_vk_result(err);
+
+	// Free resources in queue
+	for (auto &queue : s_ResourceFreeQueue)
+	{
+		for (auto &func : queue)
+			func();
+	}
+	s_ResourceFreeQueue.clear();
+
+	// ImGui_ImplVulkan_Shutdown();
+	// ImGui_ImplGlfw_Shutdown();
+	// ImGui::DestroyContext();
+
+	// CleanupVulkanWindow();
+	// CleanupVulkan();
+
+	glfwDestroyWindow(WindowController::GetInstance().GetWindow());
+	glfwTerminate();
+
+	m_Running = false;
 }
