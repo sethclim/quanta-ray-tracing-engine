@@ -29,6 +29,9 @@ void WindowController::NewWindow()
 
 	M_ASSERT((m_WindowHandle = glfwCreateWindow(1024, 768, "A sample scene", NULL, NULL)) != nullptr, "Failed to open GLFW window.");
 	glfwMakeContextCurrent(m_WindowHandle);
+	glfwSetWindowUserPointer(m_WindowHandle, this);
+	glfwSetFramebufferSizeCallback(m_WindowHandle, framebufferResizeCallback);
+
 }
 
 Resolution WindowController::GetResolution()
@@ -43,4 +46,10 @@ glm::vec2 WindowController::GetSize()
 	int width, height;
 	glfwGetWindowSize(m_WindowHandle, &width, &height);
 	return glm::vec2(width, height);
+}
+
+
+void WindowController::UpdateFrameBufferResized()
+{
+	VulkanBackend::GetInstance().SetFrameBufferResized(true);
 }

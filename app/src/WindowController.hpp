@@ -6,6 +6,7 @@
 #include <glm/glm.hpp>
 #include "Resolution.hpp"
 #include "StandardIncludes.hpp"
+#include "VulkanBackend.hpp"
 
 class WindowController : public Singleton<WindowController>
 {
@@ -24,6 +25,13 @@ public:
 
 private:
     GLFWwindow *m_WindowHandle;
+
+    void UpdateFrameBufferResized();
+
+    static void framebufferResizeCallback(GLFWwindow* window, int width, int height) {
+        auto windowController = reinterpret_cast<WindowController*>(glfwGetWindowUserPointer(window));
+        windowController->UpdateFrameBufferResized();
+    }
 };
 
 #endif

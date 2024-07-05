@@ -36,20 +36,15 @@ void Application::Init()
 	uint32_t extensions_count = 0;
 	const char **extensions = glfwGetRequiredInstanceExtensions(&extensions_count);
 
+	VulkanBackend& vulkanBackend = VulkanBackend::GetInstance();
+	auto& renderContext = vulkanBackend.GetRenderContext();
+
 	glfwGetFramebufferSize(
 		WindowController::GetInstance().GetWindow(),
-		&m_Quanta_ImplVulkanH_RenderContext.Width,
-		&m_Quanta_ImplVulkanH_RenderContext.Height);
+		&renderContext.Width,
+		&renderContext.Height);
 
-	VulkanBackend::SetupVulkan(
-		extensions,
-		extensions_count,
-		m_Quanta_ImplVulkanH_RenderContext,
-		swapChainImages,
-		swapChainImageFormat,
-		swapChainExtent,
-		swapChainImageViews,
-		swapChainFramebuffers);
+	vulkanBackend.SetupVulkan(extensions, extensions_count);
 
 	/*ImGui_ImplVulkanH_Window *wd = &g_MainWindowData;*/
 	// SetupVulkanWindow(wd, surface, w, h);
@@ -65,6 +60,8 @@ void Application::Run()
 	const double fpsLimit = 1.0 / 60.0;
 
 	m_Running = true;
+
+	VulkanBackend& vulkanBackend = VulkanBackend::GetInstance();
 
 	while (glfwWindowShouldClose(WindowController::GetInstance().GetWindow()) == 0 && m_Running)
 	{
@@ -87,7 +84,23 @@ void Application::Run()
 		// glfwSwapBuffers(WindowController::GetInstance().GetWindow());
 
 		glfwPollEvents();
-		VulkanBackend::drawFrame(m_Quanta_ImplVulkanH_RenderContext, swapChainFramebuffers, swapChainExtent);
+
+		/*if (!m_Image || vulkanBackend.GetRenderContext().Width != m_Image->GetWidth() || vulkanBackend.GetRenderContext().Height != m_Image->GetHeight())
+		{
+			m_Image = std::make_shared<Image>(vulkanBackend.GetRenderContext().Width, vulkanBackend.GetRenderContext().Height, ImageFormat::RGBA);
+			delete[] m_ImageData;
+			m_ImageData = new uint32_t[vulkanBackend.GetRenderContext().Width * vulkanBackend.GetRenderContext().Height];
+		}
+
+		for (uint32_t i = 0; i < vulkanBackend.GetRenderContext().Width * vulkanBackend.GetRenderContext().Height; i++)
+		{
+			m_ImageData[i] = Random::UInt();
+			m_ImageData[i] |= 0xff000000;
+		}
+
+		m_Image->SetData(m_ImageData);*/
+
+		VulkanBackend::GetInstance().drawFrame();
 	}
 
 	// m_gameController->CleanUp();
@@ -101,7 +114,7 @@ void Application::Close()
 void Application::Shutdown()
 {
 	// Cleanup
-	VkResult err = vkDeviceWaitIdle(g_Device);
+	VkResult err = vkDeviceWaitIdle(VulkanBackend::GetInstance().GetDevice());
 	check_vk_result(err);
 
 	// Free resources in queue
@@ -110,6 +123,7 @@ void Application::Shutdown()
 		for (auto &func : queue)
 			func();
 	}
+
 	s_ResourceFreeQueue.clear();
 
 	// ImGui_ImplVulkan_Shutdown();
