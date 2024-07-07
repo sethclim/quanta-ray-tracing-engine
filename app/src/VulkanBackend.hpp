@@ -66,10 +66,10 @@ struct Vertex
 };
 
 const std::vector<Vertex> vertices = {
-    {{-0.5f, -0.5f}, {1.0f, 0.0f, 0.0f}, {1.0f, 0.0f}},
-    {{0.5f, -0.5f}, {0.0f, 1.0f, 0.0f}, {0.0f, 0.0f}},
-    {{0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}, {0.0f, 1.0f}},
-    {{-0.5f, 0.5f}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f}}};
+    {{-1.0f, -1.0f}, {1.0f, 0.0f, 0.0f}, {1.0f, 0.0f}},
+    {{1.0f, -1.0f}, {0.0f, 1.0f, 0.0f}, {0.0f, 0.0f}},
+    {{1.0f, 1.0f}, {0.0f, 0.0f, 1.0f}, {0.0f, 1.0f}},
+    {{-1.0f, 1.0f}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f}}};
 
 const std::vector<uint16_t> indices = {
     0, 1, 2, 2, 3, 0};
@@ -140,11 +140,10 @@ public:
     void SetupVulkan(const char **extensions, uint32_t extensions_count);
 
     void drawFrame();
-    VkPhysicalDevice& GetPhysicalDevice();
-    VkDevice& GetDevice();
-    VkDescriptorSet ImGui_ImplVulkan_AddTexture(VkSampler sampler, VkImageView image_view, VkImageLayout image_layout);
-    void createDescriptorSets(VkSampler& sampler, VkImageView& image_view);
-    VkImageView createImageView(VkImage& image, VkFormat format);
+    VkPhysicalDevice &GetPhysicalDevice();
+    VkDevice &GetDevice();
+    void createDescriptorSets(VkSampler &sampler, VkImageView &image_view);
+    VkImageView createImageView(VkImage &image, VkFormat format);
 
     void SetFrameBufferResized(bool resized) { framebufferResized = resized; }
 
@@ -201,9 +200,7 @@ private:
 
     void createDescriptorPool();
 
-
     void copyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size);
-
 
 public:
     void createBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer &buffer, VkDeviceMemory &bufferMemory);
