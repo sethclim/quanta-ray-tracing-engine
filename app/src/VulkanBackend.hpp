@@ -148,39 +148,39 @@ public:
 
     void SetFrameBufferResized(bool resized) { framebufferResized = resized; }
 
-    Quanta_ImplVulkanH_RenderContext &GetRenderContext() { return m_Quanta_ImplVulkanH_RenderContext; }
+    Quanta_ImplVulkanH_RenderContext &GetRenderContext() { return context; }
 
 private:
-    void recreateSwapChain(Quanta_ImplVulkanH_RenderContext &context);
-    void cleanupSwapChain(Quanta_ImplVulkanH_RenderContext &context);
+    void recreateSwapChain();
+    void cleanupSwapChain();
 
     void createInstance(const char **glfwExtensions, uint32_t extensions_count);
 
-    void createSurface(Quanta_ImplVulkanH_RenderContext &context);
+    void createSurface();
 
-    void pickPhysicalDevice(Quanta_ImplVulkanH_RenderContext &context);
+    void pickPhysicalDevice();
 
-    void createLogicalDevice(Quanta_ImplVulkanH_RenderContext &context);
+    void createLogicalDevice();
 
-    void createSwapChain(Quanta_ImplVulkanH_RenderContext &context);
+    void createSwapChain();
 
     void createImageViews();
 
-    void createRenderPass(Quanta_ImplVulkanH_RenderContext &context);
+    void createRenderPass();
 
-    void createDescriptorSetLayout(Quanta_ImplVulkanH_RenderContext &context);
+    void createDescriptorSetLayout();
 
-    void createGraphicsPipeline(Quanta_ImplVulkanH_RenderContext &context);
+    void createGraphicsPipeline();
 
-    void createFramebuffers(Quanta_ImplVulkanH_RenderContext &context);
+    void createFramebuffers();
 
-    void createCommandPool(Quanta_ImplVulkanH_RenderContext &context);
+    void createCommandPool();
 
-    void createCommandBuffers(Quanta_ImplVulkanH_RenderContext &context);
+    void createCommandBuffers();
 
-    void recordCommandBuffer(VkCommandBuffer commandBuffer, Quanta_ImplVulkanH_RenderContext &context);
+    void recordCommandBuffer(VkCommandBuffer commandBuffer);
 
-    void createSyncObjects(Quanta_ImplVulkanH_RenderContext &context);
+    void createSyncObjects();
     void updateUniformBuffer(uint32_t currentImage);
 
     VkSurfaceFormatKHR chooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR> &availableFormats);
@@ -255,7 +255,7 @@ private:
     std::vector<VkFramebuffer> swapChainFramebuffers;
     bool framebufferResized = false;
 
-    Quanta_ImplVulkanH_RenderContext m_Quanta_ImplVulkanH_RenderContext;
+    Quanta_ImplVulkanH_RenderContext context;
 };
 
 #endif

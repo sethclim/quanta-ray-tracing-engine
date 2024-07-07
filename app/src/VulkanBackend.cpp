@@ -3,19 +3,16 @@
 void VulkanBackend::SetupVulkan(const char **extensions, uint32_t extensions_count)
 {
     createInstance(extensions, extensions_count);
-    createSurface(m_Quanta_ImplVulkanH_RenderContext);
-    pickPhysicalDevice(m_Quanta_ImplVulkanH_RenderContext);
-    createLogicalDevice(m_Quanta_ImplVulkanH_RenderContext);
-    createSwapChain(m_Quanta_ImplVulkanH_RenderContext);
+    createSurface();
+    pickPhysicalDevice();
+    createLogicalDevice();
+    createSwapChain();
     createImageViews();
-    createRenderPass(m_Quanta_ImplVulkanH_RenderContext);
-    createDescriptorSetLayout(m_Quanta_ImplVulkanH_RenderContext);
-    createGraphicsPipeline(m_Quanta_ImplVulkanH_RenderContext);
-    createFramebuffers(m_Quanta_ImplVulkanH_RenderContext);
-    createCommandPool(m_Quanta_ImplVulkanH_RenderContext);
-    /* createTextureImage();
-     createTextureImageView();
-     createTextureSampler();*/
+    createRenderPass();
+    createDescriptorSetLayout();
+    createGraphicsPipeline();
+    createFramebuffers();
+    createCommandPool();
 
     createDescriptorPool();
     createUniformBuffers();
@@ -23,19 +20,19 @@ void VulkanBackend::SetupVulkan(const char **extensions, uint32_t extensions_cou
     createVertexBuffer();
     createIndexBuffer();
 
-    createCommandBuffers(m_Quanta_ImplVulkanH_RenderContext);
-    createSyncObjects(m_Quanta_ImplVulkanH_RenderContext);
+    createCommandBuffers();
+    createSyncObjects();
 }
 
 void VulkanBackend::drawFrame()
 {
-    vkWaitForFences(g_Device, 1, &m_Quanta_ImplVulkanH_RenderContext.inFlightFences[m_Quanta_ImplVulkanH_RenderContext.currentFrame], VK_TRUE, UINT64_MAX);
+    vkWaitForFences(g_Device, 1, &context.inFlightFences[context.currentFrame], VK_TRUE, UINT64_MAX);
 
-    VkResult result = vkAcquireNextImageKHR(g_Device, m_Quanta_ImplVulkanH_RenderContext.Swapchain, UINT64_MAX, m_Quanta_ImplVulkanH_RenderContext.imageAvailableSemaphores[m_Quanta_ImplVulkanH_RenderContext.currentFrame], VK_NULL_HANDLE, &m_Quanta_ImplVulkanH_RenderContext.ImageIndex);
+    VkResult result = vkAcquireNextImageKHR(g_Device, context.Swapchain, UINT64_MAX, context.imageAvailableSemaphores[context.currentFrame], VK_NULL_HANDLE, &context.ImageIndex);
 
     if (result == VK_ERROR_OUT_OF_DATE_KHR)
     {
-        recreateSwapChain(m_Quanta_ImplVulkanH_RenderContext);
+        recreateSwapChain();
         return;
     }
     else if (result != VK_SUCCESS && result != VK_SUBOPTIMAL_KHR)
@@ -43,30 +40,30 @@ void VulkanBackend::drawFrame()
         throw std::runtime_error("failed to acquire swap chain image!");
     }
 
-    updateUniformBuffer(m_Quanta_ImplVulkanH_RenderContext.currentFrame);
+    updateUniformBuffer(context.currentFrame);
 
-    vkResetFences(g_Device, 1, &m_Quanta_ImplVulkanH_RenderContext.inFlightFences[m_Quanta_ImplVulkanH_RenderContext.currentFrame]);
+    vkResetFences(g_Device, 1, &context.inFlightFences[context.currentFrame]);
 
-    vkResetCommandBuffer(commandBuffers[m_Quanta_ImplVulkanH_RenderContext.currentFrame], /*VkCommandBufferResetFlagBits*/ 0);
-    recordCommandBuffer(commandBuffers[m_Quanta_ImplVulkanH_RenderContext.currentFrame], m_Quanta_ImplVulkanH_RenderContext);
+    vkResetCommandBuffer(commandBuffers[context.currentFrame], /*VkCommandBufferResetFlagBits*/ 0);
+    recordCommandBuffer(commandBuffers[context.currentFrame]);
 
     VkSubmitInfo submitInfo{};
     submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
 
-    VkSemaphore waitSemaphores[] = {m_Quanta_ImplVulkanH_RenderContext.imageAvailableSemaphores[m_Quanta_ImplVulkanH_RenderContext.currentFrame]};
+    VkSemaphore waitSemaphores[] = {context.imageAvailableSemaphores[context.currentFrame]};
     VkPipelineStageFlags waitStages[] = {VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT};
     submitInfo.waitSemaphoreCount = 1;
     submitInfo.pWaitSemaphores = waitSemaphores;
     submitInfo.pWaitDstStageMask = waitStages;
 
     submitInfo.commandBufferCount = 1;
-    submitInfo.pCommandBuffers = &commandBuffers[m_Quanta_ImplVulkanH_RenderContext.currentFrame];
+    submitInfo.pCommandBuffers = &commandBuffers[context.currentFrame];
 
-    VkSemaphore signalSemaphores[] = {m_Quanta_ImplVulkanH_RenderContext.renderFinishedSemaphores[m_Quanta_ImplVulkanH_RenderContext.currentFrame]};
+    VkSemaphore signalSemaphores[] = {context.renderFinishedSemaphores[context.currentFrame]};
     submitInfo.signalSemaphoreCount = 1;
     submitInfo.pSignalSemaphores = signalSemaphores;
 
-    if (vkQueueSubmit(g_GraphicsQueue, 1, &submitInfo, m_Quanta_ImplVulkanH_RenderContext.inFlightFences[m_Quanta_ImplVulkanH_RenderContext.currentFrame]) != VK_SUCCESS)
+    if (vkQueueSubmit(g_GraphicsQueue, 1, &submitInfo, context.inFlightFences[context.currentFrame]) != VK_SUCCESS)
     {
         throw std::runtime_error("failed to submit draw command buffer!");
     }
@@ -77,25 +74,25 @@ void VulkanBackend::drawFrame()
     presentInfo.waitSemaphoreCount = 1;
     presentInfo.pWaitSemaphores = signalSemaphores;
 
-    VkSwapchainKHR swapChains[] = {m_Quanta_ImplVulkanH_RenderContext.Swapchain};
+    VkSwapchainKHR swapChains[] = {context.Swapchain};
     presentInfo.swapchainCount = 1;
     presentInfo.pSwapchains = swapChains;
 
-    presentInfo.pImageIndices = &m_Quanta_ImplVulkanH_RenderContext.ImageIndex;
+    presentInfo.pImageIndices = &context.ImageIndex;
 
     result = vkQueuePresentKHR(g_PresentQueue, &presentInfo);
 
     if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR || framebufferResized)
     {
         framebufferResized = false;
-        recreateSwapChain(m_Quanta_ImplVulkanH_RenderContext);
+        recreateSwapChain();
     }
     else if (result != VK_SUCCESS)
     {
         throw std::runtime_error("failed to present swap chain image!");
     }
 
-    m_Quanta_ImplVulkanH_RenderContext.currentFrame = (m_Quanta_ImplVulkanH_RenderContext.currentFrame + 1) % MAX_FRAMES_IN_FLIGHT;
+    context.currentFrame = (context.currentFrame + 1) % MAX_FRAMES_IN_FLIGHT;
 }
 
 VkPhysicalDevice &VulkanBackend::GetPhysicalDevice()
@@ -113,7 +110,7 @@ VkDescriptorSet VulkanBackend::ImGui_ImplVulkan_AddTexture(VkSampler sampler, Vk
     // ImGui_ImplVulkan_Data* bd = ImGui_ImplVulkan_GetBackendData();
     // ImGui_ImplVulkan_InitInfo* v = &bd->VulkanInitInfo;
 
-    std::vector<VkDescriptorSetLayout> layouts(1, m_Quanta_ImplVulkanH_RenderContext.descriptorSetLayout);
+    std::vector<VkDescriptorSetLayout> layouts(1, context.descriptorSetLayout);
 
     // Create Descriptor Set:
     VkDescriptorSet descriptor_set;
@@ -148,7 +145,7 @@ VkDescriptorSet VulkanBackend::ImGui_ImplVulkan_AddTexture(VkSampler sampler, Vk
 
 void VulkanBackend::createDescriptorSets(VkSampler &sampler, VkImageView &image_view)
 {
-    std::vector<VkDescriptorSetLayout> layouts(MAX_FRAMES_IN_FLIGHT, m_Quanta_ImplVulkanH_RenderContext.descriptorSetLayout);
+    std::vector<VkDescriptorSetLayout> layouts(MAX_FRAMES_IN_FLIGHT, context.descriptorSetLayout);
     VkDescriptorSetAllocateInfo allocInfo{};
     allocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
     allocInfo.descriptorPool = descriptorPool;
@@ -195,7 +192,7 @@ void VulkanBackend::createDescriptorSets(VkSampler &sampler, VkImageView &image_
     }
 }
 
-void VulkanBackend::recreateSwapChain(Quanta_ImplVulkanH_RenderContext &context)
+void VulkanBackend::recreateSwapChain()
 {
     int width = 0, height = 0;
     glfwGetFramebufferSize(WindowController::GetInstance().GetWindow(), &width, &height);
@@ -207,14 +204,14 @@ void VulkanBackend::recreateSwapChain(Quanta_ImplVulkanH_RenderContext &context)
 
     vkDeviceWaitIdle(g_Device);
 
-    cleanupSwapChain(context);
+    cleanupSwapChain();
 
-    createSwapChain(context);
+    createSwapChain();
     createImageViews();
-    createFramebuffers(context);
+    createFramebuffers();
 }
 
-void VulkanBackend::cleanupSwapChain(Quanta_ImplVulkanH_RenderContext &context)
+void VulkanBackend::cleanupSwapChain()
 {
     for (auto framebuffer : swapChainFramebuffers)
     {
@@ -275,14 +272,14 @@ void VulkanBackend::createInstance(const char **glfwExtensions, uint32_t extensi
     }
 }
 
-void VulkanBackend::createSurface(Quanta_ImplVulkanH_RenderContext &context)
+void VulkanBackend::createSurface()
 {
     // Create Window Surface
     VkResult err = glfwCreateWindowSurface(g_Instance, WindowController::GetInstance().GetWindow(), g_Allocator, &context.Surface);
     check_vk_result(err);
 }
 
-void VulkanBackend::pickPhysicalDevice(Quanta_ImplVulkanH_RenderContext &context)
+void VulkanBackend::pickPhysicalDevice()
 {
     uint32_t deviceCount = 0;
     vkEnumeratePhysicalDevices(g_Instance, &deviceCount, nullptr);
@@ -310,7 +307,7 @@ void VulkanBackend::pickPhysicalDevice(Quanta_ImplVulkanH_RenderContext &context
     }
 }
 
-void VulkanBackend::createLogicalDevice(Quanta_ImplVulkanH_RenderContext &context)
+void VulkanBackend::createLogicalDevice()
 {
     QueueFamilyIndices indices = findQueueFamilies(g_PhysicalDevice, context.Surface);
 
@@ -361,7 +358,7 @@ void VulkanBackend::createLogicalDevice(Quanta_ImplVulkanH_RenderContext &contex
     vkGetDeviceQueue(g_Device, indices.presentFamily.value(), 0, &g_PresentQueue);
 }
 
-void VulkanBackend::createSwapChain(Quanta_ImplVulkanH_RenderContext &context)
+void VulkanBackend::createSwapChain()
 {
     SwapChainSupportDetails swapChainSupport = querySwapChainSupport(g_PhysicalDevice, context.Surface);
 
@@ -430,7 +427,7 @@ void VulkanBackend::createImageViews()
     }
 }
 
-void VulkanBackend::createRenderPass(Quanta_ImplVulkanH_RenderContext &context)
+void VulkanBackend::createRenderPass()
 {
     VkAttachmentDescription colorAttachment{};
     colorAttachment.format = swapChainImageFormat;
@@ -474,7 +471,7 @@ void VulkanBackend::createRenderPass(Quanta_ImplVulkanH_RenderContext &context)
     }
 }
 
-void VulkanBackend::createDescriptorSetLayout(Quanta_ImplVulkanH_RenderContext &context)
+void VulkanBackend::createDescriptorSetLayout()
 {
     VkDescriptorSetLayoutBinding uboLayoutBinding{};
     uboLayoutBinding.binding = 0;
@@ -502,7 +499,7 @@ void VulkanBackend::createDescriptorSetLayout(Quanta_ImplVulkanH_RenderContext &
     }
 }
 
-void VulkanBackend::createGraphicsPipeline(Quanta_ImplVulkanH_RenderContext &context)
+void VulkanBackend::createGraphicsPipeline()
 {
     auto vertShaderCode = readFile("C:/Users/sethc/coding/cplusplus/graphics/quanta-ray-tracing-engine/app/src/shaders/shader.vert.spv");
     auto fragShaderCode = readFile("C:/Users/sethc/coding/cplusplus/graphics/quanta-ray-tracing-engine/app/src/shaders/shader.frag.spv");
@@ -618,7 +615,7 @@ void VulkanBackend::createGraphicsPipeline(Quanta_ImplVulkanH_RenderContext &con
     vkDestroyShaderModule(g_Device, vertShaderModule, nullptr);
 }
 
-void VulkanBackend::createFramebuffers(Quanta_ImplVulkanH_RenderContext &context)
+void VulkanBackend::createFramebuffers()
 {
     swapChainFramebuffers.resize(swapChainImageViews.size());
 
@@ -643,7 +640,7 @@ void VulkanBackend::createFramebuffers(Quanta_ImplVulkanH_RenderContext &context
     }
 }
 
-void VulkanBackend::createCommandPool(Quanta_ImplVulkanH_RenderContext &context)
+void VulkanBackend::createCommandPool()
 {
     QueueFamilyIndices queueFamilyIndices = findQueueFamilies(g_PhysicalDevice, context.Surface);
 
@@ -856,7 +853,7 @@ VkImageView VulkanBackend::createImageView(VkImage &image, VkFormat format)
 //     endSingleTimeCommands(commandBuffer);
 // }
 
-void VulkanBackend::createCommandBuffers(Quanta_ImplVulkanH_RenderContext &context)
+void VulkanBackend::createCommandBuffers()
 {
     commandBuffers.resize(MAX_FRAMES_IN_FLIGHT);
 
@@ -872,7 +869,7 @@ void VulkanBackend::createCommandBuffers(Quanta_ImplVulkanH_RenderContext &conte
     }
 }
 
-void VulkanBackend::recordCommandBuffer(VkCommandBuffer commandBuffer, Quanta_ImplVulkanH_RenderContext &context)
+void VulkanBackend::recordCommandBuffer(VkCommandBuffer commandBuffer)
 {
     VkCommandBufferBeginInfo beginInfo{};
     beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
@@ -929,7 +926,7 @@ void VulkanBackend::recordCommandBuffer(VkCommandBuffer commandBuffer, Quanta_Im
     }
 }
 
-void VulkanBackend::createSyncObjects(Quanta_ImplVulkanH_RenderContext &context)
+void VulkanBackend::createSyncObjects()
 {
     context.imageAvailableSemaphores.resize(MAX_FRAMES_IN_FLIGHT);
     context.renderFinishedSemaphores.resize(MAX_FRAMES_IN_FLIGHT);
