@@ -8,6 +8,7 @@
 #include "WindowController.hpp"
 #include "VulkanBackend.hpp"
 #include "Random.hpp"
+#include "image.hpp"
 
 void check_vk_result(VkResult err);
 
@@ -39,8 +40,8 @@ private:
 	// VulkanBackend& m_VulkanBackend;
 	// VulkanBackend::Quanta_ImplVulkanH_RenderContext m_Quanta_ImplVulkanH_RenderContext;
 
-	// std::shared_ptr<Image> m_Image;
-	// uint32_t *m_ImageData = nullptr;
+	 std::shared_ptr<Image> m_Image;
+	 uint32_t *m_ImageData = nullptr;
 };
 
 #endif

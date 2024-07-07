@@ -22,14 +22,18 @@ const std::vector<const char *> validationLayers = {
 const std::vector<const char *> deviceExtensions = {
     VK_KHR_SWAPCHAIN_EXTENSION_NAME};
 
-#include "stb_image.h"
+#include "Random.hpp"
 
-struct Vertex {
+class Image;
+
+struct Vertex
+{
     glm::vec2 pos;
     glm::vec3 color;
     glm::vec2 texCoord;
 
-    static VkVertexInputBindingDescription getBindingDescription() {
+    static VkVertexInputBindingDescription getBindingDescription()
+    {
         VkVertexInputBindingDescription bindingDescription{};
         bindingDescription.binding = 0;
         bindingDescription.stride = sizeof(Vertex);
@@ -38,7 +42,8 @@ struct Vertex {
         return bindingDescription;
     }
 
-    static std::array<VkVertexInputAttributeDescription, 3> getAttributeDescriptions() {
+    static std::array<VkVertexInputAttributeDescription, 3> getAttributeDescriptions()
+    {
         std::array<VkVertexInputAttributeDescription, 3> attributeDescriptions{};
 
         attributeDescriptions[0].binding = 0;
@@ -64,12 +69,10 @@ const std::vector<Vertex> vertices = {
     {{-0.5f, -0.5f}, {1.0f, 0.0f, 0.0f}, {1.0f, 0.0f}},
     {{0.5f, -0.5f}, {0.0f, 1.0f, 0.0f}, {0.0f, 0.0f}},
     {{0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}, {0.0f, 1.0f}},
-    {{-0.5f, 0.5f}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f}}
-};
+    {{-0.5f, 0.5f}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f}}};
 
 const std::vector<uint16_t> indices = {
-    0, 1, 2, 2, 3, 0
-};
+    0, 1, 2, 2, 3, 0};
 
 class VulkanBackend : public Singleton<VulkanBackend>
 {
@@ -137,12 +140,15 @@ public:
     void SetupVulkan(const char **extensions, uint32_t extensions_count);
 
     void drawFrame();
-    VkPhysicalDevice GetPhysicalDevice();
-    VkDevice GetDevice();
+    VkPhysicalDevice& GetPhysicalDevice();
+    VkDevice& GetDevice();
     VkDescriptorSet ImGui_ImplVulkan_AddTexture(VkSampler sampler, VkImageView image_view, VkImageLayout image_layout);
+    void createDescriptorSets(VkSampler& sampler, VkImageView& image_view);
+    VkImageView createImageView(VkImage& image, VkFormat format);
+
     void SetFrameBufferResized(bool resized) { framebufferResized = resized; }
 
-    Quanta_ImplVulkanH_RenderContext GetRenderContext() { return m_Quanta_ImplVulkanH_RenderContext; }
+    Quanta_ImplVulkanH_RenderContext &GetRenderContext() { return m_Quanta_ImplVulkanH_RenderContext; }
 
 private:
     void recreateSwapChain(Quanta_ImplVulkanH_RenderContext &context);
@@ -170,15 +176,6 @@ private:
 
     void createCommandPool(Quanta_ImplVulkanH_RenderContext &context);
 
-    void createTextureImage();
-    void createTextureImageView();
-    void createTextureSampler();
-    VkImageView createImageView(VkImage image, VkFormat format);
-
-    void createImage(uint32_t width, uint32_t height, VkFormat format, VkImageTiling tiling, VkImageUsageFlags usage, VkMemoryPropertyFlags properties, VkImage &image, VkDeviceMemory &imageMemory);
-    void transitionImageLayout(VkImage image, VkFormat format, VkImageLayout oldLayout, VkImageLayout newLayout);
-    void copyBufferToImage(VkBuffer buffer, VkImage image, uint32_t width, uint32_t height);
-
     void createCommandBuffers(Quanta_ImplVulkanH_RenderContext &context);
 
     void recordCommandBuffer(VkCommandBuffer commandBuffer, Quanta_ImplVulkanH_RenderContext &context);
@@ -204,17 +201,14 @@ private:
 
     void createDescriptorPool();
 
-    void createDescriptorSets(Quanta_ImplVulkanH_RenderContext &context);
-
-    void createBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer &buffer, VkDeviceMemory &bufferMemory);
 
     void copyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size);
 
-    uint32_t findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties);
 
 public:
+    void createBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer &buffer, VkDeviceMemory &bufferMemory);
+    uint32_t findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties);
     VkCommandBuffer beginSingleTimeCommands();
-
     void endSingleTimeCommands(VkCommandBuffer commandBuffer);
 
 private:
@@ -228,6 +222,7 @@ private:
 
     VkShaderModule createShaderModule(const std::vector<char> &code);
 
+private:
     VkAllocationCallbacks *g_Allocator = VK_NULL_HANDLE;
     VkInstance g_Instance = VK_NULL_HANDLE;
     VkPhysicalDevice g_PhysicalDevice = VK_NULL_HANDLE;
@@ -239,10 +234,6 @@ private:
     VkPipelineCache g_PipelineCache = VK_NULL_HANDLE;
     VkDescriptorPool g_DescriptorPool = VK_NULL_HANDLE;
     VkCommandPool commandPool = VK_NULL_HANDLE;
-    VkImage textureImage;
-    VkDeviceMemory textureImageMemory;
-    VkImageView textureImageView;
-    VkSampler textureSampler;
 
     VkBuffer vertexBuffer = VK_NULL_HANDLE;
     VkDeviceMemory vertexBufferMemory = VK_NULL_HANDLE;

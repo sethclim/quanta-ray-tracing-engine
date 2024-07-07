@@ -11,6 +11,8 @@ add_executable(app
     src/VulkanBackend.cpp
     src/Random.hpp
     src/Random.cpp
+    src/Image.hpp
+    src/Image.cpp
 )
 
 target_link_libraries(app PRIVATE quanta)

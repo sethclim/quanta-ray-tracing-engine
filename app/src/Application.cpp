@@ -37,14 +37,15 @@ void Application::Init()
 	const char **extensions = glfwGetRequiredInstanceExtensions(&extensions_count);
 
 	VulkanBackend& vulkanBackend = VulkanBackend::GetInstance();
-	auto& renderContext = vulkanBackend.GetRenderContext();
+	auto& renderContext = VulkanBackend::GetInstance().GetRenderContext();
 
 	glfwGetFramebufferSize(
 		WindowController::GetInstance().GetWindow(),
 		&renderContext.Width,
 		&renderContext.Height);
 
-	vulkanBackend.SetupVulkan(extensions, extensions_count);
+	VulkanBackend::GetInstance().SetupVulkan(extensions, extensions_count);
+
 
 	/*ImGui_ImplVulkanH_Window *wd = &g_MainWindowData;*/
 	// SetupVulkanWindow(wd, surface, w, h);
@@ -85,20 +86,22 @@ void Application::Run()
 
 		glfwPollEvents();
 
-		/*if (!m_Image || vulkanBackend.GetRenderContext().Width != m_Image->GetWidth() || vulkanBackend.GetRenderContext().Height != m_Image->GetHeight())
+		if (!m_Image || VulkanBackend::GetInstance().GetRenderContext().Width != m_Image->GetWidth() || VulkanBackend::GetInstance().GetRenderContext().Height != m_Image->GetHeight())
 		{
-			m_Image = std::make_shared<Image>(vulkanBackend.GetRenderContext().Width, vulkanBackend.GetRenderContext().Height, ImageFormat::RGBA);
+
+			m_Image = std::make_shared<Image>(VulkanBackend::GetInstance().GetRenderContext().Width, VulkanBackend::GetInstance().GetRenderContext().Height, ImageFormat::RGBA);
 			delete[] m_ImageData;
-			m_ImageData = new uint32_t[vulkanBackend.GetRenderContext().Width * vulkanBackend.GetRenderContext().Height];
+			m_ImageData = new uint32_t[VulkanBackend::GetInstance().GetRenderContext().Width * VulkanBackend::GetInstance().GetRenderContext().Height];
 		}
 
-		for (uint32_t i = 0; i < vulkanBackend.GetRenderContext().Width * vulkanBackend.GetRenderContext().Height; i++)
+		for (uint32_t i = 0; i < VulkanBackend::GetInstance().GetRenderContext().Width * VulkanBackend::GetInstance().GetRenderContext().Height; i++)
 		{
 			m_ImageData[i] = Random::UInt();
 			m_ImageData[i] |= 0xff000000;
 		}
 
-		m_Image->SetData(m_ImageData);*/
+		m_Image->SetData(m_ImageData);
+
 
 		VulkanBackend::GetInstance().drawFrame();
 	}
