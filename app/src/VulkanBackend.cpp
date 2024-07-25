@@ -738,11 +738,6 @@ void VulkanBackend::createSyncObjects()
 
 void VulkanBackend::updateUniformBuffer(uint32_t currentImage)
 {
-    static auto startTime = std::chrono::high_resolution_clock::now();
-
-    auto currentTime = std::chrono::high_resolution_clock::now();
-    float time = std::chrono::duration<float, std::chrono::seconds::period>(currentTime - startTime).count();
-
     UniformBufferObject ubo{};
     ubo.model = glm::mat4(1.0f);
     ubo.view = glm::mat4(1.0f);

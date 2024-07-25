@@ -10,7 +10,7 @@ static std::vector<std::vector<std::function<void()>>> s_ResourceFreeQueue;
 
 static uint32_t s_CurrentFrameIndex = 0;
 
-Application::Application()
+Application::Application(): doMath(0,0)
 {
 	Init();
 }
@@ -26,6 +26,7 @@ void Application::Init()
 	glfwSetErrorCallback(glfw_error_callback);
 
 	WindowController::GetInstance().NewWindow();
+
 
 	// Setup Vulkan
 	if (!glfwVulkanSupported())
@@ -52,6 +53,7 @@ void Application::Init()
 
 	// s_AllocatedCommandBuffers.resize(wd->ImageCount);
 	// s_ResourceFreeQueue.resize(wd->ImageCount);
+	doMath = DoMath(VulkanBackend::GetInstance().GetRenderContext().Width, VulkanBackend::GetInstance().GetRenderContext().Height);
 }
 
 void Application::Run()
@@ -63,6 +65,7 @@ void Application::Run()
 	m_Running = true;
 
 	VulkanBackend& vulkanBackend = VulkanBackend::GetInstance();
+
 
 	while (glfwWindowShouldClose(WindowController::GetInstance().GetWindow()) == 0 && m_Running)
 	{
@@ -94,10 +97,15 @@ void Application::Run()
 			m_ImageData = new uint32_t[VulkanBackend::GetInstance().GetRenderContext().Width * VulkanBackend::GetInstance().GetRenderContext().Height];
 		}
 
-		for (uint32_t i = 0; i < VulkanBackend::GetInstance().GetRenderContext().Width * VulkanBackend::GetInstance().GetRenderContext().Height; i++)
+		for (uint32_t y = 0; y < VulkanBackend::GetInstance().GetRenderContext().Height; y++)
 		{
-			m_ImageData[i] = Random::UInt();
-			m_ImageData[i] |= 0xff000000;
+			for (uint32_t x = 0; x < VulkanBackend::GetInstance().GetRenderContext().Width; x++)
+			{
+				uint32_t idx = x + (y * VulkanBackend::GetInstance().GetRenderContext().Width);
+
+				m_ImageData[idx] = doMath.checkRay(x, y);
+				m_ImageData[idx] |= 0xff000000;
+			}
 		}
 
 		m_Image->SetData(m_ImageData);

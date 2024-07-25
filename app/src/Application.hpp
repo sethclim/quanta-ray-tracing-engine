@@ -42,6 +42,8 @@ private:
 
 	 std::shared_ptr<Image> m_Image;
 	 uint32_t *m_ImageData = nullptr;
+
+	 DoMath doMath;
 };
 
 #endif
