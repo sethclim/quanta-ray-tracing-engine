@@ -10,16 +10,7 @@ const uint32_t BLACK = 0x00000000;
 class DoMath
 {
 public:
-    DoMath(int width, int height)
-    {
-        m_width = width;
-        m_height = height;
-    }
+    DoMath(){}
 
-    int add(int a, int b);
-
-    uint32_t checkRay(int x, int y);
-
-private:
-    int m_width, m_height;
+    uint32_t checkRay(float x, float y);
 };

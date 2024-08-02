@@ -1,38 +1,45 @@
 #include "quanta.hpp"
 
-int DoMath::add(int a, int b)
+
+static uint32_t ConvertToRGBA(const Math::Vector3<float>& color)
 {
-    return a + b;
+    uint8_t r = (color.x * 255.0f);
+    uint8_t g = (color.y * 255.0f);
+    uint8_t b = (color.z * 255.0f);
+    uint8_t a = (255.0f);
+
+    return (a << 24) | (b << 16) | (g << 8) | r;
 }
 
-uint32_t DoMath::checkRay(int image_x, int image_y)
+uint32_t DoMath::checkRay(float image_x, float image_y)
 {
     // convert to 0,0 in the centre
-    int coordX = image_x - ((float)m_width / 2);
-    int coordY = image_y - ((float)m_height / 2);
+    float coordX = image_x * 2.0f - 1.0f;
+    float coordY = image_y * 2.0f - 1.0f;
 
-    Vector3<int> screenCoord3d = Vector3<int>(coordX, coordY, 10);
+    Math::Vector3<float> rayOrigin = Math::Vector3<float>(0.0f, 0.0f, 2.0f);
+    Math::Vector3<float> rayDir = Math::Vector3<float>(coordX, coordY, -1.0f);
 
-    int r = 9;
+    float r = 0.5;
 
-    Vector3<int> cameraPosition = Vector3<int>(0, 0, -10);
-
-    Vector3<int> rayDir = cameraPosition - screenCoord3d;
-
-    int a = (rayDir.x * rayDir.x) + (rayDir.y * rayDir.y) + (rayDir.z * rayDir.z);
-    int b = (2 * cameraPosition.x * rayDir.x) + (2 * cameraPosition.y * rayDir.y) + (2 * cameraPosition.z * rayDir.z);
-    float c = (cameraPosition.x * cameraPosition.x) + (cameraPosition.y * cameraPosition.y) + (cameraPosition.z * cameraPosition.z) - (r * r);
+    float a = Math::LengthSquared(rayDir);
+    float b = 2.0f * Math::Dot(rayOrigin, rayDir); 
+    float c = Math::LengthSquared(rayOrigin) - Math::Sqr(r);
 
     // int ans = (-b + sqrt((b * b) - (4 * a * c))) / (2 * a);
-    float discriminant = (b * b) - (4 * a * c);
+    float discriminant = Math::Sqr(b) - 4.0f * a * c;
 
-    // if intersects draw red
-    if (discriminant >= 0)
-    {
-        return RED;
-    }
-    else
-    {
+    if (discriminant < 0.0f)
         return BLACK;
-    }
+
+    float t0 = (-b + std::sqrt(discriminant)) / (2.0f * a);
+    float t1 = (-b - std::sqrt(discriminant)) / (2.0f * a);
+
+    Math::Vector3<float> hitPoint = rayOrigin + rayDir * t1;
+
+    Math::Vector3<float> normal = Math::Normalize(hitPoint);
+
+    Math::Vector3<float> res = Math::Clamp(normal, 0.0f, 1.0f);
+
+    return ConvertToRGBA(res);
 }

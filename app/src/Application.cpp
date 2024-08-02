@@ -10,7 +10,7 @@ static std::vector<std::vector<std::function<void()>>> s_ResourceFreeQueue;
 
 static uint32_t s_CurrentFrameIndex = 0;
 
-Application::Application(): doMath(0,0)
+Application::Application(): doMath()
 {
 	Init();
 }
@@ -53,7 +53,6 @@ void Application::Init()
 
 	// s_AllocatedCommandBuffers.resize(wd->ImageCount);
 	// s_ResourceFreeQueue.resize(wd->ImageCount);
-	doMath = DoMath(VulkanBackend::GetInstance().GetRenderContext().Width, VulkanBackend::GetInstance().GetRenderContext().Height);
 }
 
 void Application::Run()
@@ -101,10 +100,12 @@ void Application::Run()
 		{
 			for (uint32_t x = 0; x < VulkanBackend::GetInstance().GetRenderContext().Width; x++)
 			{
-				uint32_t idx = x + (y * VulkanBackend::GetInstance().GetRenderContext().Width);
 
-				m_ImageData[idx] = doMath.checkRay(x, y);
-				m_ImageData[idx] |= 0xff000000;
+				float normalizedX = (float)x / (float)VulkanBackend::GetInstance().GetRenderContext().Width;
+				float normalizedY = (float)y / (float)VulkanBackend::GetInstance().GetRenderContext().Height;
+
+				uint32_t idx = x + (y * VulkanBackend::GetInstance().GetRenderContext().Width);
+				m_ImageData[idx] = doMath.checkRay(normalizedX, normalizedY);
 			}
 		}
 
