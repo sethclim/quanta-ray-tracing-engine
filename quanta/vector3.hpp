@@ -1,3 +1,4 @@
+#pragma once;
 
 namespace Math
 {
@@ -64,9 +65,9 @@ namespace Math
             return res;
         }
 
-        Vector3 operator*(T const &scale)
+        Vector3<T> operator*(T const &scale)
         {
-            Vector3 res = Vector3();
+            Vector3<T> res = Vector3<T>();
             res.x = x * scale;
             res.y = y * scale;
             res.z = z * scale;

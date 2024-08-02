@@ -17,13 +17,12 @@
 
 #include <vulkan/vulkan.h>
 
-
-#define M_ASSERT(_cond, _msg)           \
-    if (!(_cond))                       \
-    {                                   \
-        LogError(_msg);                 \
-        std::abort();                   \
-        glfwTerminate();                \
+#define M_ASSERT(_cond, _msg) \
+    if (!(_cond))             \
+    {                         \
+        LogError(_msg);       \
+        std::abort();         \
+        glfwTerminate();      \
     }
 
 #define M_ARRAYSIZE(_ARR) ((int)(sizeof(_ARR) / sizeof(*_ARR)))

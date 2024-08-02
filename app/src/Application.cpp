@@ -10,7 +10,7 @@ static std::vector<std::vector<std::function<void()>>> s_ResourceFreeQueue;
 
 static uint32_t s_CurrentFrameIndex = 0;
 
-Application::Application(): doMath()
+Application::Application()
 {
 	Init();
 }
@@ -27,6 +27,16 @@ void Application::Init()
 
 	WindowController::GetInstance().NewWindow();
 
+	{
+		Scene::SceneGraph scene;
+
+		Scene::Shapes::Sphere sphere;
+		sphere.Origin = Math::Vector3<float>(0, 0, 0);
+
+		scene.Spheres.push_back(sphere);
+
+		renderer = std::make_unique<Renderer>(scene);
+	}
 
 	// Setup Vulkan
 	if (!glfwVulkanSupported())
@@ -105,7 +115,7 @@ void Application::Run()
 				float normalizedY = (float)y / (float)VulkanBackend::GetInstance().GetRenderContext().Height;
 
 				uint32_t idx = x + (y * VulkanBackend::GetInstance().GetRenderContext().Width);
-				m_ImageData[idx] = doMath.checkRay(normalizedX, normalizedY);
+				m_ImageData[idx] = renderer->PerPixel(normalizedX, normalizedY);
 			}
 		}
 
