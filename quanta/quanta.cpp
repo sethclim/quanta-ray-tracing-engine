@@ -35,9 +35,11 @@ Math::Vector3<float> Renderer::TraceRay(const Ray &ray)
     {
         Scene::Shapes::Sphere sphere = m_Scene.Spheres[i];
 
+        Math::Vector3<float> offsetRayOrigin = (Math::Vector3<float>)ray.Origin - sphere.Origin;
+
         float a = Math::LengthSquared(ray.Direction);
-        float b = 2.0f * Math::Dot(ray.Origin, ray.Direction);
-        float c = Math::LengthSquared(ray.Origin) - Math::Sqr(sphere.Radius);
+        float b = 2.0f * Math::Dot(offsetRayOrigin, ray.Direction);
+        float c = Math::LengthSquared(offsetRayOrigin) - Math::Sqr(sphere.Radius);
 
         float discriminant = Math::Sqr(b) - 4.0f * a * c;
 

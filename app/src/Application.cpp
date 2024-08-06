@@ -31,7 +31,7 @@ void Application::Init()
 		Scene::SceneGraph scene;
 
 		Scene::Shapes::Sphere sphere;
-		sphere.Origin = Math::Vector3<float>(0, 0, 0);
+		sphere.Origin = Math::Vector3<float>(1, 2, 0);
 
 		scene.Spheres.push_back(sphere);
 
