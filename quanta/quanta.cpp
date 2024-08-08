@@ -10,6 +10,8 @@ static uint32_t ConvertToRGBA(const Math::Vector3<float> &color)
     return (a << 24) | (b << 16) | (g << 8) | r;
 }
 
+const int MAX_BOUNCES = 3;
+
 uint32_t Renderer::PerPixel(float image_x, float image_y)
 {
     // convert to 0,0 in the centre
@@ -20,16 +22,34 @@ uint32_t Renderer::PerPixel(float image_x, float image_y)
     ray.Origin = Math::Vector3<float>(0.0f, 0.0f, 2.0f);
     ray.Direction = Math::Vector3<float>(coordX, coordY, -1.0f);
 
-    Math::Vector3<float> hitPoint = TraceRay(ray);
+    Math::Vector3<float> incomingLight = Math::Vector3<float>(0, 0, 0);
+    Math::Vector3<float> rayColor = Math::Vector3<float>(1, 1, 1);
 
-    Math::Vector3<float> normal = Math::Normalize(hitPoint);
+    for (int i = 0; i < MAX_BOUNCES; i++)
+    {
+        HitInfo info = TraceRay(ray);
 
-    Math::Vector3<float> res = Math::Clamp(normal, 0.0f, 1.0f);
+        if (info.HitPoint == Math::Vector3<float>(-1, -1, -1))
+        {
+            break;
+        }
 
-    return ConvertToRGBA(res);
+        ray.Origin = info.HitPoint;
+        ray.Direction = info.Normal;
+
+        Math::Vector3<float> emittedLight = info.Material.EmissionColor * info.Material.EmissionStrength;
+
+        incomingLight += emittedLight * rayColor;
+
+        rayColor *= info.Material.Color;
+
+        Math::Vector3<float> res = Math::Clamp(info.Normal, 0.0f, 1.0f);
+    }
+
+    return ConvertToRGBA(incomingLight);
 }
 
-Math::Vector3<float> Renderer::TraceRay(const Ray &ray)
+HitInfo Renderer::TraceRay(const Ray &ray)
 {
     for (int i = 0; i < m_Scene.Spheres.size(); i++)
     {
@@ -50,10 +70,19 @@ Math::Vector3<float> Renderer::TraceRay(const Ray &ray)
         float t0 = (-b + std::sqrt(discriminant)) / (2.0f * a);
         float t1 = (-b - std::sqrt(discriminant)) / (2.0f * a);
 
-        Math::Vector3<float> hitPoint = (Math::Vector3<float>)ray.Origin + (Math::Vector3<float>)ray.Direction * t1;
-        return hitPoint;
+        HitInfo hitInfo;
+
+        hitInfo.HitPoint = (Math::Vector3<float>)ray.Origin + (Math::Vector3<float>)ray.Direction * t1;
+
+        hitInfo.Normal = Math::Normalize(hitInfo.HitPoint - sphere.Origin);
+
+        hitInfo.Material = sphere.Material;
+
+        return hitInfo;
     }
 
+    HitInfo hitInfo;
+    hitInfo.HitPoint = Math::Vector3<float>(-1,-1,-1);
     // All misses
-    return Math::Vector3<float>(0, 0, 0);
+    return hitInfo;
 }

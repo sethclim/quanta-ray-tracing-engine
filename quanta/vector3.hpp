@@ -38,6 +38,14 @@ namespace Math
             return res;
         }
 
+
+        void operator+=(Vector3<T> const& obj)
+        {
+            x = x + obj.x;
+            y = y + obj.y;
+            z = z + obj.z;
+        }
+
         Vector3 operator-(Vector3 const &obj)
         {
             Vector3 res = Vector3();
@@ -54,6 +62,13 @@ namespace Math
             res.y = y * obj.y;
             res.z = z * obj.z;
             return res;
+        }
+
+        void operator*=(Vector3 const& obj)
+        {
+            x = x * obj.x;
+            y = y * obj.y;
+            z = z * obj.z;
         }
 
         Vector3 operator/(Vector3 const& obj)
@@ -81,6 +96,11 @@ namespace Math
             res.y = y / scale;
             res.z = z / scale;
             return res;
+        }
+
+        bool operator==(Vector3<T> const& obj)
+        {
+            return x == obj.x && y == obj.y && z == obj.z;
         }
     };
 

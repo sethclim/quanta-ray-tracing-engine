@@ -30,10 +30,26 @@ void Application::Init()
 	{
 		Scene::SceneGraph scene;
 
+		Scene::Material mat;
+		mat.Color = Math::Vector3<float>(0, 0, 1);
+		mat.EmissionColor = Math::Vector3<float>(1, 1, 1);
+		mat.EmissionStrength = 0.2f;
+
+		Scene::Material mat2;
+		mat2.Color = Math::Vector3<float>(1, 1, 0);
+		mat2.EmissionColor = Math::Vector3<float>(1, 1, 1);
+		mat2.EmissionStrength = 0.3f;
+
 		Scene::Shapes::Sphere sphere;
-		sphere.Origin = Math::Vector3<float>(1, 2, 0);
+		sphere.Origin = Math::Vector3<float>(0, 0, 0);
+		sphere.Material = mat;
+
+		Scene::Shapes::Sphere sphere2;
+		sphere2.Origin = Math::Vector3<float>(1, 1, 0);
+		sphere2.Material = mat2;
 
 		scene.Spheres.push_back(sphere);
+		scene.Spheres.push_back(sphere2);
 
 		renderer = std::make_unique<Renderer>(scene);
 	}
