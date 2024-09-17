@@ -40,6 +40,16 @@ void Application::Init()
 		mat2.EmissionColor = Math::Vector3<float>(1, 1, 1);
 		mat2.EmissionStrength = 0.3f;
 
+		Scene::Material mat3;
+		mat3.Color = Math::Vector3<float>(1, 1, 1);
+		mat3.EmissionColor = Math::Vector3<float>(1, 1, 1);
+		mat3.EmissionStrength = 0.0f;
+
+		Scene::Material mat4;
+		mat4.Color = Math::Vector3<float>(1, 1, 1);
+		mat4.EmissionColor = Math::Vector3<float>(1, 1, 1);
+		mat4.EmissionStrength = 4.0f;
+
 		Scene::Shapes::Sphere sphere;
 		sphere.Origin = Math::Vector3<float>(0, 0, 0);
 		sphere.Material = mat;
@@ -48,8 +58,20 @@ void Application::Init()
 		sphere2.Origin = Math::Vector3<float>(1, 1, 0);
 		sphere2.Material = mat2;
 
+		Scene::Shapes::Sphere sphere3;
+		sphere3.Origin = Math::Vector3<float>(1, -2, 1);
+		sphere3.Material = mat3;
+		sphere3.Radius = 1.8f;
+
+		Scene::Shapes::Sphere sphere4;
+		sphere4.Origin = Math::Vector3<float>(-2, 1.4, 1);
+		sphere4.Material = mat4;
+		sphere4.Radius = 1.0f;
+
 		scene.Spheres.push_back(sphere);
 		scene.Spheres.push_back(sphere2);
+		scene.Spheres.push_back(sphere3);
+		scene.Spheres.push_back(sphere4);
 
 		renderer = std::make_unique<Renderer>(scene);
 	}

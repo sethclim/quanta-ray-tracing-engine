@@ -10,6 +10,18 @@ static uint32_t ConvertToRGBA(const Math::Vector3<float> &color)
     return (a << 24) | (b << 16) | (g << 8) | r;
 }
 
+/// <summary>
+/// Finds the reflected ray
+/// </summary>
+/// <param name="N">Normal</param>
+/// <param name="Ri">Incident Ray</param>
+/// <returns>reflected ray</returns>
+Math::Vector3<float> Reflect(Math::Vector3<float> &N, Math::Vector3<float> &Ri)
+{
+    // Rr = Ri - 2 N (Ri . N)
+    return Ri - (N * 2.0f * Math::Dot(Ri, N));
+}
+
 const int MAX_BOUNCES = 3;
 
 uint32_t Renderer::PerPixel(float image_x, float image_y)
@@ -35,9 +47,10 @@ uint32_t Renderer::PerPixel(float image_x, float image_y)
         }
 
         ray.Origin = info.HitPoint;
-        ray.Direction = info.Normal;
+        ray.Direction = Reflect(info.Normal, ray.Direction);
 
-        Math::Vector3<float> emittedLight = info.Material.EmissionColor * info.Material.EmissionStrength;
+        Math::Vector3<float>
+            emittedLight = info.Material.EmissionColor * info.Material.EmissionStrength;
 
         incomingLight += emittedLight * rayColor;
 
@@ -82,7 +95,7 @@ HitInfo Renderer::TraceRay(const Ray &ray)
     }
 
     HitInfo hitInfo;
-    hitInfo.HitPoint = Math::Vector3<float>(-1,-1,-1);
+    hitInfo.HitPoint = Math::Vector3<float>(-1, -1, -1);
     // All misses
     return hitInfo;
 }
