@@ -22,7 +22,7 @@ Math::Vector3<float> Reflect(Math::Vector3<float> &N, Math::Vector3<float> &Ri)
     return Ri - (N * 2.0f * Math::Dot(Ri, N));
 }
 
-const int MAX_BOUNCES = 3;
+const int MAX_BOUNCES = 1;
 
 uint32_t Renderer::PerPixel(float image_x, float image_y)
 {
@@ -46,18 +46,30 @@ uint32_t Renderer::PerPixel(float image_x, float image_y)
             break;
         }
 
-        ray.Origin = info.HitPoint;
+        if (info.ObjectID == 22)
+            std::cout << "[Hit] index: " << i << " ID: " << info.ObjectID << " " << image_x << " " << image_y << std::endl;
+
+
+        ray.Origin = (info.HitPoint + 0.001f);
         ray.Direction = Reflect(info.Normal, ray.Direction);
+
+        //std::cout << "ray.Direction: " << ray.Direction.ToString() << std::endl;
 
         Math::Vector3<float>
             emittedLight = info.Material.EmissionColor * info.Material.EmissionStrength;
 
         incomingLight += emittedLight * rayColor;
+        //incomingLight = emittedLight;
 
         rayColor *= info.Material.Color;
 
+        /*if (info.ObjectID == 0)
+            std::cout << "Hit: id " << i << " " << info.ObjectID << incomingLight.ToString() << std::endl;*/
+
         Math::Vector3<float> res = Math::Clamp(info.Normal, 0.0f, 1.0f);
     }
+
+
 
     return ConvertToRGBA(incomingLight);
 }
@@ -90,6 +102,8 @@ HitInfo Renderer::TraceRay(const Ray &ray)
         hitInfo.Normal = Math::Normalize(hitInfo.HitPoint - sphere.Origin);
 
         hitInfo.Material = sphere.Material;
+
+        hitInfo.ObjectID = sphere.id;
 
         return hitInfo;
     }

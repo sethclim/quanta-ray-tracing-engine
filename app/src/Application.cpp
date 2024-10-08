@@ -33,44 +33,48 @@ void Application::Init()
 		Scene::Material mat;
 		mat.Color = Math::Vector3<float>(0, 0, 1);
 		mat.EmissionColor = Math::Vector3<float>(1, 1, 1);
-		mat.EmissionStrength = 0.2f;
+		mat.EmissionStrength = 0.0f;
 
 		Scene::Material mat2;
 		mat2.Color = Math::Vector3<float>(1, 1, 0);
 		mat2.EmissionColor = Math::Vector3<float>(1, 1, 1);
-		mat2.EmissionStrength = 0.3f;
+		mat2.EmissionStrength = 0.0f;
 
 		Scene::Material mat3;
 		mat3.Color = Math::Vector3<float>(1, 1, 1);
 		mat3.EmissionColor = Math::Vector3<float>(1, 1, 1);
 		mat3.EmissionStrength = 0.0f;
 
-		Scene::Material mat4;
-		mat4.Color = Math::Vector3<float>(1, 1, 1);
-		mat4.EmissionColor = Math::Vector3<float>(1, 1, 1);
-		mat4.EmissionStrength = 4.0f;
+		Scene::Material lightMaterial;
+		lightMaterial.Color = Math::Vector3<float>(1, 1, 1);
+		lightMaterial.EmissionColor = Math::Vector3<float>(1, 1, 1);
+		lightMaterial.EmissionStrength = 10.0f;
 
 		Scene::Shapes::Sphere sphere;
 		sphere.Origin = Math::Vector3<float>(0, 0, 0);
 		sphere.Material = mat;
+		sphere.id = 0;
 
-		Scene::Shapes::Sphere sphere2;
+	/*	Scene::Shapes::Sphere sphere2;
 		sphere2.Origin = Math::Vector3<float>(1, 1, 0);
 		sphere2.Material = mat2;
+		sphere2.id = 1;
 
 		Scene::Shapes::Sphere sphere3;
 		sphere3.Origin = Math::Vector3<float>(1, -2, 1);
 		sphere3.Material = mat3;
 		sphere3.Radius = 1.8f;
+		sphere3.id = 2;*/
 
 		Scene::Shapes::Sphere sphere4;
 		sphere4.Origin = Math::Vector3<float>(-2, 1.4, 1);
-		sphere4.Material = mat4;
+		sphere4.Material = lightMaterial;
 		sphere4.Radius = 1.0f;
+		sphere4.id = 2222;
 
 		scene.Spheres.push_back(sphere);
-		scene.Spheres.push_back(sphere2);
-		scene.Spheres.push_back(sphere3);
+		//scene.Spheres.push_back(sphere2);
+		//scene.Spheres.push_back(sphere3);
 		scene.Spheres.push_back(sphere4);
 
 		renderer = std::make_unique<Renderer>(scene);
@@ -85,8 +89,8 @@ void Application::Init()
 	uint32_t extensions_count = 0;
 	const char **extensions = glfwGetRequiredInstanceExtensions(&extensions_count);
 
-	VulkanBackend& vulkanBackend = VulkanBackend::GetInstance();
-	auto& renderContext = VulkanBackend::GetInstance().GetRenderContext();
+	VulkanBackend &vulkanBackend = VulkanBackend::GetInstance();
+	auto &renderContext = VulkanBackend::GetInstance().GetRenderContext();
 
 	glfwGetFramebufferSize(
 		WindowController::GetInstance().GetWindow(),
@@ -94,7 +98,6 @@ void Application::Init()
 		&renderContext.Height);
 
 	VulkanBackend::GetInstance().SetupVulkan(extensions, extensions_count);
-
 
 	/*ImGui_ImplVulkanH_Window *wd = &g_MainWindowData;*/
 	// SetupVulkanWindow(wd, surface, w, h);
@@ -111,8 +114,7 @@ void Application::Run()
 
 	m_Running = true;
 
-	VulkanBackend& vulkanBackend = VulkanBackend::GetInstance();
-
+	VulkanBackend &vulkanBackend = VulkanBackend::GetInstance();
 
 	while (glfwWindowShouldClose(WindowController::GetInstance().GetWindow()) == 0 && m_Running)
 	{
@@ -158,7 +160,6 @@ void Application::Run()
 		}
 
 		m_Image->SetData(m_ImageData);
-
 
 		VulkanBackend::GetInstance().drawFrame();
 	}

@@ -1,5 +1,7 @@
 #pragma once;
 
+#include <string>
+
 namespace Math
 {
     template <typename T>
@@ -98,9 +100,25 @@ namespace Math
             return res;
         }
 
+        Vector3 operator+(T const& scale)
+        {
+            Vector3 res = Vector3();
+            res.x = x + scale;
+            res.y = y + scale;
+            res.z = z + scale;
+            return res;
+        }
+
         bool operator==(Vector3<T> const& obj)
         {
             return x == obj.x && y == obj.y && z == obj.z;
+        }
+
+        std::string ToString()
+        {
+            std::ostringstream os;
+            os << "{x: " << x << " y: " << y << " z: " << z << " }\n";
+            return os.str();
         }
     };
 

@@ -18,6 +18,7 @@ namespace Scene
             float Radius = 0.5f;
             Math::Vector3<float> Origin;
             Material Material;
+            int id;
         };
     }
 }
