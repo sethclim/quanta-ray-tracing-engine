@@ -9,6 +9,9 @@
 #include "VulkanBackend.hpp"
 #include "Random.hpp"
 #include "image.hpp"
+#include "../../editor/editor.hpp"
+
+//#include "MapleUI/maple.hpp"
 
 void check_vk_result(VkResult err);
 
@@ -40,10 +43,11 @@ private:
 	// VulkanBackend& m_VulkanBackend;
 	// VulkanBackend::Quanta_ImplVulkanH_RenderContext m_Quanta_ImplVulkanH_RenderContext;
 
-	 std::shared_ptr<Image> m_Image;
-	 uint32_t *m_ImageData = nullptr;
+	std::shared_ptr<Image> m_Image;
+	uint32_t *m_ImageData = nullptr;
 
-	 std::unique_ptr<Renderer> renderer;
+	std::unique_ptr<Renderer> renderer;
+	Editor editor;
 };
 
 #endif

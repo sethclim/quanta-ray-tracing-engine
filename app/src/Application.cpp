@@ -21,12 +21,12 @@ Application::~Application()
 }
 
 void Application::Init()
-{
-	// Setup GLFW window
+{ // Setup GLFW window
 	glfwSetErrorCallback(glfw_error_callback);
 
 	WindowController::GetInstance().NewWindow();
 
+	editor = Editor();
 	{
 		Scene::SceneGraph scene;
 
@@ -55,16 +55,16 @@ void Application::Init()
 		sphere.Material = mat;
 		sphere.id = 0;
 
-	/*	Scene::Shapes::Sphere sphere2;
-		sphere2.Origin = Math::Vector3<float>(1, 1, 0);
-		sphere2.Material = mat2;
-		sphere2.id = 1;
+		/*	Scene::Shapes::Sphere sphere2;
+			sphere2.Origin = Math::Vector3<float>(1, 1, 0);
+			sphere2.Material = mat2;
+			sphere2.id = 1;
 
-		Scene::Shapes::Sphere sphere3;
-		sphere3.Origin = Math::Vector3<float>(1, -2, 1);
-		sphere3.Material = mat3;
-		sphere3.Radius = 1.8f;
-		sphere3.id = 2;*/
+			Scene::Shapes::Sphere sphere3;
+			sphere3.Origin = Math::Vector3<float>(1, -2, 1);
+			sphere3.Material = mat3;
+			sphere3.Radius = 1.8f;
+			sphere3.id = 2;*/
 
 		Scene::Shapes::Sphere sphere4;
 		sphere4.Origin = Math::Vector3<float>(-2, 1.4, 1);
@@ -73,8 +73,8 @@ void Application::Init()
 		sphere4.id = 2222;
 
 		scene.Spheres.push_back(sphere);
-		//scene.Spheres.push_back(sphere2);
-		//scene.Spheres.push_back(sphere3);
+		// scene.Spheres.push_back(sphere2);
+		// scene.Spheres.push_back(sphere3);
 		scene.Spheres.push_back(sphere4);
 
 		renderer = std::make_unique<Renderer>(scene);
@@ -137,27 +137,30 @@ void Application::Run()
 		// glfwSwapBuffers(WindowController::GetInstance().GetWindow());
 
 		glfwPollEvents();
+		std::vector<int> dimensions = editor.CalculateLayout(
+			VulkanBackend::GetInstance().GetRenderContext().Width, 
+			VulkanBackend::GetInstance().GetRenderContext().Height);
 
-		if (!m_Image || VulkanBackend::GetInstance().GetRenderContext().Width != m_Image->GetWidth() || VulkanBackend::GetInstance().GetRenderContext().Height != m_Image->GetHeight())
+		if (!m_Image || dimensions[0] != m_Image->GetWidth() || dimensions[1] != m_Image->GetHeight())
 		{
 
-			m_Image = std::make_shared<Image>(VulkanBackend::GetInstance().GetRenderContext().Width, VulkanBackend::GetInstance().GetRenderContext().Height, ImageFormat::RGBA);
+			m_Image = std::make_shared<Image>(dimensions[0], dimensions[1], ImageFormat::RGBA);
 			delete[] m_ImageData;
-			m_ImageData = new uint32_t[VulkanBackend::GetInstance().GetRenderContext().Width * VulkanBackend::GetInstance().GetRenderContext().Height];
+			m_ImageData = new uint32_t[dimensions[0] * dimensions[1]];
 		}
 
-		for (uint32_t y = 0; y < VulkanBackend::GetInstance().GetRenderContext().Height; y++)
-		{
-			for (uint32_t x = 0; x < VulkanBackend::GetInstance().GetRenderContext().Width; x++)
-			{
+		 for (uint32_t y = 0; y < dimensions[1]; y++)
+		 {
+		 	for (uint32_t x = 0; x < dimensions[0]; x++)
+		 	{
 
-				float normalizedX = (float)x / (float)VulkanBackend::GetInstance().GetRenderContext().Width;
-				float normalizedY = (float)y / (float)VulkanBackend::GetInstance().GetRenderContext().Height;
+		 		float normalizedX = (float)x / (float)dimensions[0];
+		 		float normalizedY = (float)y / (float)dimensions[1];
 
-				uint32_t idx = x + (y * VulkanBackend::GetInstance().GetRenderContext().Width);
-				m_ImageData[idx] = renderer->PerPixel(normalizedX, normalizedY);
-			}
-		}
+		 		uint32_t idx = x + (y * dimensions[0]);
+		 		m_ImageData[idx] = renderer->PerPixel(normalizedX, normalizedY);
+		 	}
+		 }
 
 		m_Image->SetData(m_ImageData);
 
