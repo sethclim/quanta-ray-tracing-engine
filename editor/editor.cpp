@@ -1,7 +1,10 @@
 #include "Editor.hpp"
 #include "MapleUI/maple.hpp"
 
-Editor::Editor() : maple(new Maple()){ }
+Editor::Editor() : maple(new Maple())
+{
+
+}
 
 std::vector<int> Editor::CalculateLayout(int width, int height)
 {
@@ -11,9 +14,13 @@ std::vector<int> Editor::CalculateLayout(int width, int height)
 	return dimensions;
 }
 
-std::vector<int> Editor::RenderEditor()
+DrawData Editor::RenderEditor()
 {
-	std::vector<int> yo;
-	yo.emplace_back(200);
-	return yo;
+	DrawData dd;
+
+	dd.vertices = vertices;
+	dd.indices = indices;
+
+
+	return dd;
 }

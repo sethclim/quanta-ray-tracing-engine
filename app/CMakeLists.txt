@@ -21,7 +21,7 @@ add_executable(app
 
 target_link_libraries(app PRIVATE quanta)
 target_link_libraries(app PRIVATE glfw)
-target_link_libraries(app PRIVATE editor)
+target_link_libraries(app PUBLIC editor)
 target_link_libraries(app PRIVATE glm::glm-header-only)
 # target_link_libraries(app PRIVATE MapleUI::mapleui)
 

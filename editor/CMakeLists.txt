@@ -53,3 +53,11 @@ message(STATUS "MapleUI::MapleUI Target Type: ${TARGET_TYPE}")
 target_include_directories(editor PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/")
 # target_include_directories(editor PUBLIC ${MapleUI_INCLUDE_DIRS})
 target_link_libraries(editor PRIVATE  MapleUI::mapleui)
+
+target_link_libraries(editor PRIVATE  app)
+target_link_libraries(editor PRIVATE glm::glm-header-only)
+
+find_package(Vulkan REQUIRED)
+target_link_libraries(editor PRIVATE Vulkan::Vulkan)
+
+target_link_libraries(editor PRIVATE glfw)

@@ -26,7 +26,10 @@ void Application::Init()
 
 	WindowController::GetInstance().NewWindow();
 
-	editor = Editor();
+	editor = std::make_unique <Editor>();
+
+	DrawData drawData = editor->RenderEditor();
+
 	{
 		Scene::SceneGraph scene;
 
@@ -97,7 +100,7 @@ void Application::Init()
 		&renderContext.Width,
 		&renderContext.Height);
 
-	VulkanBackend::GetInstance().SetupVulkan(extensions, extensions_count);
+	VulkanBackend::GetInstance().SetupVulkan(extensions, extensions_count, drawData.vertices, drawData.indices);
 
 	/*ImGui_ImplVulkanH_Window *wd = &g_MainWindowData;*/
 	// SetupVulkanWindow(wd, surface, w, h);
@@ -137,17 +140,17 @@ void Application::Run()
 		// glfwSwapBuffers(WindowController::GetInstance().GetWindow());
 
 		glfwPollEvents();
-		std::vector<int> dimensions = editor.CalculateLayout(
-			VulkanBackend::GetInstance().GetRenderContext().Width, 
-			VulkanBackend::GetInstance().GetRenderContext().Height);
+		std::vector<int> dimensions = editor->CalculateLayout(
+		 	VulkanBackend::GetInstance().GetRenderContext().Width,
+		 	VulkanBackend::GetInstance().GetRenderContext().Height);
 
-		if (!m_Image || dimensions[0] != m_Image->GetWidth() || dimensions[1] != m_Image->GetHeight())
-		{
+		 if (!m_Image || dimensions[0] != m_Image->GetWidth() || dimensions[1] != m_Image->GetHeight())
+		 {
 
-			m_Image = std::make_shared<Image>(dimensions[0], dimensions[1], ImageFormat::RGBA);
-			delete[] m_ImageData;
-			m_ImageData = new uint32_t[dimensions[0] * dimensions[1]];
-		}
+		 	m_Image = std::make_shared<Image>(dimensions[0], dimensions[1], ImageFormat::RGBA);
+		 	delete[] m_ImageData;
+		 	m_ImageData = new uint32_t[dimensions[0] * dimensions[1]];
+		 }
 
 		 for (uint32_t y = 0; y < dimensions[1]; y++)
 		 {
@@ -163,8 +166,8 @@ void Application::Run()
 		 }
 
 		m_Image->SetData(m_ImageData);
-
-		VulkanBackend::GetInstance().drawFrame();
+		DrawData drawData = editor->RenderEditor();
+		VulkanBackend::GetInstance().drawFrame(drawData.indices);
 	}
 
 	// m_gameController->CleanUp();

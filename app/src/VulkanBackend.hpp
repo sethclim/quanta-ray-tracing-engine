@@ -4,9 +4,9 @@
 #include "StandardIncludes.hpp"
 #include "WindowController.hpp"
 
-//#define GLM_FORCE_RADIANS
+// #define GLM_FORCE_RADIANS
 #include <glm/glm.hpp>
-//#include <glm/gtc/matrix_transform.hpp>
+// #include <glm/gtc/matrix_transform.hpp>
 
 const int MAX_FRAMES_IN_FLIGHT = 2;
 
@@ -64,15 +64,22 @@ struct Vertex
         return attributeDescriptions;
     }
 };
+//
+//
+// struct DrawData
+//{
+//    std::vector<Vertex> vertices;
+//    std::vector<uint16_t> indices;
+//};
 
-const std::vector<Vertex> vertices = {
-    {{-1.0f, -1.0f}, {1.0f, 0.0f, 0.0f}, {1.0f, 0.0f}},
-    {{1.0f, -1.0f}, {0.0f, 1.0f, 0.0f}, {0.0f, 0.0f}},
-    {{1.0f, 1.0f}, {0.0f, 0.0f, 1.0f}, {0.0f, 1.0f}},
-    {{-1.0f, 1.0f}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f}}};
+// const std::vector<Vertex> vertices = {
+//     {{-1.0f, -1.0f}, {1.0f, 0.0f, 0.0f}, {1.0f, 0.0f}},
+//     {{1.0f, -1.0f}, {0.0f, 1.0f, 0.0f}, {0.0f, 0.0f}},
+//     {{1.0f, 1.0f}, {0.0f, 0.0f, 1.0f}, {0.0f, 1.0f}},
+//     {{-1.0f, 1.0f}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f}}};
 
-const std::vector<uint16_t> indices = {
-    0, 1, 2, 2, 3, 0};
+// const std::vector<uint16_t> indices = {
+//     0, 1, 2, 2, 3, 0};
 
 class VulkanBackend : public Singleton<VulkanBackend>
 {
@@ -137,9 +144,9 @@ public:
         alignas(16) glm::mat4 proj;
     };
 
-    void SetupVulkan(const char **extensions, uint32_t extensions_count);
+    void SetupVulkan(const char **extensions, uint32_t extensions_count, const std::vector<Vertex> vertices, const std::vector<uint16_t> indices);
 
-    void drawFrame();
+    void drawFrame(const std::vector<uint16_t> indices);
     VkPhysicalDevice &GetPhysicalDevice();
     VkDevice &GetDevice();
     void createDescriptorSets(VkSampler &sampler, VkImageView &image_view);
@@ -177,7 +184,7 @@ private:
 
     void createCommandBuffers();
 
-    void recordCommandBuffer(VkCommandBuffer commandBuffer);
+    void recordCommandBuffer(VkCommandBuffer commandBuffer, const std::vector<uint16_t> indices);
 
     void createSyncObjects();
     void updateUniformBuffer(uint32_t currentImage);
@@ -192,9 +199,9 @@ private:
 
     QueueFamilyIndices findQueueFamilies(VkPhysicalDevice device, VkSurfaceKHR &surface);
 
-    void createVertexBuffer();
+    void createVertexBuffer(const std::vector<Vertex> vertices);
 
-    void createIndexBuffer();
+    void createIndexBuffer(const std::vector<uint16_t> indices);
 
     void createUniformBuffers();
 
@@ -241,7 +248,7 @@ private:
     std::vector<VkDeviceMemory> uniformBuffersMemory;
     std::vector<void *> uniformBuffersMapped;
     VkDescriptorPool descriptorPool = VK_NULL_HANDLE;
-    ;
+
     std::vector<VkDescriptorSet> descriptorSets;
     std::vector<VkCommandBuffer> commandBuffers;
 

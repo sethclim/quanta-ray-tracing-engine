@@ -1,6 +1,6 @@
 #include "VulkanBackend.hpp"
 
-void VulkanBackend::SetupVulkan(const char **extensions, uint32_t extensions_count)
+void VulkanBackend::SetupVulkan(const char **extensions, uint32_t extensions_count, const std::vector<Vertex> vertices, const std::vector<uint16_t> indices)
 {
     createInstance(extensions, extensions_count);
     createSurface();
@@ -17,14 +17,14 @@ void VulkanBackend::SetupVulkan(const char **extensions, uint32_t extensions_cou
     createDescriptorPool();
     createUniformBuffers();
 
-    createVertexBuffer();
-    createIndexBuffer();
+    createVertexBuffer(vertices);
+    createIndexBuffer(indices);
 
     createCommandBuffers();
     createSyncObjects();
 }
 
-void VulkanBackend::drawFrame()
+void VulkanBackend::drawFrame(const std::vector<uint16_t> indices)
 {
     vkWaitForFences(g_Device, 1, &context.inFlightFences[context.currentFrame], VK_TRUE, UINT64_MAX);
 
@@ -45,7 +45,7 @@ void VulkanBackend::drawFrame()
     vkResetFences(g_Device, 1, &context.inFlightFences[context.currentFrame]);
 
     vkResetCommandBuffer(commandBuffers[context.currentFrame], /*VkCommandBufferResetFlagBits*/ 0);
-    recordCommandBuffer(commandBuffers[context.currentFrame]);
+    recordCommandBuffer(commandBuffers[context.currentFrame], indices);
 
     VkSubmitInfo submitInfo{};
     submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
@@ -655,7 +655,7 @@ void VulkanBackend::createCommandBuffers()
     }
 }
 
-void VulkanBackend::recordCommandBuffer(VkCommandBuffer commandBuffer)
+void VulkanBackend::recordCommandBuffer(VkCommandBuffer commandBuffer, const std::vector<uint16_t> indices)
 {
     VkCommandBufferBeginInfo beginInfo{};
     beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
@@ -855,7 +855,7 @@ VulkanBackend::QueueFamilyIndices VulkanBackend::findQueueFamilies(VkPhysicalDev
     return indices;
 }
 
-void VulkanBackend::createVertexBuffer()
+void VulkanBackend::createVertexBuffer(const std::vector<Vertex> vertices)
 {
     VkDeviceSize bufferSize = sizeof(vertices[0]) * vertices.size();
 
@@ -876,7 +876,7 @@ void VulkanBackend::createVertexBuffer()
     vkFreeMemory(g_Device, stagingBufferMemory, nullptr);
 }
 
-void VulkanBackend::createIndexBuffer()
+void VulkanBackend::createIndexBuffer(const std::vector<uint16_t> indices)
 {
     VkDeviceSize bufferSize = sizeof(indices[0]) * indices.size();
 

@@ -47,7 +47,7 @@ private:
 	uint32_t *m_ImageData = nullptr;
 
 	std::unique_ptr<Renderer> renderer;
-	Editor editor;
+	std::unique_ptr <Editor> editor;
 };
 
 #endif
