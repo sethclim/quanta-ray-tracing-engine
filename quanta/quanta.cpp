@@ -49,17 +49,16 @@ uint32_t Renderer::PerPixel(float image_x, float image_y)
         if (info.ObjectID == 22)
             std::cout << "[Hit] index: " << i << " ID: " << info.ObjectID << " " << image_x << " " << image_y << std::endl;
 
-
         ray.Origin = (info.HitPoint + 0.001f);
         ray.Direction = Reflect(info.Normal, ray.Direction);
 
-        //std::cout << "ray.Direction: " << ray.Direction.ToString() << std::endl;
+        // std::cout << "ray.Direction: " << ray.Direction.ToString() << std::endl;
 
         Math::Vector3<float>
             emittedLight = info.Material.EmissionColor * info.Material.EmissionStrength;
 
-        incomingLight += emittedLight * rayColor;
-        //incomingLight = emittedLight;
+        // incomingLight += emittedLight * rayColor;
+        incomingLight = emittedLight;
 
         rayColor *= info.Material.Color;
 
@@ -68,8 +67,6 @@ uint32_t Renderer::PerPixel(float image_x, float image_y)
 
         Math::Vector3<float> res = Math::Clamp(info.Normal, 0.0f, 1.0f);
     }
-
-
 
     return ConvertToRGBA(incomingLight);
 }

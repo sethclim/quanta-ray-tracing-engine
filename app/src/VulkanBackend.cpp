@@ -1,4 +1,6 @@
 #include "VulkanBackend.hpp"
+#define GLM_ENABLE_EXPERIMENTAL
+#include <glm/gtx/string_cast.hpp>
 
 void VulkanBackend::SetupVulkan(const char **extensions, uint32_t extensions_count, const std::vector<Vertex> vertices, const std::vector<uint16_t> indices)
 {
@@ -743,6 +745,8 @@ void VulkanBackend::updateUniformBuffer(uint32_t currentImage)
     ubo.view = glm::mat4(1.0f);
     ubo.proj = glm::mat4(1.0f);
     ubo.proj[1][1] *= -1;
+
+    std::cout << "ubo.proj " << glm::to_string(ubo.proj) << std::endl;
 
     memcpy(uniformBuffersMapped[currentImage], &ubo, sizeof(ubo));
 }

@@ -87,31 +87,30 @@ void Image::AllocateMemory(uint64_t size)
 {
     VkFormat vulkanFormat = Utils::WalnutFormatToVulkanFormat(m_Format);
 
-    createImage(vulkanFormat, 
-        VK_IMAGE_TILING_OPTIMAL, 
-        VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT, 
-        VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
+    createImage(vulkanFormat,
+                VK_IMAGE_TILING_OPTIMAL,
+                VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT,
+                VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
 
     m_ImageView = VulkanBackend::GetInstance().createImageView(m_Image, vulkanFormat);
     createTextureSampler();
     VulkanBackend::GetInstance().createDescriptorSets(m_Sampler, m_ImageView);
 }
 
-
 void Image::Release()
 {
-    //TODO - find out what this does
-   // Application::SubmitResourceFree([sampler = m_Sampler, imageView = m_ImageView, image = m_Image,
-   //                                  memory = m_Memory, stagingBuffer = m_StagingBuffer, stagingBufferMemory = m_StagingBufferMemory]()
-   //                                 {
-	VkDevice& device = VulkanBackend::GetInstance().GetDevice();
+    // TODO - find out what this does
+    // Application::SubmitResourceFree([sampler = m_Sampler, imageView = m_ImageView, image = m_Image,
+    //                                  memory = m_Memory, stagingBuffer = m_StagingBuffer, stagingBufferMemory = m_StagingBufferMemory]()
+    //                                 {
+    VkDevice &device = VulkanBackend::GetInstance().GetDevice();
 
-	vkDestroySampler(device, m_Sampler, nullptr);
-	vkDestroyImageView(device, m_ImageView, nullptr);
-	vkDestroyImage(device, m_Image, nullptr);
-	vkFreeMemory(device, m_Memory, nullptr);
-	vkDestroyBuffer(device, m_StagingBuffer, nullptr);
-	vkFreeMemory(device, m_StagingBufferMemory, nullptr); 
+    vkDestroySampler(device, m_Sampler, nullptr);
+    vkDestroyImageView(device, m_ImageView, nullptr);
+    vkDestroyImage(device, m_Image, nullptr);
+    vkFreeMemory(device, m_Memory, nullptr);
+    vkDestroyBuffer(device, m_StagingBuffer, nullptr);
+    vkFreeMemory(device, m_StagingBufferMemory, nullptr);
 
     m_Sampler = nullptr;
     m_ImageView = nullptr;
@@ -121,9 +120,9 @@ void Image::Release()
     m_StagingBufferMemory = nullptr;
 }
 
-void Image::SetData(const void * pixels)
+void Image::SetData(const void *pixels)
 {
-    VkDevice& device = VulkanBackend::GetInstance().GetDevice();
+    VkDevice &device = VulkanBackend::GetInstance().GetDevice();
 
     size_t upload_size = m_Width * m_Height * Utils::BytesPerPixel(m_Format);
 
@@ -136,7 +135,7 @@ void Image::SetData(const void * pixels)
 
     // Upload to Buffer
     {
-        
+
         void *data;
         vkMapMemory(device, m_StagingBufferMemory, 0, upload_size, 0, &data);
         memcpy(data, pixels, static_cast<size_t>(upload_size));
@@ -212,11 +211,11 @@ void Image::copyBufferToImage()
     region.imageSubresource.mipLevel = 0;
     region.imageSubresource.baseArrayLayer = 0;
     region.imageSubresource.layerCount = 1;
-    region.imageOffset = { 0, 0, 0 };
+    region.imageOffset = {0, 0, 0};
     region.imageExtent = {
         m_Width,
         m_Height,
-        1 };
+        1};
 
     vkCmdCopyBufferToImage(commandBuffer, m_StagingBuffer, m_Image, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &region);
 

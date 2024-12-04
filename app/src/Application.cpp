@@ -26,7 +26,7 @@ void Application::Init()
 
 	WindowController::GetInstance().NewWindow();
 
-	editor = std::make_unique <Editor>();
+	editor = std::make_unique<Editor>();
 
 	DrawData drawData = editor->RenderEditor();
 
@@ -141,29 +141,29 @@ void Application::Run()
 
 		glfwPollEvents();
 		std::vector<int> dimensions = editor->CalculateLayout(
-		 	VulkanBackend::GetInstance().GetRenderContext().Width,
-		 	VulkanBackend::GetInstance().GetRenderContext().Height);
+			VulkanBackend::GetInstance().GetRenderContext().Width,
+			VulkanBackend::GetInstance().GetRenderContext().Height);
 
-		 if (!m_Image || dimensions[0] != m_Image->GetWidth() || dimensions[1] != m_Image->GetHeight())
-		 {
+		if (!m_Image || dimensions[0] != m_Image->GetWidth() || dimensions[1] != m_Image->GetHeight())
+		{
 
-		 	m_Image = std::make_shared<Image>(dimensions[0], dimensions[1], ImageFormat::RGBA);
-		 	delete[] m_ImageData;
-		 	m_ImageData = new uint32_t[dimensions[0] * dimensions[1]];
-		 }
+			m_Image = std::make_shared<Image>(dimensions[0], dimensions[1], ImageFormat::RGBA);
+			delete[] m_ImageData;
+			m_ImageData = new uint32_t[dimensions[0] * dimensions[1]];
+		}
 
-		 for (uint32_t y = 0; y < dimensions[1]; y++)
-		 {
-		 	for (uint32_t x = 0; x < dimensions[0]; x++)
-		 	{
+		for (uint32_t y = 0; y < dimensions[1]; y++)
+		{
+			for (uint32_t x = 0; x < dimensions[0]; x++)
+			{
 
-		 		float normalizedX = (float)x / (float)dimensions[0];
-		 		float normalizedY = (float)y / (float)dimensions[1];
+				float normalizedX = (float)x / (float)dimensions[0];
+				float normalizedY = (float)y / (float)dimensions[1];
 
-		 		uint32_t idx = x + (y * dimensions[0]);
-		 		m_ImageData[idx] = renderer->PerPixel(normalizedX, normalizedY);
-		 	}
-		 }
+				uint32_t idx = x + (y * dimensions[0]);
+				m_ImageData[idx] = renderer->PerPixel(normalizedX, normalizedY);
+			}
+		}
 
 		m_Image->SetData(m_ImageData);
 		DrawData drawData = editor->RenderEditor();
