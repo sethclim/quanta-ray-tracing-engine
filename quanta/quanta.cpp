@@ -68,7 +68,7 @@ uint32_t Renderer::PerPixel(float image_x, float image_y)
         Math::Vector3<float> res = Math::Clamp(info.Normal, 0.0f, 1.0f);
     }
 
-    return ConvertToRGBA(incomingLight);
+    return ConvertToRGBA(rayColor);
 }
 
 HitInfo Renderer::TraceRay(const Ray &ray)
