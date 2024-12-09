@@ -26,6 +26,10 @@ void Application::Init()
 
 	WindowController::GetInstance().NewWindow();
 
+	Input::InputManager::Init();
+
+	glfwSetCursorPosCallback(WindowController::GetInstance().GetWindow(), Input::cursor_position_callback);
+
 	editor = std::make_unique<Editor>();
 
 	DrawData drawData = editor->RenderEditor();

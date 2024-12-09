@@ -17,13 +17,14 @@ add_executable(app
     src/Random.cpp
     src/Image.hpp
     src/Image.cpp
+    src/InputManager.hpp
+    src/InputManager.cpp
 )
 
 target_link_libraries(app PRIVATE quanta)
 target_link_libraries(app PRIVATE glfw)
 target_link_libraries(app PUBLIC editor)
 target_link_libraries(app PRIVATE glm::glm-header-only)
-# target_link_libraries(app PRIVATE MapleUI::mapleui)
 
 find_package(Vulkan REQUIRED)
 

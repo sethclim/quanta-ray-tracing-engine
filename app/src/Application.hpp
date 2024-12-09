@@ -9,6 +9,7 @@
 #include "VulkanBackend.hpp"
 #include "Random.hpp"
 #include "image.hpp"
+#include "InputManager.hpp"
 #include "../../editor/editor.hpp"
 
 //#include "MapleUI/maple.hpp"
