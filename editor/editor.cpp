@@ -41,5 +41,9 @@ DrawData Editor::RenderEditor()
 	dd.vertices = _vertices;
 	dd.indices = indices;
 
+	glm::vec2 mouse = Input::InputManager::GetInstance().GetMousePosition();
+
+
+
 	return dd;
 }

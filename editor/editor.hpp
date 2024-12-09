@@ -2,6 +2,7 @@
 
 #include <vector>
 #include "../app/src/VulkanBackend.hpp"
+#include "../app/src/InputManager.hpp"
 // #include "../app/src/VulkanBackend.hpp"
 // #include "MapleUI/maple.hpp"
 

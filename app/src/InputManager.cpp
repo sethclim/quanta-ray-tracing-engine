@@ -12,6 +12,11 @@ namespace Input
         ypos = y;
     }
 
+    glm::vec2 InputManager::GetMousePosition()
+    {
+        return { xpos, ypos };
+    }
+
     InputManager::InputManager()
     {
         xpos = 0;
