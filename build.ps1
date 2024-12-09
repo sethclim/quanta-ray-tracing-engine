@@ -1,0 +1,1 @@
+cmake -B ./quanta-vs -G "Visual Studio 17 2022" .  
