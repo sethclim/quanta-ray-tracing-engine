@@ -31,6 +31,8 @@ void Application::Init()
 	glfwSetCursorPosCallback(WindowController::GetInstance().GetWindow(), Input::cursor_position_callback);
 
 	editor = std::make_unique<Editor>();
+	glm::vec2 size = WindowController::GetInstance().GetSize();
+	editor->CalculateLayout(size.x, size.y);
 
 	DrawData drawData = editor->RenderEditor();
 
@@ -170,6 +172,9 @@ void Application::Run()
 		}
 
 		m_Image->SetData(m_ImageData);
+
+		glm::vec2 size = WindowController::GetInstance().GetSize();
+		editor->CalculateLayout(size.x, size.y);
 		DrawData drawData = editor->RenderEditor();
 		VulkanBackend::GetInstance().drawFrame(drawData.indices);
 	}
