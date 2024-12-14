@@ -19,6 +19,9 @@ add_executable(app
     src/Image.cpp
     src/InputManager.hpp
     src/InputManager.cpp
+    src/VK_Pipeline.hpp
+    src/VK_Pipeline.cpp
+    src/VK_Types.hpp
 )
 
 target_link_libraries(app PRIVATE quanta)

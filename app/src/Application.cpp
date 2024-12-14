@@ -71,7 +71,7 @@ void Application::Init()
 		Scene::Material lightMaterial;
 		lightMaterial.Color = Math::Vector3<float>(1, 1, 1);
 		lightMaterial.EmissionColor = Math::Vector3<float>(1, 1, 1);
-		lightMaterial.EmissionStrength = 0.3f;
+		lightMaterial.EmissionStrength = 0.6f;
 
 		Scene::Shapes::Sphere sphere;
 		sphere.Origin = Math::Vector3<float>(0, 0, 0);
