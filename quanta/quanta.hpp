@@ -36,7 +36,7 @@ public:
         m_Scene = scene;
     }
 
-    uint32_t PerPixel(float x, float y);
+    Math::Vector3<float> PerPixel(float x, float y);
     HitInfo TraceRay(const Ray &ray);
 
 private:

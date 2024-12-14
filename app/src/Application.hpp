@@ -41,11 +41,14 @@ private:
 	bool m_Running = false;
 	float m_LastFrameTime;
 
+	uint32_t m_FrameIndex = 1;
+
 	// VulkanBackend& m_VulkanBackend;
 	// VulkanBackend::Quanta_ImplVulkanH_RenderContext m_Quanta_ImplVulkanH_RenderContext;
 
 	std::shared_ptr<Image> m_Image;
 	uint32_t *m_ImageData = nullptr;
+	glm::vec4* m_AccumulationData = nullptr;
 
 	std::unique_ptr<Renderer> renderer;
 	std::unique_ptr <Editor> editor;
