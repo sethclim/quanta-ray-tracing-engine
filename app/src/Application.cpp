@@ -39,7 +39,7 @@ void Application::Init()
 
 		Scene::Material mat;
 		mat.Color = Math::Vector3<float>(1.0, 0, 0);
-		mat.EmissionColor = Math::Vector3<float>(1.0, 0, 0);
+		mat.EmissionColor = Math::Vector3<float>(0, 0, 0);
 		mat.EmissionStrength = 0.0f;
 
 		//Scene::Material mat2;
@@ -53,8 +53,8 @@ void Application::Init()
 		//mat3.EmissionStrength = 0.0f;
 
 		Scene::Material lightMaterial;
-		lightMaterial.Color = Math::Vector3<float>(0, 0, 0);
-		lightMaterial.EmissionColor = Math::Vector3<float>(0, 1, 0);
+		lightMaterial.Color = Math::Vector3<float>(1, 1, 1);
+		lightMaterial.EmissionColor = Math::Vector3<float>(1, 1, 1);
 		lightMaterial.EmissionStrength = 1.0f;
 
 		Scene::Shapes::Sphere sphere;
