@@ -43,7 +43,5 @@ DrawData Editor::RenderEditor()
 
 	glm::vec2 mouse = Input::InputManager::GetInstance().GetMousePosition();
 
-
-
 	return dd;
 }

@@ -21,7 +21,8 @@ Application::~Application()
 }
 
 void Application::Init()
-{ // Setup GLFW window
+{ 
+	// Setup GLFW window
 	glfwSetErrorCallback(glfw_error_callback);
 
 	WindowController::GetInstance().NewWindow();
@@ -33,29 +34,28 @@ void Application::Init()
 	editor = std::make_unique<Editor>();
 
 	DrawData drawData = editor->RenderEditor();
-
 	{
 		Scene::SceneGraph scene;
 
 		Scene::Material mat;
-		mat.Color = Math::Vector3<float>(0, 0, 1);
-		mat.EmissionColor = Math::Vector3<float>(1, 1, 1);
+		mat.Color = Math::Vector3<float>(1.0, 0, 0);
+		mat.EmissionColor = Math::Vector3<float>(1.0, 0, 0);
 		mat.EmissionStrength = 0.0f;
 
-		Scene::Material mat2;
-		mat2.Color = Math::Vector3<float>(1, 1, 0);
-		mat2.EmissionColor = Math::Vector3<float>(1, 1, 1);
-		mat2.EmissionStrength = 0.0f;
+		//Scene::Material mat2;
+		//mat2.Color = Math::Vector3<float>(1, 1, 0);
+		//mat2.EmissionColor = Math::Vector3<float>(1, 1, 1);
+		//mat2.EmissionStrength = 0.0f;
 
-		Scene::Material mat3;
-		mat3.Color = Math::Vector3<float>(1, 1, 1);
-		mat3.EmissionColor = Math::Vector3<float>(1, 1, 1);
-		mat3.EmissionStrength = 0.0f;
+		//Scene::Material mat3;
+		//mat3.Color = Math::Vector3<float>(1, 1, 1);
+		//mat3.EmissionColor = Math::Vector3<float>(1, 1, 1);
+		//mat3.EmissionStrength = 0.0f;
 
 		Scene::Material lightMaterial;
-		lightMaterial.Color = Math::Vector3<float>(1, 1, 1);
-		lightMaterial.EmissionColor = Math::Vector3<float>(1, 1, 1);
-		lightMaterial.EmissionStrength = 10.0f;
+		lightMaterial.Color = Math::Vector3<float>(0, 0, 0);
+		lightMaterial.EmissionColor = Math::Vector3<float>(0, 1, 0);
+		lightMaterial.EmissionStrength = 1.0f;
 
 		Scene::Shapes::Sphere sphere;
 		sphere.Origin = Math::Vector3<float>(0, 0, 0);
@@ -71,10 +71,10 @@ void Application::Init()
 			sphere3.Origin = Math::Vector3<float>(1, -2, 1);
 			sphere3.Material = mat3;
 			sphere3.Radius = 1.8f;
-			sphere3.id = 2;*/
+			sphere3.id = 2;  */
 
 		Scene::Shapes::Sphere sphere4;
-		sphere4.Origin = Math::Vector3<float>(-2, 1.4, 1);
+		sphere4.Origin = Math::Vector3<float>(-1, 1.7, 1);
 		sphere4.Material = lightMaterial;
 		sphere4.Radius = 1.0f;
 		sphere4.id = 2222;
