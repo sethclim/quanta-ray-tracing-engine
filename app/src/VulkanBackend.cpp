@@ -465,8 +465,10 @@ void VulkanBackend::createDescriptorSetLayout()
 
 void VulkanBackend::createGraphicsPipeline()
 {
-    auto vertShaderCode = readFile("C:/Users/sethc/coding/cplusplus/graphics/quanta-ray-tracing-engine/app/src/shaders/shader.vert.spv");
-    auto fragShaderCode = readFile("C:/Users/sethc/coding/cplusplus/graphics/quanta-ray-tracing-engine/app/src/shaders/shader.frag.spv");
+    auto p = std::filesystem::path("../../app/src/shaders/");
+    auto abs = std::filesystem::absolute(p);
+    auto vertShaderCode = readFile(abs.string() + "shader.vert.spv");
+    auto fragShaderCode = readFile(abs.string() + "shader.frag.spv");
 
     VkShaderModule vertShaderModule = createShaderModule(vertShaderCode);
     VkShaderModule fragShaderModule = createShaderModule(fragShaderCode);
