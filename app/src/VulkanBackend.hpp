@@ -3,6 +3,7 @@
 
 #include "StandardIncludes.hpp"
 #include "WindowController.hpp"
+#include <filesystem>
 
 // #define GLM_FORCE_RADIANS
 #include <glm/glm.hpp>

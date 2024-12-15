@@ -6,8 +6,12 @@ set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
 set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
 set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
 
-add_subdirectory(../dependencies/glfw glfw)
-add_subdirectory(../dependencies/glm glm)
+set(DEPENDENCIES CACHE STRING "")
+
+message("dep ${DEPENDENCIES}")
+
+add_subdirectory("${DEPENDENCIES}/glfw" glfw)
+add_subdirectory("${DEPENDENCIES}/glm" glm)
 
 add_subdirectory(quanta)
 add_subdirectory(editor)
