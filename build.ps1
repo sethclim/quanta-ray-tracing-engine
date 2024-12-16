@@ -1,1 +1,1 @@
-cmake -B ./quanta-vs -G "Visual Studio 17 2022" .  
+cmake -B ./quanta-vs -D MapleUI_DIR=C:/Users/sethc/coding/c++/projects/MapleUI/_install/lib/cmake/MapleUI -D DEPENDENCIES=../../dependencies -G "Visual Studio 17 2022" .  

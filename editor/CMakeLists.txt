@@ -1,5 +1,5 @@
 
-set(MapleUI_DIR C:/Users/sethc/coding/cplusplus/graphics/MapleUI/_install/lib/cmake/MapleUI)
+set(MapleUI_DIR CACHE STRING C:/Users/sethc/coding/cplusplus/graphics/MapleUI/_install/lib/cmake/MapleUI)
 find_package(MapleUI REQUIRED)
 
 add_library(editor
