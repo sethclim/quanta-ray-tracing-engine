@@ -10,6 +10,22 @@ static std::vector<std::vector<std::function<void()>>> s_ResourceFreeQueue;
 
 static uint32_t s_CurrentFrameIndex = 0;
 
+namespace Utils
+{
+
+	static uint32_t ConvertToRGBA(const glm::vec4 &color)
+	{
+		uint8_t r = (uint8_t)(color.r * 255.0f);
+		uint8_t g = (uint8_t)(color.g * 255.0f);
+		uint8_t b = (uint8_t)(color.b * 255.0f);
+		uint8_t a = (uint8_t)(color.a * 255.0f);
+
+		uint32_t result = (a << 24) | (b << 16) | (g << 8) | r;
+		return result;
+	}
+
+}
+
 Application::Application()
 {
 	Init();
@@ -21,7 +37,8 @@ Application::~Application()
 }
 
 void Application::Init()
-{ // Setup GLFW window
+{
+	// Setup GLFW window
 	glfwSetErrorCallback(glfw_error_callback);
 
 	WindowController::GetInstance().NewWindow();
@@ -35,29 +52,28 @@ void Application::Init()
 	editor->CalculateLayout(size.x, size.y);
 
 	DrawData drawData = editor->RenderEditor();
-
 	{
 		Scene::SceneGraph scene;
 
 		Scene::Material mat;
-		mat.Color = Math::Vector3<float>(0, 0, 1);
-		mat.EmissionColor = Math::Vector3<float>(1, 1, 1);
+		mat.Color = Math::Vector3<float>(1.0, 0, 0);
+		mat.EmissionColor = Math::Vector3<float>(0, 0, 0);
 		mat.EmissionStrength = 0.0f;
 
-		Scene::Material mat2;
-		mat2.Color = Math::Vector3<float>(1, 1, 0);
-		mat2.EmissionColor = Math::Vector3<float>(1, 1, 1);
-		mat2.EmissionStrength = 0.0f;
+		// Scene::Material mat2;
+		// mat2.Color = Math::Vector3<float>(1, 1, 0);
+		// mat2.EmissionColor = Math::Vector3<float>(1, 1, 1);
+		// mat2.EmissionStrength = 0.0f;
 
-		Scene::Material mat3;
-		mat3.Color = Math::Vector3<float>(1, 1, 1);
-		mat3.EmissionColor = Math::Vector3<float>(1, 1, 1);
-		mat3.EmissionStrength = 0.0f;
+		// Scene::Material mat3;
+		// mat3.Color = Math::Vector3<float>(1, 1, 1);
+		// mat3.EmissionColor = Math::Vector3<float>(1, 1, 1);
+		// mat3.EmissionStrength = 0.0f;
 
 		Scene::Material lightMaterial;
 		lightMaterial.Color = Math::Vector3<float>(1, 1, 1);
 		lightMaterial.EmissionColor = Math::Vector3<float>(1, 1, 1);
-		lightMaterial.EmissionStrength = 10.0f;
+		lightMaterial.EmissionStrength = 0.3f;
 
 		Scene::Shapes::Sphere sphere;
 		sphere.Origin = Math::Vector3<float>(0, 0, 0);
@@ -73,10 +89,10 @@ void Application::Init()
 			sphere3.Origin = Math::Vector3<float>(1, -2, 1);
 			sphere3.Material = mat3;
 			sphere3.Radius = 1.8f;
-			sphere3.id = 2;*/
+			sphere3.id = 2;  */
 
 		Scene::Shapes::Sphere sphere4;
-		sphere4.Origin = Math::Vector3<float>(-2, 1.4, 1);
+		sphere4.Origin = Math::Vector3<float>(-1, 1.7, 1);
 		sphere4.Material = lightMaterial;
 		sphere4.Radius = 1.0f;
 		sphere4.id = 2222;
@@ -156,7 +172,12 @@ void Application::Run()
 			m_Image = std::make_shared<Image>(dimensions[0], dimensions[1], ImageFormat::RGBA);
 			delete[] m_ImageData;
 			m_ImageData = new uint32_t[dimensions[0] * dimensions[1]];
+			delete[] m_AccumulationData;
+			m_AccumulationData = new glm::vec4[dimensions[0] * dimensions[1]];
 		}
+
+		if (m_FrameIndex == 1)
+			memset(m_AccumulationData, 0, m_Image->GetWidth() * m_Image->GetHeight() * sizeof(glm::vec4));
 
 		for (uint32_t y = 0; y < dimensions[1]; y++)
 		{
@@ -167,7 +188,15 @@ void Application::Run()
 				float normalizedY = (float)y / (float)dimensions[1];
 
 				uint32_t idx = x + (y * dimensions[0]);
-				m_ImageData[idx] = renderer->PerPixel(normalizedX, normalizedY);
+				Math::Vector3<float> color = renderer->PerPixel(normalizedX, normalizedY);
+
+				m_AccumulationData[x + y * m_Image->GetWidth()] += glm::vec4(color.x, color.y, color.z, 1.0f);
+
+				glm::vec4 accumulatedColor = m_AccumulationData[x + y * m_Image->GetWidth()];
+				accumulatedColor /= (float)m_FrameIndex;
+
+				accumulatedColor = glm::clamp(accumulatedColor, glm::vec4(0.0f), glm::vec4(1.0f));
+				m_ImageData[idx] = Utils::ConvertToRGBA(accumulatedColor);
 			}
 		}
 
@@ -177,6 +206,8 @@ void Application::Run()
 		editor->CalculateLayout(size.x, size.y);
 		DrawData drawData = editor->RenderEditor();
 		VulkanBackend::GetInstance().drawFrame(drawData.indices);
+
+		m_FrameIndex++;
 	}
 
 	// m_gameController->CleanUp();

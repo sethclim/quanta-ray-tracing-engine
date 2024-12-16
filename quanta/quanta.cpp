@@ -22,9 +22,10 @@ Math::Vector3<float> Reflect(Math::Vector3<float> &N, Math::Vector3<float> &Ri)
     return Ri - (N * 2.0f * Math::Dot(Ri, N));
 }
 
-const int MAX_BOUNCES = 1;
+const int MAX_BOUNCES = 3;
+const int SAMPLES_PER_PIXEL = 10;
 
-uint32_t Renderer::PerPixel(float image_x, float image_y)
+Math::Vector3<float> Renderer::PerPixel(float image_x, float image_y)
 {
     // convert to 0,0 in the centre
     float coordX = image_x * 2.0f - 1.0f;
@@ -34,41 +35,73 @@ uint32_t Renderer::PerPixel(float image_x, float image_y)
     ray.Origin = Math::Vector3<float>(0.0f, 0.0f, 2.0f);
     ray.Direction = Math::Vector3<float>(coordX, coordY, -1.0f);
 
-    Math::Vector3<float> incomingLight = Math::Vector3<float>(0, 0, 0);
-    Math::Vector3<float> rayColor = Math::Vector3<float>(1, 1, 1);
+    Math::Vector3<float> pixel_color(0, 0, 0);
+    for (int sample = 0; sample < SAMPLES_PER_PIXEL; sample++) {
 
-    for (int i = 0; i < MAX_BOUNCES; i++)
-    {
-        HitInfo info = TraceRay(ray);
+        Math::Vector3<float> incomingLight = Math::Vector3<float>(0, 0, 0);
+        Math::Vector3<float> rayColor = Math::Vector3<float>(1, 1, 1);
 
-        if (info.HitPoint == Math::Vector3<float>(-1, -1, -1))
+        for (int i = 0; i < MAX_BOUNCES; i++)
         {
-            break;
+            HitInfo info = TraceRay(ray);
+
+            if (info.HitPoint == Math::Vector3<float>(-1, -1, -1))
+            {
+                break;
+            }
+
+            if (i == 0 && info.ObjectID == 2222)
+            {
+                break;
+            }
+
+            /*if (i > 0 && info.ObjectID == 2222)
+            {
+                std::cout << "HIT THE LIGHT" << std::endl;
+            } */
+
+            /* if(i > 0)
+                 std::cout << "[Hit] index: " << i << " ID: " << info.ObjectID << " x " << image_x << " y " << image_y << std::endl;*/
+
+            ray.Origin = (info.HitPoint + 0.001f);
+            //ray.Direction = Reflect(info.Normal, ray.Direction);
+            ray.Direction = Utilities::Random::Random_On_Hemisphere(info.Normal);
+
+            //ray.Direction = info.Normal;
+
+            //std::cout << "ray.Direction: " << ray.Direction.ToString() << std::endl;
+
+            Math::Vector3<float> emittedLight = info.Material.EmissionColor * info.Material.EmissionStrength;
+
+            //incomingLight += emittedLight * rayColor;
+            //incomingLight = emittedLight;
+
+            rayColor *= info.Material.Color;
+
+            /* if (info.ObjectID == 0)
+                std::cout << "Hit: id " << i << " " << info.ObjectID << incomingLight.ToString() << std::endl; */
+
+                //Math::Vector3<float> res = Math::Clamp(info.Normal, 0.0f, 1.0f);
+            
+            incomingLight += (rayColor * emittedLight);
+            //if (i == 0)
+            //{
+            //    //incomingLight += (rayColor * emittedLight);
+            //    incomingLight += rayColor * emittedLight;
+            //    //incomingLight += Math::Clamp(info.Normal, 0.0f, 1.0f);
+            //}
+            //else
+            //{
+            //    //incomingLight += emittedLight;
+            //    incomingLight += (rayColor * emittedLight);
+            //    //incomingLight += rayColor;
+            //}
         }
 
-        if (info.ObjectID == 22)
-            std::cout << "[Hit] index: " << i << " ID: " << info.ObjectID << " " << image_x << " " << image_y << std::endl;
-
-        ray.Origin = (info.HitPoint + 0.001f);
-        ray.Direction = Reflect(info.Normal, ray.Direction);
-
-        // std::cout << "ray.Direction: " << ray.Direction.ToString() << std::endl;
-
-        Math::Vector3<float>
-            emittedLight = info.Material.EmissionColor * info.Material.EmissionStrength;
-
-        // incomingLight += emittedLight * rayColor;
-        incomingLight = emittedLight;
-
-        rayColor *= info.Material.Color;
-
-        /*if (info.ObjectID == 0)
-            std::cout << "Hit: id " << i << " " << info.ObjectID << incomingLight.ToString() << std::endl;*/
-
-        Math::Vector3<float> res = Math::Clamp(info.Normal, 0.0f, 1.0f);
+        pixel_color += incomingLight;
     }
 
-    return ConvertToRGBA(rayColor);
+    return pixel_color;
 }
 
 HitInfo Renderer::TraceRay(const Ray &ray)
