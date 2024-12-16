@@ -1,13 +1,15 @@
 #ifndef VULKANBACKEND_H
 #define VULKANBACKEND_H
 
-#include "StandardIncludes.hpp"
-#include "WindowController.hpp"
 #include <filesystem>
 
 // #define GLM_FORCE_RADIANS
 #include <glm/glm.hpp>
 // #include <glm/gtc/matrix_transform.hpp>
+
+#include "StandardIncludes.hpp"
+#include "WindowController.hpp"
+#include "VK_Pipeline.hpp"
 
 const int MAX_FRAMES_IN_FLIGHT = 2;
 

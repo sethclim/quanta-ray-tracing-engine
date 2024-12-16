@@ -22,6 +22,10 @@ add_executable(app
     src/VK_Pipeline.hpp
     src/VK_Pipeline.cpp
     src/VK_Types.hpp
+    src/VK_Initializers.cpp
+    src/VK_Initializers.hpp
+    src/utils/Utilities.hpp
+    src/utils/Utilities.cpp
 )
 
 target_link_libraries(app PRIVATE quanta)

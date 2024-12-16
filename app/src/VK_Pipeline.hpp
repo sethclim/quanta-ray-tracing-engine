@@ -1,10 +1,11 @@
 #pragma once
 #include "StandardIncludes.hpp"
 #include "VK_Types.hpp"
+#include "VK_Initializers.hpp"
+#include "utils/Utilities.hpp"
 
 class PipelineBuilder
 {
-    //> pipeline
 public:
     std::vector<VkPipelineShaderStageCreateInfo> _shaderStages;
 
@@ -17,7 +18,7 @@ public:
     VkPipelineRenderingCreateInfo _renderInfo;
     VkFormat _colorAttachmentformat;
 
-    PipelineBuilder() { clear(); }
+    PipelineBuilder() { clear(); }  
 
     void clear();
 
@@ -25,6 +26,7 @@ public:
     //< pipeline
     void set_shaders(VkShaderModule vertexShader, VkShaderModule fragmentShader);
     void set_input_topology(VkPrimitiveTopology topology);
+    void set_raster_defaults();
     void set_polygon_mode(VkPolygonMode mode);
     void set_cull_mode(VkCullModeFlags cullMode, VkFrontFace frontFace);
     void set_multisampling_none();
@@ -40,5 +42,5 @@ public:
 
 namespace vkutil
 {
-    bool load_shader_module(const char *filePath, VkDevice device, VkShaderModule *outShaderModule);
+    bool load_shader_module(const std::string& filePath, VkDevice device, VkShaderModule &outShaderModule);
 }
