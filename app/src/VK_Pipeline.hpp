@@ -14,6 +14,7 @@ public:
     VkPipelineColorBlendAttachmentState _colorBlendAttachment;
     VkPipelineMultisampleStateCreateInfo _multisampling;
     VkPipelineLayout _pipelineLayout;
+    VkPipelineLayoutCreateInfo _pipelineLayoutCreateInfo;
     VkPipelineDepthStencilStateCreateInfo _depthStencil;
     VkPipelineRenderingCreateInfo _renderInfo;
     VkFormat _colorAttachmentformat;
@@ -22,8 +23,8 @@ public:
 
     void clear();
 
-    VkPipeline build_pipeline(VkDevice device);
-    //< pipeline
+    VkPipeline build_pipeline(VkDevice device, Quanta_ImplVulkanH_RenderContext& context);
+
     void set_shaders(VkShaderModule vertexShader, VkShaderModule fragmentShader);
     void set_input_topology(VkPrimitiveTopology topology);
     void set_raster_defaults();

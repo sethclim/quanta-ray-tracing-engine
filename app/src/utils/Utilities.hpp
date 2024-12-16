@@ -4,5 +4,5 @@
 
 namespace Utils
 {
-    bool read_file(const std::string& filePath, std::vector<uint32_t> buffer);
+	bool read_file(const std::string& filePath, std::vector<uint32_t>& buffer);
 }

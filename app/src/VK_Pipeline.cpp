@@ -8,26 +8,35 @@ void PipelineBuilder::clear()
 {
     // clear all of the structs we need back to 0 with their correct stype
 
-    _inputAssembly = {.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO};
-
-    _rasterizer = {.sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO};
+    _inputAssembly = {};
+    _inputAssembly.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
+    
+    _rasterizer = {};
+    _rasterizer.sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO;
 
     _colorBlendAttachment = {};
 
-    _multisampling = {.sType = VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO};
+    _multisampling = {};
+    _multisampling.sType = VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO;
 
     _pipelineLayout = {};
 
-    _depthStencil = {.sType = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO};
+    _depthStencil = {};
+    _depthStencil.sType = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO;
 
-    _renderInfo = {.sType = VK_STRUCTURE_TYPE_PIPELINE_RENDERING_CREATE_INFO};
+    _renderInfo = {};
+    _renderInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_RENDERING_CREATE_INFO;
+
+
+    _pipelineLayoutCreateInfo = {};
+    _pipelineLayoutCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
 
     _shaderStages.clear();
 }
 //< pipe_clear
 
 //> build_pipeline_1
-VkPipeline PipelineBuilder::build_pipeline(VkDevice device)
+VkPipeline PipelineBuilder::build_pipeline(VkDevice device, Quanta_ImplVulkanH_RenderContext& context)
 {
     // make viewport state from our stored viewport and scissor.
     // at the moment we wont support multiple viewports or scissors
@@ -51,7 +60,8 @@ VkPipeline PipelineBuilder::build_pipeline(VkDevice device)
 
     //ADD something to create this and call after set shaders IG
     // completely clear VertexInputStateCreateInfo, as we have no need for it
-    VkPipelineVertexInputStateCreateInfo _vertexInputInfo = {.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO};
+    VkPipelineVertexInputStateCreateInfo _vertexInputInfo = {};
+    _vertexInputInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
 
     auto bindingDescription = Vertex::getBindingDescription();
     auto attributeDescriptions = Vertex::getAttributeDescriptions();
@@ -62,20 +72,22 @@ VkPipeline PipelineBuilder::build_pipeline(VkDevice device)
     _vertexInputInfo.pVertexAttributeDescriptions = attributeDescriptions.data();
     
     
-    VkPipelineDynamicStateCreateInfo dynamicInfo = {.sType = VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO};
+    VkPipelineDynamicStateCreateInfo dynamicInfo = {};
+    dynamicInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO;
     VkDynamicState state[] = {VK_DYNAMIC_STATE_VIEWPORT, VK_DYNAMIC_STATE_SCISSOR};
     dynamicInfo.pDynamicStates = &state[0];
     dynamicInfo.dynamicStateCount = 2;
 
-    VkPipelineLayoutCreateInfo pipelineLayoutInfo{};
-    pipelineLayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
-    pipelineLayoutInfo.setLayoutCount = 1;
-    pipelineLayoutInfo.pSetLayouts = &context.descriptorSetLayout;
 
-    if (vkCreatePipelineLayout(g_Device, &pipelineLayoutInfo, nullptr, &context.PipelineLayout) != VK_SUCCESS)
+    _pipelineLayoutCreateInfo.setLayoutCount = 1;
+    _pipelineLayoutCreateInfo.pSetLayouts = &context.descriptorSetLayout;
+
+    if (vkCreatePipelineLayout(device, &_pipelineLayoutCreateInfo, nullptr, &_pipelineLayout) != VK_SUCCESS)
     {
         throw std::runtime_error("failed to create pipeline layout!");
     }
+
+    context.PipelineLayout = _pipelineLayout;
 
     //< build_pipeline_1
 
@@ -83,7 +95,8 @@ VkPipeline PipelineBuilder::build_pipeline(VkDevice device)
     // build the actual pipeline
     // we now use all of the info structs we have been writing into into this one
     // to create the pipeline
-    VkGraphicsPipelineCreateInfo pipelineInfo = {.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO};
+    VkGraphicsPipelineCreateInfo pipelineInfo = {};
+    pipelineInfo.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
     // connect the renderInfo to the pNext extension mechanism
     pipelineInfo.pNext = &_renderInfo;
 
@@ -112,7 +125,7 @@ VkPipeline PipelineBuilder::build_pipeline(VkDevice device)
     if (vkCreateGraphicsPipelines(device, VK_NULL_HANDLE, 1, &pipelineInfo,
                                   nullptr, &newPipeline) != VK_SUCCESS)
     {
-        fmt::println("failed to create pipeline");
+        std::cout << "failed to create pipeline" << std::endl;
         return VK_NULL_HANDLE; // failed to create graphics pipeline
     }
     else
@@ -286,7 +299,7 @@ bool vkutil::load_shader_module(const std::string& filePath,
     {
         return false;
     }
-    *outShaderModule = shaderModule;
+    outShaderModule = shaderModule;
     return true;
 }
 //< load_shader

@@ -606,8 +606,12 @@ void VulkanBackend::createGraphicsPipeline()
     //{
     //    throw std::runtime_error("failed to create graphics pipeline!");
     //}
+    /*VkPipelineLayout newLayout;
+    context.PipelineLayout = newLayout;
 
-    _pipelineBuilder.build_pipeline(g_Device);
+    _pipelineBuilder._pipelineLayout = newLayout;*/
+
+    context.GraphicsPipeline = _pipelineBuilder.build_pipeline(g_Device, context);
 
     vkDestroyShaderModule(g_Device, fragShaderModule, nullptr);
     vkDestroyShaderModule(g_Device, vertShaderModule, nullptr);
@@ -830,7 +834,7 @@ VkExtent2D VulkanBackend::chooseSwapExtent(const VkSurfaceCapabilitiesKHR &capab
     }
 }
 
-VulkanBackend::SwapChainSupportDetails VulkanBackend::querySwapChainSupport(VkPhysicalDevice device, VkSurfaceKHR &surface)
+SwapChainSupportDetails VulkanBackend::querySwapChainSupport(VkPhysicalDevice device, VkSurfaceKHR &surface)
 {
     SwapChainSupportDetails details;
 
@@ -857,7 +861,7 @@ VulkanBackend::SwapChainSupportDetails VulkanBackend::querySwapChainSupport(VkPh
     return details;
 }
 
-VulkanBackend::QueueFamilyIndices VulkanBackend::findQueueFamilies(VkPhysicalDevice device, VkSurfaceKHR &surface)
+QueueFamilyIndices VulkanBackend::findQueueFamilies(VkPhysicalDevice device, VkSurfaceKHR &surface)
 {
     QueueFamilyIndices indices;
 

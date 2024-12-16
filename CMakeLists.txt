@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.29)
+cmake_minimum_required(VERSION 3.12...3.29)
 
 project(QuantaRayTracingEngine VERSION 0.0.1)
 
@@ -7,8 +7,6 @@ set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
 set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
 
 set(DEPENDENCIES CACHE STRING "")
-
-message("dep ${DEPENDENCIES}")
 
 add_subdirectory("${DEPENDENCIES}/glfw" glfw)
 add_subdirectory("${DEPENDENCIES}/glm" glm)
