@@ -2,6 +2,7 @@
 
 #include "vector3.hpp"
 #include "quanta_types.hpp"
+#include "Utilities/Interval.hpp"
 
 namespace Scene
 {
@@ -11,7 +12,7 @@ namespace Scene
         {
         public:
             virtual ~RayTarget() = default;
-            virtual HitInfo hit(Ray ray) = 0;
+            virtual HitInfo hit(Ray ray, Utilities::Interval ray_t) = 0;
         };
 
         class Sphere : public RayTarget
@@ -24,7 +25,7 @@ namespace Scene
 
             ~Sphere() {}
 
-            HitInfo hit(Ray ray)
+            HitInfo hit(Ray ray, Utilities::Interval ray_t)
             {
                 Math::Vector3<float> offsetRayOrigin = (Math::Vector3<float>)ray.Origin - Origin;
 
@@ -40,9 +41,19 @@ namespace Scene
                     return info;
                 }
 
-                // int ans = (-b + sqrt((b * b) - (4 * a * c))) / (2 * a);
-                float t0 = (-b + std::sqrt(discriminant)) / (2.0f * a);
-                float t1 = (-b - std::sqrt(discriminant)) / (2.0f * a);
+                double t1 = (-b - std::sqrt(discriminant)) / (2.0f * a);
+
+                if (!ray_t.surrounds(t1))
+                {
+                    // int ans = (-b + sqrt((b * b) - (4 * a * c))) / (2 * a);
+                    double t0 = (-b + std::sqrt(discriminant)) / (2.0f * a);
+                    if (!ray_t.surrounds(t0))
+                    {
+                        HitInfo info{};
+                        info.HitPoint = Math::Vector3(-1.0f, -1.0f, -1.0f);
+                        return info;
+                    }
+                }
 
                 HitInfo hitInfo{};
 

@@ -60,15 +60,15 @@ void Application::Init()
 		mat.EmissionColor = Math::Vector3<float>(0, 0, 0);
 		mat.EmissionStrength = 0.0f;
 
-		// Scene::Material mat2;
-		// mat2.Color = Math::Vector3<float>(1, 1, 0);
-		// mat2.EmissionColor = Math::Vector3<float>(1, 1, 1);
-		// mat2.EmissionStrength = 0.0f;
+		Scene::Material mat2;
+		mat2.Color = Math::Vector3<float>(1, 1, 0);
+		mat2.EmissionColor = Math::Vector3<float>(1, 1, 1);
+		mat2.EmissionStrength = 0.0f;
 
-		// Scene::Material mat3;
-		// mat3.Color = Math::Vector3<float>(1, 1, 1);
-		// mat3.EmissionColor = Math::Vector3<float>(1, 1, 1);
-		// mat3.EmissionStrength = 0.0f;
+		Scene::Material mat3;
+		mat3.Color = Math::Vector3<float>(1, 1, 1);
+		mat3.EmissionColor = Math::Vector3<float>(1, 1, 1);
+		mat3.EmissionStrength = 0.0f;
 
 		Scene::Material lightMaterial;
 		lightMaterial.Color = Math::Vector3<float>(1, 1, 1);
@@ -80,16 +80,16 @@ void Application::Init()
 		sphere.Material = mat;
 		sphere.id = 0;
 
-		/*	Scene::Shapes::Sphere sphere2;
-			sphere2.Origin = Math::Vector3<float>(1, 1, 0);
-			sphere2.Material = mat2;
-			sphere2.id = 1;
+		Scene::Shapes::Sphere sphere2;
+		sphere2.Origin = Math::Vector3<float>(1, 1, 0);
+		sphere2.Material = mat2;
+		sphere2.id = 1;
 
-			Scene::Shapes::Sphere sphere3;
-			sphere3.Origin = Math::Vector3<float>(1, -2, 1);
-			sphere3.Material = mat3;
-			sphere3.Radius = 1.8f;
-			sphere3.id = 2;  */
+		Scene::Shapes::Sphere sphere3;
+		sphere3.Origin = Math::Vector3<float>(1, -2, 1);
+		sphere3.Material = mat3;
+		sphere3.Radius = 1.8f;
+		sphere3.id = 2;  
 
 		Scene::Shapes::Sphere sphere4;
 		sphere4.Origin = Math::Vector3<float>(-1, 1.7, 1);
@@ -98,8 +98,8 @@ void Application::Init()
 		sphere4.id = 2222;
 
 		scene.ray_targets.push_back(std::make_shared<Scene::Shapes::Sphere>(sphere));
-		// scene.Spheres.push_back(sphere2);
-		// scene.Spheres.push_back(sphere3);
+		scene.ray_targets.push_back(std::make_shared<Scene::Shapes::Sphere>(sphere2));
+		scene.ray_targets.push_back(std::make_shared<Scene::Shapes::Sphere>(sphere3));
 		scene.ray_targets.push_back(std::make_shared<Scene::Shapes::Sphere>(sphere4));
 
 		renderer = std::make_unique<Renderer>(scene);

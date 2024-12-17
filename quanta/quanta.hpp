@@ -3,11 +3,13 @@
 #include <cstdint>
 #include <tgmath.h>
 #include <iostream>
+#include <limits>
 
 #include "vector3.hpp"
 #include "scene/Scene.hpp"
 #include <scene/Shapes.hpp>
 #include <utilities/Random.hpp>
+#include "Utilities/Interval.hpp"
 
 #include "quanta_types.hpp"
 

@@ -71,11 +71,12 @@ Math::Vector3<float> Renderer::PerPixel(float image_x, float image_y)
 
 HitInfo Renderer::TraceRay(const Ray &ray)
 {
-    for (const auto& object : m_Scene.ray_targets)
+    Utilities::Interval ray_t = Utilities::Interval(0, std::numeric_limits<double>::infinity());
+    double closest_so_far = ray_t.max;
+    for (const auto &object : m_Scene.ray_targets)
     {
-        //Scene::Shapes::RayTarget sphere = m_Scene.ray_targets[i];
 
-        HitInfo info = object->hit(ray);
+        HitInfo info = object->hit(ray, Utilities::Interval(ray_t.min, closest_so_far));
 
         if (info.HitPoint == Math::Vector3<float>(-1, -1, -1))
             continue;

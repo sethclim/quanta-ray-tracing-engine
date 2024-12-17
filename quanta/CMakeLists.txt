@@ -6,6 +6,7 @@ add_library(quanta
             scene/Scene.hpp
             scene/Shapes.hpp
             utilities/Random.hpp
+            utilities/Interval.hpp
             )
             
 target_include_directories(quanta PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/")
