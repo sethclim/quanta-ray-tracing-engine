@@ -54,7 +54,8 @@ Math::Vector3<float> Renderer::PerPixel(float image_x, float image_y)
 
             ray.Origin = (info.HitPoint + 0.001f);
             // ray.Direction = Reflect(info.Normal, ray.Direction);
-            ray.Direction = Utilities::Random::Random_On_Hemisphere(info.Normal);
+            // ray.Direction = Utilities::Random::Random_On_Hemisphere(info.Normal);
+            ray.Direction = info.Normal + Utilities::Random::Random_Unit_Vector();
 
             Math::Vector3<float> emittedLight = info.Material.EmissionColor * info.Material.EmissionStrength;
 
@@ -71,7 +72,7 @@ Math::Vector3<float> Renderer::PerPixel(float image_x, float image_y)
 
 HitInfo Renderer::TraceRay(const Ray &ray)
 {
-    Utilities::Interval ray_t = Utilities::Interval(0, std::numeric_limits<double>::infinity());
+    Utilities::Interval ray_t = Utilities::Interval(0.001, std::numeric_limits<double>::infinity());
     double closest_so_far = ray_t.max;
     for (const auto &object : m_Scene.ray_targets)
     {
