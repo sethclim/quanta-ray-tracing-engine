@@ -97,10 +97,10 @@ void Application::Init()
 		sphere4.Radius = 1.0f;
 		sphere4.id = 2222;
 
-		scene.Spheres.push_back(sphere);
+		scene.ray_targets.push_back(std::make_shared<Scene::Shapes::Sphere>(sphere));
 		// scene.Spheres.push_back(sphere2);
 		// scene.Spheres.push_back(sphere3);
-		scene.Spheres.push_back(sphere4);
+		scene.ray_targets.push_back(std::make_shared<Scene::Shapes::Sphere>(sphere4));
 
 		renderer = std::make_unique<Renderer>(scene);
 	}

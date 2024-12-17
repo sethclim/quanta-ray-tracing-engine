@@ -7,6 +7,6 @@ namespace Scene
 {
     struct SceneGraph
     {
-        std::vector<Shapes::Sphere> Spheres;
+        std::vector<std::shared_ptr<Shapes::RayTarget>> ray_targets;
     };
 }
