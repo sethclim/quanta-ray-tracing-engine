@@ -3,6 +3,7 @@
 #include "vector3.hpp"
 #include "quanta_types.hpp"
 #include "Utilities/Interval.hpp"
+#include "scene/Materials.hpp"
 
 namespace Scene
 {
@@ -20,7 +21,7 @@ namespace Scene
         public:
             float Radius = 0.5f;
             Math::Vector3<float> Origin;
-            Material Material;
+            //Materials::Material Material;
             int id;
 
             ~Sphere() {}
@@ -64,6 +65,8 @@ namespace Scene
 
                 return hitInfo;
             }
+
+            std::shared_ptr<Materials::Material> Material;
         };
     }
 }

@@ -5,6 +5,7 @@ add_library(quanta
             quanta_types.hpp
             scene/Scene.hpp
             scene/Shapes.hpp
+            scene/Materials.hpp
             utilities/Random.hpp
             utilities/Interval.hpp
             )

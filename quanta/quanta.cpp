@@ -1,15 +1,5 @@
 #include "quanta.hpp"
 
-static uint32_t ConvertToRGBA(const Math::Vector3<float> &color)
-{
-    uint8_t r = (color.x * 255.0f);
-    uint8_t g = (color.y * 255.0f);
-    uint8_t b = (color.z * 255.0f);
-    uint8_t a = (255.0f);
-
-    return (a << 24) | (b << 16) | (g << 8) | r;
-}
-
 /// <summary>
 /// Finds the reflected ray
 /// </summary>
@@ -52,16 +42,31 @@ Math::Vector3<float> Renderer::PerPixel(float image_x, float image_y)
             if (i == 0 && info.ObjectID == 2222)
                 break;
 
-            ray.Origin = (info.HitPoint + 0.001f);
-            // ray.Direction = Reflect(info.Normal, ray.Direction);
-            // ray.Direction = Utilities::Random::Random_On_Hemisphere(info.Normal);
-            ray.Direction = info.Normal + Utilities::Random::Random_Unit_Vector();
+            // ray.Origin = (info.HitPoint + 0.001f);
+            // // ray.Direction = Reflect(info.Normal, ray.Direction);
+            // // ray.Direction = Utilities::Random::Random_On_Hemisphere(info.Normal);
+            // ray.Direction = info.Normal + Utilities::Random::Random_Unit_Vector();
 
-            Math::Vector3<float> emittedLight = info.Material.EmissionColor * info.Material.EmissionStrength;
+            Math::Vector3<float> attenuation;
+            Ray ray2;
+            if (info.Material->scatter(ray, info, attenuation, ray2))
+            {
+                Math::Vector3<float>
+                    emittedLight = info.Material->EmissionColor * info.Material->EmissionStrength;
 
-            rayColor *= info.Material.Color;
+                rayColor *= attenuation;
 
-            incomingLight += rayColor * emittedLight;
+                incomingLight += rayColor * emittedLight;
+
+                ray.Origin = ray2.Origin;
+                ray.Direction = ray2.Direction;
+            }
+            else
+            {
+                Math::Vector3<float>
+                    emittedLight = info.Material->EmissionColor * info.Material->EmissionStrength;
+                incomingLight += rayColor * emittedLight;
+            }
         }
 
         pixel_color += incomingLight;
