@@ -65,7 +65,7 @@ void Application::Init()
 		mat2.EmissionColor = Math::Vector3<float>(1, 1, 1);
 		mat2.EmissionStrength = 0.0f;
 
-		Materials::Metal mat3 = Materials::Metal(Math::Vector3<float>(1, 0, 0));
+		Materials::Metal mat3 = Materials::Metal(Math::Vector3<float>(1, 1, 1));
 		/*mat3.Color = Math::Vector3<float>(1, 1, 1);
 		mat3.EmissionColor = Math::Vector3<float>(1, 1, 1);
 		mat3.EmissionStrength = 0.0f;*/
@@ -102,9 +102,9 @@ void Application::Init()
 		sphere4.Radius = 1.0f;
 		sphere4.id = 2222;
 
-		//scene.ray_targets.push_back(std::make_shared<Scene::Shapes::Sphere>(sphere));
-		//scene.ray_targets.push_back(std::make_shared<Scene::Shapes::Sphere>(sphere2));
-		scene.ray_targets.push_back(std::make_shared<Scene::Shapes::Sphere>(sphere3));
+		scene.ray_targets.push_back(std::make_shared<Scene::Shapes::Sphere>(sphere));
+		scene.ray_targets.push_back(std::make_shared<Scene::Shapes::Sphere>(sphere2));
+		scene.ray_targets.push_back(std::make_shared<Scene::Shapes::Sphere>(sphere));
 		scene.ray_targets.push_back(std::make_shared<Scene::Shapes::Sphere>(sphere4));
 
 		renderer = std::make_unique<Renderer>(scene);
@@ -127,7 +127,10 @@ void Application::Init()
 		&renderContext.Width,
 		&renderContext.Height);
 
-	VulkanBackend::GetInstance().SetupVulkan(extensions, extensions_count, drawData.vertices, drawData.indices);
+
+	VkDeviceSize debugBufferSize = sizeof(Utilities::DebugLine) * 1572864;
+
+	VulkanBackend::GetInstance().SetupVulkan(extensions, extensions_count, drawData.vertices, drawData.indices, debugBufferSize, false);
 
 	/*ImGui_ImplVulkanH_Window *wd = &g_MainWindowData;*/
 	// SetupVulkanWindow(wd, surface, w, h);
@@ -155,7 +158,7 @@ void Application::Run()
 
 		float deltaTime = std::min(frameTime, fpsLimit);
 
-		/*     m_gameController->ProcessInput(deltaTime);*/
+		/* m_gameController->ProcessInput(deltaTime);*/
 		// m_gameController->Update(deltaTime);
 
 		// Utilities::FPSCounter::CalculateFrameRate();
@@ -173,6 +176,7 @@ void Application::Run()
 
 		if (!m_Image || dimensions[0] != m_Image->GetWidth() || dimensions[1] != m_Image->GetHeight())
 		{
+			std::cout << "[dimensions x: " << dimensions[0] << " y: " << dimensions[1] << std::endl;
 
 			m_Image = std::make_shared<Image>(dimensions[0], dimensions[1], ImageFormat::RGBA);
 			delete[] m_ImageData;
@@ -193,7 +197,11 @@ void Application::Run()
 				float normalizedY = (float)y / (float)dimensions[1];
 
 				uint32_t idx = x + (y * dimensions[0]);
-				Math::Vector3<float> color = renderer->PerPixel(normalizedX, normalizedY);
+
+				Math::Vector3<float> color = Math::Vector3<float>(0, 0, 0);
+
+				if (x == 535 && y == 318)
+					color = renderer->PerPixel(normalizedX, normalizedY);
 
 				m_AccumulationData[x + y * m_Image->GetWidth()] += glm::vec4(color.x, color.y, color.z, 1.0f);
 
@@ -207,10 +215,17 @@ void Application::Run()
 
 		m_Image->SetData(m_ImageData);
 
+
+		auto d_lines = renderer->GetDebugLines();
+		if (false)
+		{
+			vulkanBackend.updateDebugBuffer(d_lines);
+		}
+
 		glm::vec2 size = WindowController::GetInstance().GetSize();
 		editor->CalculateLayout(size.x, size.y);
 		DrawData drawData = editor->RenderEditor();
-		VulkanBackend::GetInstance().drawFrame(drawData.indices);
+		VulkanBackend::GetInstance().drawFrame(drawData.indices, d_lines.size());
 
 		m_FrameIndex++;
 	}

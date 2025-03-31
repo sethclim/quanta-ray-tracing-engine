@@ -17,6 +17,9 @@
 
 #include <vulkan/vulkan.h>
 
+#include "../../render_data/render_data.hpp"
+
+
 #define M_ASSERT(_cond, _msg) \
     if (!(_cond))             \
     {                         \

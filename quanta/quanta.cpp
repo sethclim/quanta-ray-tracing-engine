@@ -12,7 +12,7 @@ Math::Vector3<float> Reflect(Math::Vector3<float> &N, Math::Vector3<float> &Ri)
     return Ri - (N * 2.0f * Math::Dot(Ri, N));
 }
 
-const int MAX_BOUNCES = 3;
+const int MAX_BOUNCES = 2;
 const int SAMPLES_PER_PIXEL = 10;
 
 Math::Vector3<float> Renderer::PerPixel(float image_x, float image_y)
@@ -26,21 +26,29 @@ Math::Vector3<float> Renderer::PerPixel(float image_x, float image_y)
     ray.Direction = Math::Vector3<float>(coordX, coordY, -1.0f);
 
     Math::Vector3<float> pixel_color(0, 0, 0);
+
     for (int sample = 0; sample < SAMPLES_PER_PIXEL; sample++)
     {
-
         Math::Vector3<float> incomingLight = Math::Vector3<float>(0, 0, 0);
         Math::Vector3<float> rayColor = Math::Vector3<float>(1, 1, 1);
 
         for (int i = 0; i < MAX_BOUNCES; i++)
         {
+
             HitInfo info = TraceRay(ray);
 
             if (info.HitPoint == Math::Vector3<float>(-1, -1, -1))
-                break;
+                break; 
 
             if (i == 0 && info.ObjectID == 2222)
                 break;
+
+            if (i == 1)
+            {
+                std::cout << "hit: image_x: " << image_x << " image_y " << image_y << std::endl;
+            }
+
+            addDebugLine(ray.Origin, info.HitPoint);
 
             // ray.Origin = (info.HitPoint + 0.001f);
             // // ray.Direction = Reflect(info.Normal, ray.Direction);

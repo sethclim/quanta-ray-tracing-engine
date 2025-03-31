@@ -60,8 +60,8 @@ VkPipeline PipelineBuilder::build_pipeline(VkDevice device, Quanta_ImplVulkanH_R
     VkPipelineVertexInputStateCreateInfo _vertexInputInfo = {};
     _vertexInputInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
 
-    auto bindingDescription = Vertex::getBindingDescription();
-    auto attributeDescriptions = Vertex::getAttributeDescriptions();
+    auto bindingDescription = RenderData::getBindingDescription();
+    auto attributeDescriptions = RenderData::getAttributeDescriptions();
 
     _vertexInputInfo.vertexBindingDescriptionCount = 1;
     _vertexInputInfo.vertexAttributeDescriptionCount = static_cast<uint32_t>(attributeDescriptions.size());
@@ -160,7 +160,7 @@ void PipelineBuilder::set_raster_defaults()
 void PipelineBuilder::set_polygon_mode(VkPolygonMode mode)
 {
     _rasterizer.polygonMode = mode;
-    _rasterizer.lineWidth = 1.f;
+    _rasterizer.lineWidth = 2.f;
 }
 
 void PipelineBuilder::set_cull_mode(VkCullModeFlags cullMode, VkFrontFace frontFace)

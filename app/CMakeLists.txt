@@ -22,6 +22,7 @@ add_executable(app
     src/VK_Pipeline.hpp
     src/VK_Pipeline.cpp
     src/VK_Types.hpp
+    src/VK_Types.cpp
     src/VK_Initializers.cpp
     src/VK_Initializers.hpp
     src/utils/Utilities.hpp
@@ -32,6 +33,8 @@ target_link_libraries(app PRIVATE quanta)
 target_link_libraries(app PRIVATE glfw)
 target_link_libraries(app PUBLIC editor)
 target_link_libraries(app PRIVATE glm::glm-header-only)
+
+target_include_directories(app PRIVATE ${QUANTA_INCLUDE_DIR})
 
 find_package(Vulkan REQUIRED)
 

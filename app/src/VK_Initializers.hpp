@@ -1,4 +1,5 @@
-#pragma once
+#ifndef VKINITIALIZERS_H
+#define VKINITIALIZERS_H
 
 #include <vulkan/vulkan.h>
 
@@ -9,3 +10,5 @@ VkPipelineShaderStageCreateInfo pipeline_shader_stage_create_info(VkShaderStageF
     const char* entry = "main");
 
 } // namespace vkinit
+
+#endif

@@ -1,9 +1,10 @@
 
 #include "Utilities.hpp"
 
+
 namespace Utils
 {
-    bool read_file(const std::string &filePath, std::vector<uint32_t> &buffer)
+	bool read_file(const std::string &filePath, std::vector<uint32_t> &buffer)
     {
         // open the file. With cursor at the end
         std::ifstream file(filePath, std::ios::ate | std::ios::binary);

@@ -61,3 +61,5 @@ find_package(Vulkan REQUIRED)
 target_link_libraries(editor PRIVATE Vulkan::Vulkan)
 
 target_link_libraries(editor PRIVATE glfw)
+
+target_link_libraries(editor PRIVATE RenderData)

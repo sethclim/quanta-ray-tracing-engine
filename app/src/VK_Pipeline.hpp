@@ -1,4 +1,6 @@
-#pragma once
+#ifndef VKPIPELINE_H
+#define VKPIPELINE_H
+
 #include "StandardIncludes.hpp"
 #include "VK_Types.hpp"
 #include "VK_Initializers.hpp"
@@ -45,3 +47,5 @@ namespace vkutil
 {
     bool load_shader_module(const std::string& filePath, VkDevice device, VkShaderModule &outShaderModule);
 }
+
+#endif // VKPIPELINE_H

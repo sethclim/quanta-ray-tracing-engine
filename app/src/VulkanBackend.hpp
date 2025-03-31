@@ -1,6 +1,8 @@
 #ifndef VULKANBACKEND_H
 #define VULKANBACKEND_H
 
+#include "quanta.hpp"
+
 #include <filesystem>
 
 // #define GLM_FORCE_RADIANS
@@ -11,6 +13,7 @@
 #include "WindowController.hpp"
 #include "VK_Pipeline.hpp"
 #include "VK_Types.hpp"
+
 
 const int MAX_FRAMES_IN_FLIGHT = 2;
 
@@ -50,9 +53,9 @@ class Image;
 class VulkanBackend : public Singleton<VulkanBackend>
 {
 public:
-    void SetupVulkan(const char **extensions, uint32_t extensions_count, const std::vector<Vertex> vertices, const std::vector<uint16_t> indices);
+    void SetupVulkan(const char **extensions, uint32_t extensions_count, const std::vector<Vertex> vertices, const std::vector<uint16_t> indices, int debugBufferSize, bool debug);
 
-    void drawFrame(const std::vector<uint16_t> indices);
+    void drawFrame(const std::vector<uint16_t> indices, int debugLinesCount);
     VkPhysicalDevice &GetPhysicalDevice();
     VkDevice &GetDevice();
     void createDescriptorSets(VkSampler &sampler, VkImageView &image_view);
@@ -84,13 +87,15 @@ private:
 
     void createGraphicsPipeline();
 
+    void createDebugPipeline();
+
     void createFramebuffers();
 
     void createCommandPool();
 
     void createCommandBuffers();
 
-    void recordCommandBuffer(VkCommandBuffer commandBuffer, const std::vector<uint16_t> indices);
+    void recordCommandBuffer(VkCommandBuffer commandBuffer, const std::vector<uint16_t> indices, int debugLinesCount);
 
     void createSyncObjects();
     void updateUniformBuffer(uint32_t currentImage);
@@ -115,7 +120,12 @@ private:
 
     void copyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size);
 
+    void createDebugBuffer(VkDevice device, VkDeviceSize bufferSize);
+
+    void drawDebugRays(VkCommandBuffer commandBuffer, int numLines); 
+
 public:
+    void updateDebugBuffer(std::vector<Utilities::DebugLine>& newLines);
     void createBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer &buffer, VkDeviceMemory &bufferMemory);
     uint32_t findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties);
     VkCommandBuffer beginSingleTimeCommands();
@@ -166,6 +176,14 @@ private:
     bool framebufferResized = false;
 
     Quanta_ImplVulkanH_RenderContext context;
+
+    //Debug
+    VkBuffer debugVertexBuffer;
+    VkDeviceMemory debugVertexBufferMemory;
+    Utilities::DebugLine* mappedDebugMemory = nullptr; // Pointer to mapped memory
+
+    int maxDebugLines;
+    bool debug;
 };
 
 #endif

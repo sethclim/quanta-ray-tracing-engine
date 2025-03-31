@@ -1,5 +1,6 @@
 
-#pragma once
+#ifndef IMAGE_H
+#define IMAGE_H
 
 #include <string>
 
@@ -57,3 +58,5 @@ private:
 
     std::string m_Filepath;
 };
+
+#endif
