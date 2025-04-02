@@ -38,6 +38,8 @@ Application::~Application()
 
 void Application::Init()
 {
+	debug = true;
+
 	// Setup GLFW window
 	glfwSetErrorCallback(glfw_error_callback);
 
@@ -83,7 +85,7 @@ void Application::Init()
 		Scene::Shapes::Sphere sphere;
 		sphere.Origin = Math::Vector3<float>(0, 0, 0);
 		sphere.Material = mat_one;
-		sphere.id = 0;
+		sphere.id = 666;
 
 		Scene::Shapes::Sphere sphere2;
 		sphere2.Origin = Math::Vector3<float>(1, 1, 0);
@@ -94,7 +96,7 @@ void Application::Init()
 		sphere3.Origin = Math::Vector3<float>(1, -2, 1);
 		sphere3.Material = mat_three;
 		sphere3.Radius = 1.8f;
-		sphere3.id = 2;  
+		sphere3.id = 2;
 
 		Scene::Shapes::Sphere sphere4;
 		sphere4.Origin = Math::Vector3<float>(-1, 1.7, 1);
@@ -103,9 +105,9 @@ void Application::Init()
 		sphere4.id = 2222;
 
 		scene.ray_targets.push_back(std::make_shared<Scene::Shapes::Sphere>(sphere));
-		scene.ray_targets.push_back(std::make_shared<Scene::Shapes::Sphere>(sphere2));
-		scene.ray_targets.push_back(std::make_shared<Scene::Shapes::Sphere>(sphere));
-		scene.ray_targets.push_back(std::make_shared<Scene::Shapes::Sphere>(sphere4));
+		// scene.ray_targets.push_back(std::make_shared<Scene::Shapes::Sphere>(sphere2));
+		// scene.ray_targets.push_back(std::make_shared<Scene::Shapes::Sphere>(sphere));
+		// scene.ray_targets.push_back(std::make_shared<Scene::Shapes::Sphere>(sphere4));
 
 		renderer = std::make_unique<Renderer>(scene);
 	}
@@ -127,10 +129,9 @@ void Application::Init()
 		&renderContext.Width,
 		&renderContext.Height);
 
-
 	VkDeviceSize debugBufferSize = sizeof(Utilities::DebugLine) * 1572864;
 
-	VulkanBackend::GetInstance().SetupVulkan(extensions, extensions_count, drawData.vertices, drawData.indices, debugBufferSize, false);
+	VulkanBackend::GetInstance().SetupVulkan(extensions, extensions_count, drawData.vertices, drawData.indices, debugBufferSize, debug);
 
 	/*ImGui_ImplVulkanH_Window *wd = &g_MainWindowData;*/
 	// SetupVulkanWindow(wd, surface, w, h);
@@ -148,6 +149,8 @@ void Application::Run()
 	m_Running = true;
 
 	VulkanBackend &vulkanBackend = VulkanBackend::GetInstance();
+
+	bool drawn = false;
 
 	while (glfwWindowShouldClose(WindowController::GetInstance().GetWindow()) == 0 && m_Running)
 	{
@@ -188,36 +191,40 @@ void Application::Run()
 		if (m_FrameIndex == 1)
 			memset(m_AccumulationData, 0, m_Image->GetWidth() * m_Image->GetHeight() * sizeof(glm::vec4));
 
-		for (uint32_t y = 0; y < dimensions[1]; y++)
+		if (!drawn)
 		{
-			for (uint32_t x = 0; x < dimensions[0]; x++)
+			for (uint32_t y = 0; y < dimensions[1]; y++)
 			{
+				for (uint32_t x = 0; x < dimensions[0]; x++)
+				{
 
-				float normalizedX = (float)x / (float)dimensions[0];
-				float normalizedY = (float)y / (float)dimensions[1];
+					float normalizedX = (float)x / (float)dimensions[0];
+					float normalizedY = (float)y / (float)dimensions[1];
 
-				uint32_t idx = x + (y * dimensions[0]);
+					uint32_t idx = x + (y * dimensions[0]);
 
-				Math::Vector3<float> color = Math::Vector3<float>(0, 0, 0);
+					Math::Vector3<float> color = Math::Vector3<float>(0, 0, 0);
 
-				if (x == 535 && y == 318)
+					/*	if (x == 535 && y == 318)*/
 					color = renderer->PerPixel(normalizedX, normalizedY);
 
-				m_AccumulationData[x + y * m_Image->GetWidth()] += glm::vec4(color.x, color.y, color.z, 1.0f);
+					m_AccumulationData[x + y * m_Image->GetWidth()] += glm::vec4(color.x, color.y, color.z, 1.0f);
 
-				glm::vec4 accumulatedColor = m_AccumulationData[x + y * m_Image->GetWidth()];
-				accumulatedColor /= (float)m_FrameIndex;
+					glm::vec4 accumulatedColor = m_AccumulationData[x + y * m_Image->GetWidth()];
+					accumulatedColor /= (float)m_FrameIndex;
 
-				accumulatedColor = glm::clamp(accumulatedColor, glm::vec4(0.0f), glm::vec4(1.0f));
-				m_ImageData[idx] = Utils::ConvertToRGBA(accumulatedColor);
+					accumulatedColor = glm::clamp(accumulatedColor, glm::vec4(0.0f), glm::vec4(1.0f));
+					m_ImageData[idx] = Utils::ConvertToRGBA(accumulatedColor);
+				}
 			}
+
+			drawn = true;
 		}
 
 		m_Image->SetData(m_ImageData);
 
-
 		auto d_lines = renderer->GetDebugLines();
-		if (false)
+		if (debug)
 		{
 			vulkanBackend.updateDebugBuffer(d_lines);
 		}

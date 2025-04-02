@@ -13,7 +13,9 @@ void VulkanBackend::SetupVulkan(const char **extensions, uint32_t extensions_cou
     createRenderPass();
     createDescriptorSetLayout();
     createGraphicsPipeline();
-    createDebugPipeline();
+
+    if(_debug)
+        createDebugPipeline();
 
     createFramebuffers();
     createCommandPool();
