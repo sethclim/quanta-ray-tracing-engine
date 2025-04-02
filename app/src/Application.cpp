@@ -48,6 +48,7 @@ void Application::Init()
 	Input::InputManager::Init();
 
 	glfwSetCursorPosCallback(WindowController::GetInstance().GetWindow(), Input::cursor_position_callback);
+	glfwSetMouseButtonCallback(WindowController::GetInstance().GetWindow(), Input::mouse_button_callback);
 
 	editor = std::make_unique<Editor>();
 	glm::vec2 size = WindowController::GetInstance().GetSize();
@@ -133,6 +134,10 @@ void Application::Init()
 
 	VulkanBackend::GetInstance().SetupVulkan(extensions, extensions_count, drawData.vertices, drawData.indices, debugBufferSize, debug);
 
+	Input::InputManager::GetInstance().AddCallback([](const Input::MouseEvent& e) {
+		std::cout << "Mouse event at (" << e.x << ", " << e.y << ")\n";
+	});
+
 	/*ImGui_ImplVulkanH_Window *wd = &g_MainWindowData;*/
 	// SetupVulkanWindow(wd, surface, w, h);
 
@@ -190,6 +195,10 @@ void Application::Run()
 
 		if (m_FrameIndex == 1)
 			memset(m_AccumulationData, 0, m_Image->GetWidth() * m_Image->GetHeight() * sizeof(glm::vec4));
+
+		//glm::vec2 mouse = Input::InputManager::GetInstance().GetMousePosition();
+
+		Input::InputManager::GetInstance().ProcessEvents();
 
 		if (!drawn)
 		{

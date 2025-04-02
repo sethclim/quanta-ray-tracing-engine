@@ -46,5 +46,23 @@ namespace Input
         delete s_Instance;
         s_Instance = nullptr;
     };
+
+    void InputManager::AddCallback(std::function<void(const MouseEvent&)> callback) {
+        callbacks.push_back(callback);
+    }
+
+    void InputManager::QueueEvent(const MouseEvent& event) {
+        eventQueue.push(event);
+    }
+
+    void InputManager::ProcessEvents() {
+        while (!eventQueue.empty()) {
+            MouseEvent event = eventQueue.front();
+            eventQueue.pop();
+            for (auto& callback : callbacks) {
+                callback(event);
+            }
+        }
+    }
 }
        
