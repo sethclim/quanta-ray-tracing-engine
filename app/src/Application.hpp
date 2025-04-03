@@ -53,7 +53,9 @@ private:
 	std::unique_ptr<Renderer> renderer;
 	std::unique_ptr <Editor> editor;
 
+	bool drawn;
 	bool debug;
+	glm::vec2 debug_trace_coord;
 };
 
 #endif

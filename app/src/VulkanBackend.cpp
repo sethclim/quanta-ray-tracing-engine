@@ -1,8 +1,8 @@
 #include "VulkanBackend.hpp"
-//#define GLM_ENABLE_EXPERIMENTAL
-//#include <glm/gtx/string_cast.hpp>
+// #define GLM_ENABLE_EXPERIMENTAL
+// #include <glm/gtx/string_cast.hpp>
 
-void VulkanBackend::SetupVulkan(const char **extensions, uint32_t extensions_count, const std::vector<Vertex> vertices, const std::vector<uint16_t> indices,int debugBufferSize, bool _debug)
+void VulkanBackend::SetupVulkan(const char **extensions, uint32_t extensions_count, const std::vector<Vertex> vertices, const std::vector<uint16_t> indices, int debugBufferSize, bool _debug)
 {
     createInstance(extensions, extensions_count);
     createSurface();
@@ -14,7 +14,7 @@ void VulkanBackend::SetupVulkan(const char **extensions, uint32_t extensions_cou
     createDescriptorSetLayout();
     createGraphicsPipeline();
 
-    if(_debug)
+    if (_debug)
         createDebugPipeline();
 
     createFramebuffers();
@@ -478,7 +478,7 @@ void VulkanBackend::createGraphicsPipeline()
     PipelineBuilder _pipelineBuilder = PipelineBuilder();
     auto folder_path = std::filesystem::path("../../app/src/shaders/");
     auto folder_abs = std::filesystem::absolute(folder_path);
-    
+
     VkShaderModule vertShaderModule;
     VkShaderModule fragShaderModule;
 
@@ -519,7 +519,10 @@ void VulkanBackend::createDebugPipeline()
     _pipelineBuilder.set_multisampling_none();
     _pipelineBuilder.enable_blending_alphablend();
 
-    context.DebugPipeline = _pipelineBuilder.build_pipeline(g_Device, context);
+    auto debugBindingDesc = RenderData::getDebugBindingDescription();
+    auto debugAttributeDesc = RenderData::getDebugAttributeDescriptions();
+
+    context.DebugPipeline = _pipelineBuilder.build_pipeline(g_Device, context, std::pair(debugBindingDesc, debugAttributeDesc));
 
     vkDestroyShaderModule(g_Device, fragShaderModule, nullptr);
     vkDestroyShaderModule(g_Device, vertShaderModule, nullptr);
@@ -695,7 +698,7 @@ void VulkanBackend::updateUniformBuffer(uint32_t currentImage)
     ubo.proj = glm::mat4(1.0f);
     ubo.proj[1][1] *= -1;
 
-    //std::cout << "ubo.proj " << glm::to_string(ubo.proj) << std::endl;
+    // std::cout << "ubo.proj " << glm::to_string(ubo.proj) << std::endl;
 
     memcpy(uniformBuffersMapped[currentImage], &ubo, sizeof(ubo));
 }
@@ -1081,26 +1084,39 @@ VkShaderModule VulkanBackend::createShaderModule(const std::vector<char> &code)
     return shaderModule;
 }
 
-void VulkanBackend::createDebugBuffer(VkDevice device, VkDeviceSize bufferSize) {
+void VulkanBackend::createDebugBuffer(VkDevice device, VkDeviceSize bufferSize)
+{
 
     createBuffer(bufferSize,
-        VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT,
-        VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
-        debugVertexBuffer, debugVertexBufferMemory);
+                 VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT,
+                 VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
+                 debugVertexBuffer, debugVertexBufferMemory);
 
     // **Keep memory mapped for fast updates**
-    vkMapMemory(device, debugVertexBufferMemory, 0, bufferSize, 0, (void**)&mappedDebugMemory);
+    vkMapMemory(device, debugVertexBufferMemory, 0, bufferSize, 0, (void **)&mappedDebugMemory);
 }
 
-void VulkanBackend::updateDebugBuffer(std::vector<Utilities::DebugLine>& newLines) {
+void VulkanBackend::updateDebugBuffer(std::vector<Utilities::DebugLine> &newLines)
+{
     assert(newLines.size() <= maxDebugLines); // Prevent buffer overflow
 
+    std::vector<RenderData::DebugVertex> flatDebugVertices;
+    flatDebugVertices.reserve(newLines.size() * 2);
+
+    for (const auto &line : newLines)
+    {
+        flatDebugVertices.push_back({glm::vec3(line.start.x, line.start.y, line.start.z)});
+        flatDebugVertices.push_back({ glm::vec3(line.end.x, line.end.y, line.end.z) });
+    }
+
     // Copy debug lines into the mapped memory
-    memcpy(mappedDebugMemory, newLines.data(), newLines.size() * sizeof(Utilities::DebugLine));
+    memcpy(mappedDebugMemory, flatDebugVertices.data(), flatDebugVertices.size() * sizeof(RenderData::DebugVertex));
 }
 
-void VulkanBackend::drawDebugRays(VkCommandBuffer commandBuffer, int numLines) {
-    if (numLines == 0) return; // Skip rendering if no debug lines
+void VulkanBackend::drawDebugRays(VkCommandBuffer commandBuffer, int numLines)
+{
+    if (numLines == 0)
+        return; // Skip rendering if no debug lines
 
     VkDeviceSize offsets[] = {0};
     vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, context.DebugPipeline);

@@ -11,12 +11,19 @@
 #include <optional>
 #include <cstddef>
 
-namespace RenderData 
+namespace RenderData
 {
     VkVertexInputBindingDescription getBindingDescription();
-    std::array<VkVertexInputAttributeDescription, 3> getAttributeDescriptions();
-}
+    std::vector<VkVertexInputAttributeDescription> getAttributeDescriptions();
 
+    struct DebugVertex
+    {
+        glm::vec3 position;
+    };
+
+    VkVertexInputBindingDescription getDebugBindingDescription();
+    std::vector<VkVertexInputAttributeDescription> getDebugAttributeDescriptions();
+}
 
 struct Quanta_ImplVulkanH_RenderContext
 {
@@ -50,7 +57,7 @@ struct Quanta_ImplVulkanH_RenderContext
 
     Quanta_ImplVulkanH_RenderContext()
     {
-        memset((void*)this, 0, sizeof(*this));
+        memset((void *)this, 0, sizeof(*this));
         // PresentMode = (VkPresentModeKHR)~0;     // Ensure we get an error if user doesn't set this.
         // ClearEnable = true;
     }

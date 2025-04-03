@@ -21,11 +21,14 @@ public:
     VkPipelineRenderingCreateInfo _renderInfo;
     VkFormat _colorAttachmentformat;
 
-    PipelineBuilder() { clear(); }  
+    PipelineBuilder() { clear(); }
 
     void clear();
 
-    VkPipeline build_pipeline(VkDevice device, Quanta_ImplVulkanH_RenderContext& context);
+    VkPipeline build_pipeline(
+        VkDevice device,
+        Quanta_ImplVulkanH_RenderContext &context,
+        std::optional<std::pair<VkVertexInputBindingDescription, std::vector<VkVertexInputAttributeDescription>>> customVertexInfoDescriptions = std::nullopt);
 
     void set_shaders(VkShaderModule vertexShader, VkShaderModule fragmentShader);
     void set_input_topology(VkPrimitiveTopology topology);
@@ -45,7 +48,7 @@ public:
 
 namespace vkutil
 {
-    bool load_shader_module(const std::string& filePath, VkDevice device, VkShaderModule &outShaderModule);
+    bool load_shader_module(const std::string &filePath, VkDevice device, VkShaderModule &outShaderModule);
 }
 
 #endif // VKPIPELINE_H

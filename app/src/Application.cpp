@@ -39,6 +39,7 @@ Application::~Application()
 void Application::Init()
 {
 	debug = true;
+	debug_trace_coord = glm::vec2(-1, -1);
 
 	// Setup GLFW window
 	glfwSetErrorCallback(glfw_error_callback);
@@ -134,8 +135,9 @@ void Application::Init()
 
 	VulkanBackend::GetInstance().SetupVulkan(extensions, extensions_count, drawData.vertices, drawData.indices, debugBufferSize, debug);
 
-	Input::InputManager::GetInstance().AddCallback([](const Input::MouseEvent& e) {
-		std::cout << "Mouse event at (" << e.x << ", " << e.y << ")\n";
+	Input::InputManager::GetInstance().AddCallback([this](const Input::MouseEvent& e) {
+		debug_trace_coord = glm::vec2(e.x, e.y);
+		drawn = false;
 	});
 
 	/*ImGui_ImplVulkanH_Window *wd = &g_MainWindowData;*/
@@ -155,7 +157,7 @@ void Application::Run()
 
 	VulkanBackend &vulkanBackend = VulkanBackend::GetInstance();
 
-	bool drawn = false;
+	drawn = false;
 
 	while (glfwWindowShouldClose(WindowController::GetInstance().GetWindow()) == 0 && m_Running)
 	{
@@ -200,12 +202,15 @@ void Application::Run()
 
 		Input::InputManager::GetInstance().ProcessEvents();
 
+		std::vector<Utilities::DebugLine> d_lines;
+
 		if (!drawn)
 		{
 			for (uint32_t y = 0; y < dimensions[1]; y++)
 			{
 				for (uint32_t x = 0; x < dimensions[0]; x++)
 				{
+					bool debug_pixel = (x == debug_trace_coord.x && y == debug_trace_coord.y);
 
 					float normalizedX = (float)x / (float)dimensions[0];
 					float normalizedY = (float)y / (float)dimensions[1];
@@ -215,7 +220,7 @@ void Application::Run()
 					Math::Vector3<float> color = Math::Vector3<float>(0, 0, 0);
 
 					/*	if (x == 535 && y == 318)*/
-					color = renderer->PerPixel(normalizedX, normalizedY);
+					color = renderer->PerPixel(normalizedX, normalizedY, debug_pixel);
 
 					m_AccumulationData[x + y * m_Image->GetWidth()] += glm::vec4(color.x, color.y, color.z, 1.0f);
 
@@ -223,16 +228,18 @@ void Application::Run()
 					accumulatedColor /= (float)m_FrameIndex;
 
 					accumulatedColor = glm::clamp(accumulatedColor, glm::vec4(0.0f), glm::vec4(1.0f));
-					m_ImageData[idx] = Utils::ConvertToRGBA(accumulatedColor);
+					m_ImageData[idx] = Utils::ConvertToRGBA(glm::vec4(1.0f));
 				}
 			}
 
 			drawn = true;
+
+			std::cout << "image generated " << std::endl;
 		}
 
 		m_Image->SetData(m_ImageData);
 
-		auto d_lines = renderer->GetDebugLines();
+		d_lines = renderer->GetDebugLines();
 		if (debug)
 		{
 			vulkanBackend.updateDebugBuffer(d_lines);

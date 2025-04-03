@@ -15,7 +15,7 @@ Math::Vector3<float> Reflect(Math::Vector3<float> &N, Math::Vector3<float> &Ri)
 const int MAX_BOUNCES = 2;
 const int SAMPLES_PER_PIXEL = 1;
 
-Math::Vector3<float> Renderer::PerPixel(float image_x, float image_y)
+Math::Vector3<float> Renderer::PerPixel(float image_x, float image_y, bool debug)
 {
     // convert to 0,0 in the centre
     float coordX = image_x * 2.0f - 1.0f;
@@ -40,7 +40,7 @@ Math::Vector3<float> Renderer::PerPixel(float image_x, float image_y)
             if (info.HitPoint == Math::Vector3<float>(-1, -1, -1))
             {
                 if (i == 0)
-                    rayColor = Math::Vector3<float>(0, 0, 0);
+                    rayColor = Math::Vector3<float>(0, 1, 0);
                 break; 
             }
 
@@ -52,11 +52,14 @@ Math::Vector3<float> Renderer::PerPixel(float image_x, float image_y)
                 std::cout << "hit: image_x: " << image_x << " image_y " << image_y << std::endl;
             }*/ 
 
-            if (i > 0)
-                std::cout << "hit: object: " << info.ObjectID << "x: " << info.HitPoint.x << " y " << info.HitPoint.y <<  " z " << info.HitPoint.z << std::endl;
+         /*   if (i > 0)
+                std::cout << "hit: object: " << info.ObjectID << "x: " << info.HitPoint.x << " y " << info.HitPoint.y <<  " z " << info.HitPoint.z << std::endl;*/
 
-            if(i == 0)
-                addDebugLine(ray.Origin, info.Normal);
+           if (debug && i == 0)
+           {
+                /* std::cout << "hit: object: " << info.ObjectID << "x: " << info.HitPoint.x << " y " << info.HitPoint.y << " z " << info.HitPoint.z << std::endl; */
+                addDebugLine(info.HitPoint, info.Normal * 0.1);
+           }
 
             rayColor = Math::Vector3<float>(0, 1, 0);
 
@@ -65,26 +68,26 @@ Math::Vector3<float> Renderer::PerPixel(float image_x, float image_y)
             // // ray.Direction = Utilities::Random::Random_On_Hemisphere(info.Normal);
             // ray.Direction = info.Normal + Utilities::Random::Random_Unit_Vector();
 
-            Math::Vector3<float> attenuation;
-            Ray ray2;
-            if (info.Material->scatter(ray, info, attenuation, ray2))
-            {
-                //Math::Vector3<float>
-                //    emittedLight = info.Material->EmissionColor * info.Material->EmissionStrength;
+            //Math::Vector3<float> attenuation;
+            //Ray ray2;
+            //if (info.Material->scatter(ray, info, attenuation, ray2))
+            //{
+            //    //Math::Vector3<float>
+            //    //    emittedLight = info.Material->EmissionColor * info.Material->EmissionStrength;
 
-                //rayColor *= attenuation;
+            //    //rayColor *= attenuation;
 
-                //incomingLight += rayColor * emittedLight;
+            //    //incomingLight += rayColor * emittedLight;
 
-                ray.Origin = ray2.Origin;
-                ray.Direction = ray2.Direction;
-            }
-            else
-            {
-                //Math::Vector3<float>
-                //    emittedLight = info.Material->EmissionColor * info.Material->EmissionStrength;
-                //incomingLight += rayColor * emittedLight;
-            }
+            //    ray.Origin = ray2.Origin;
+            //    ray.Direction = ray2.Direction;
+            //}
+            //else
+            //{
+            //    //Math::Vector3<float>
+            //    //    emittedLight = info.Material->EmissionColor * info.Material->EmissionStrength;
+            //    //incomingLight += rayColor * emittedLight;
+            //}
         }
 
   /*      pixel_color += rayColor;*/

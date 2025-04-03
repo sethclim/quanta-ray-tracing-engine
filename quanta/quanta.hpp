@@ -33,7 +33,7 @@ public:
         m_Scene = scene;
     }
 
-    Math::Vector3<float> PerPixel(float x, float y);
+    Math::Vector3<float> PerPixel(float x, float y, bool debug);
     HitInfo TraceRay(const Ray &ray);
 
     std::vector<Utilities::DebugLine> GetDebugLines() { return debugLines; }
@@ -41,6 +41,7 @@ public:
 private:
     void addDebugLine(Math::Vector3<float> start, Math::Vector3<float> end) {
         debugLines.push_back({ start, end });
+        //std::cout << "Debug Line Length " << debugLines.size() << std::endl;
     }
 
     Scene::SceneGraph m_Scene;  
