@@ -169,7 +169,7 @@ void PipelineBuilder::set_raster_defaults()
 void PipelineBuilder::set_polygon_mode(VkPolygonMode mode)
 {
     _rasterizer.polygonMode = mode;
-    _rasterizer.lineWidth = 4.f;
+    _rasterizer.lineWidth = 2.f;
 }
 
 void PipelineBuilder::set_cull_mode(VkCullModeFlags cullMode, VkFrontFace frontFace)

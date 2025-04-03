@@ -22,8 +22,8 @@ Math::Vector3<float> Renderer::PerPixel(float image_x, float image_y, bool debug
     float coordX = image_x * 2.0f - 1.0f;
     float coordY = image_y * 2.0f - 1.0f;
 
-    if (debug)
-        std::cout << "coordX " << coordX << "coordY " << coordY << std::endl;
+    //if (debug)
+    //    std::cout << "coordX " << coordX << "coordY " << coordY << std::endl;
 
     Math::Vector3<float> camera = Math::Vector3<float>(0.0f, 0.0f, 2.0f);
 
@@ -63,16 +63,16 @@ Math::Vector3<float> Renderer::PerPixel(float image_x, float image_y, bool debug
             /*   if (i > 0)
                    std::cout << "hit: object: " << info.ObjectID << "x: " << info.HitPoint.x << " y " << info.HitPoint.y <<  " z " << info.HitPoint.z << std::endl;*/
 
-            if (i > 0)
+            if (debug && i > 0 && sample == 0)
             {
                 // std::cout << "hit: object: " << info.ObjectID << "x: " << info.HitPoint.x << " y " << info.HitPoint.y << " z " << info.HitPoint.z << std::endl;
                 addDebugLine(ray.Origin, info.HitPoint);
             }
 
-            if (info.ObjectID == 2222)
-                rayColor = Math::Vector3<float>(0, 0.2, 0.4);
-            else
-                rayColor = Math::Vector3<float>(0.2, 0.4, 0.2);
+            //if (info.ObjectID == 2222)
+            //    rayColor = Math::Vector3<float>(0, 0.2, 0.4);
+            //else
+            //    rayColor = Math::Vector3<float>(0.2, 0.4, 0.2);
 
             // ray.Origin = (info.HitPoint + 0.001f);
             // // ray.Direction = Reflect(info.Normal, ray.Direction);

@@ -65,9 +65,14 @@ void Application::Init()
 		mat.EmissionStrength = 0.0f;
 
 		Materials::Lambertian mat2;
-		mat2.Color = Math::Vector3<float>(1, 1, 0);
-		mat2.EmissionColor = Math::Vector3<float>(1, 1, 1);
+		mat2.Color = Math::Vector3<float>(0, 1, 1);
+		mat2.EmissionColor = Math::Vector3<float>(0, 0, 0);
 		mat2.EmissionStrength = 0.0f;
+
+		Materials::Lambertian floor_mat;
+		floor_mat.Color = Math::Vector3<float>(1, 1, 1);
+		floor_mat.EmissionColor = Math::Vector3<float>(0, 0, 0);
+		floor_mat.EmissionStrength = 0.0f;
 
 		Materials::Metal mat3 = Materials::Metal(Math::Vector3<float>(1, 1, 1));
 		/*mat3.Color = Math::Vector3<float>(1, 1, 1);
@@ -81,33 +86,43 @@ void Application::Init()
 
 		auto mat_one = std::make_shared<Materials::Lambertian>(mat);
 		auto mat_two = std::make_shared<Materials::Lambertian>(mat2);
+		auto mat_floor = std::make_shared<Materials::Lambertian>(floor_mat);
 		auto mat_three = std::make_shared<Materials::Metal>(mat3);
 		auto mat_light = std::make_shared<Materials::Material>(lightMaterial);
 
 		Scene::Shapes::Sphere sphere;
-		sphere.Origin = Math::Vector3<float>(-0.5, 0, 0);
+		sphere.Origin = Math::Vector3<float>(-0.5, 0, -1);
 		sphere.Material = mat_one;
 		sphere.id = 666;
 
+		Scene::Shapes::Sphere floor;
+		floor.Origin = Math::Vector3<float>(0, 12, -4);
+		floor.Material = mat_floor;
+		floor.Radius = 10.0f;
+		floor.id = 456;
+
 		Scene::Shapes::Sphere sphere2;
-		sphere2.Origin = Math::Vector3<float>(1, 1, 0);
+		sphere2.Origin = Math::Vector3<float>(1, 0, 0);
 		sphere2.Material = mat_two;
 		sphere2.id = 1;
 
 		Scene::Shapes::Sphere sphere3;
-		sphere3.Origin = Math::Vector3<float>(1, -2, 1);
+		sphere3.Origin = Math::Vector3<float>(-0.2, 0.2, -0.3);
 		sphere3.Material = mat_three;
-		sphere3.Radius = 1.8f;
+		sphere3.Radius = 0.6f;
 		sphere3.id = 2;
 
 		Scene::Shapes::Sphere sphere4;
-		sphere4.Origin = Math::Vector3<float>(0.5, 0, 0);
+		sphere4.Origin = Math::Vector3<float>(0.5, -0.5, -1);
 		sphere4.Material = mat_light;
+		sphere4.Radius = 1.3f;
 		sphere4.id = 2222;
 
+		scene.ray_targets.push_back(std::make_shared<Scene::Shapes::Sphere>(floor));
+
 		scene.ray_targets.push_back(std::make_shared<Scene::Shapes::Sphere>(sphere));
-		// scene.ray_targets.push_back(std::make_shared<Scene::Shapes::Sphere>(sphere2));
-		// scene.ray_targets.push_back(std::make_shared<Scene::Shapes::Sphere>(sphere));
+		scene.ray_targets.push_back(std::make_shared<Scene::Shapes::Sphere>(sphere2));
+		scene.ray_targets.push_back(std::make_shared<Scene::Shapes::Sphere>(sphere3));
 		scene.ray_targets.push_back(std::make_shared<Scene::Shapes::Sphere>(sphere4));
 
 		renderer = std::make_unique<Renderer>(scene);
@@ -209,7 +224,8 @@ void Application::Run()
 			{
 				for (uint32_t x = 0; x < dimensions[0]; x++)
 				{
-					bool debug_pixel = (x == debug_trace_coord.x && y == debug_trace_coord.y);
+				/*	bool debug_pixel = (x == debug_trace_coord.x && y == debug_trace_coord.y);*/
+
 
 					float flipped_y = dimensions[1] - y;
 
@@ -217,6 +233,7 @@ void Application::Run()
 					float normalizedY = (float)flipped_y / (float)dimensions[1];
 
 					uint32_t idx = x + (y * dimensions[0]);
+					bool debug_pixel = idx % 1000;
 
 					Math::Vector3<float> color = Math::Vector3<float>(0, 0, 0);
 					/*
@@ -241,7 +258,6 @@ void Application::Run()
 			}
 
 			//drawn = true;
-
 			std::cout << "image generated " << std::endl;
 
 			m_Image->SetData(m_ImageData);
