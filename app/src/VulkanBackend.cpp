@@ -1,4 +1,5 @@
 #include "VulkanBackend.hpp"
+#include <glm/ext/matrix_transform.hpp>
 // #define GLM_ENABLE_EXPERIMENTAL
 // #include <glm/gtx/string_cast.hpp>
 
@@ -694,7 +695,11 @@ void VulkanBackend::updateUniformBuffer(uint32_t currentImage)
 {
     UniformBufferObject ubo{};
     ubo.model = glm::mat4(1.0f);
-    ubo.view = glm::mat4(1.0f);
+    ubo.view = glm::lookAt(
+        glm::vec3(0.0f, 0.0f, 2.0f),  // Camera position
+        glm::vec3(0.0f, 0.0f, 0.0f),  // Looking at the origin
+        glm::vec3(0.0f, 1.0f, 0.0f)   // Up vector
+    );
     ubo.proj = glm::mat4(1.0f);
     ubo.proj[1][1] *= -1;
 

@@ -22,9 +22,17 @@ Math::Vector3<float> Renderer::PerPixel(float image_x, float image_y, bool debug
     float coordX = image_x * 2.0f - 1.0f;
     float coordY = image_y * 2.0f - 1.0f;
 
+    if (debug)
+        std::cout << "coordX " << coordX << "coordY " << coordY << std::endl;
+
+    Math::Vector3<float> camera = Math::Vector3<float>(0.0f, 0.0f, 2.0f);
+
     Ray ray;
-    ray.Origin = Math::Vector3<float>(0.0f, 0.0f, 2.0f);
-    ray.Direction = Math::Vector3<float>(coordX, coordY, -1.0f);
+    ray.Origin = camera;
+    ray.Direction = Math::Normalize(Math::Vector3<float>(coordX, coordY, -1.0f));
+
+    //if(debug)
+    //    addDebugLine(camera, ray.Direction * 2);
 
     Math::Vector3<float> pixel_color(0, 0, 0);
 
@@ -35,7 +43,6 @@ Math::Vector3<float> Renderer::PerPixel(float image_x, float image_y, bool debug
 
         for (int i = 0; i < MAX_BOUNCES; i++)
         {
-
             HitInfo info = TraceRay(ray);
 
             if (info.HitPoint == Math::Vector3<float>(-1, -1, -1))
@@ -45,9 +52,9 @@ Math::Vector3<float> Renderer::PerPixel(float image_x, float image_y, bool debug
                 break; 
             }
 
-          /*  if (i == 0 && info.ObjectID == 2222)
+           if (i == 0 && info.ObjectID == 2222)
                 break;
-
+            /*
             if (i == 1)
             {
                 std::cout << "hit: image_x: " << image_x << " image_y " << image_y << std::endl;
@@ -58,37 +65,40 @@ Math::Vector3<float> Renderer::PerPixel(float image_x, float image_y, bool debug
 
            if (debug && i == 0)
            {
-                /* std::cout << "hit: object: " << info.ObjectID << "x: " << info.HitPoint.x << " y " << info.HitPoint.y << " z " << info.HitPoint.z << std::endl; */
-                addDebugLine(info.HitPoint, info.Normal);
+                //std::cout << "hit: object: " << info.ObjectID << "x: " << info.HitPoint.x << " y " << info.HitPoint.y << " z " << info.HitPoint.z << std::endl; 
+                addDebugLine(info.HitPoint, info.Normal * 0.02);
            }
 
-            rayColor = Math::Vector3<float>(0, 1, 0);
+           if (info.ObjectID == 2222)
+               rayColor = Math::Vector3<float>(0, 0.2, 0.4);
+           else
+               rayColor = Math::Vector3<float>(0.2, 0.4, 0.2);
 
             // ray.Origin = (info.HitPoint + 0.001f);
             // // ray.Direction = Reflect(info.Normal, ray.Direction);
             // // ray.Direction = Utilities::Random::Random_On_Hemisphere(info.Normal);
             // ray.Direction = info.Normal + Utilities::Random::Random_Unit_Vector();
 
-            //Math::Vector3<float> attenuation;
-            //Ray ray2;
-            //if (info.Material->scatter(ray, info, attenuation, ray2))
-            //{
-            //    //Math::Vector3<float>
-            //    //    emittedLight = info.Material->EmissionColor * info.Material->EmissionStrength;
+            Math::Vector3<float> attenuation;
+            Ray ray2;
+            if (info.Material->scatter(ray, info, attenuation, ray2))
+            {
+                //Math::Vector3<float>
+                //    emittedLight = info.Material->EmissionColor * info.Material->EmissionStrength;
 
-            //    //rayColor *= attenuation;
+                //rayColor *= attenuation;
 
-            //    //incomingLight += rayColor * emittedLight;
+                //incomingLight += rayColor * emittedLight;
 
-            //    ray.Origin = ray2.Origin;
-            //    ray.Direction = ray2.Direction;
-            //}
-            //else
-            //{
-            //    //Math::Vector3<float>
-            //    //    emittedLight = info.Material->EmissionColor * info.Material->EmissionStrength;
-            //    //incomingLight += rayColor * emittedLight;
-            //}
+                ray.Origin = ray2.Origin;
+                ray.Direction = ray2.Direction;
+            }
+            else
+            {
+                //Math::Vector3<float>
+                //    emittedLight = info.Material->EmissionColor * info.Material->EmissionStrength;
+                //incomingLight += rayColor * emittedLight;
+            }
         }
 
   /*      pixel_color += rayColor;*/

@@ -85,7 +85,7 @@ void Application::Init()
 		auto mat_light = std::make_shared<Materials::Material>(lightMaterial);
 
 		Scene::Shapes::Sphere sphere;
-		sphere.Origin = Math::Vector3<float>(0, 0, 0);
+		sphere.Origin = Math::Vector3<float>(0.5, 0, 0);
 		sphere.Material = mat_one;
 		sphere.id = 666;
 
@@ -101,9 +101,8 @@ void Application::Init()
 		sphere3.id = 2;
 
 		Scene::Shapes::Sphere sphere4;
-		sphere4.Origin = Math::Vector3<float>(-1, 1.7, 1);
+		sphere4.Origin = Math::Vector3<float>(1, 0, 0);
 		sphere4.Material = mat_light;
-		sphere4.Radius = 1.0f;
 		sphere4.id = 2222;
 
 		scene.ray_targets.push_back(std::make_shared<Scene::Shapes::Sphere>(sphere));
@@ -135,10 +134,10 @@ void Application::Init()
 
 	VulkanBackend::GetInstance().SetupVulkan(extensions, extensions_count, drawData.vertices, drawData.indices, debugBufferSize, debug);
 
-	Input::InputManager::GetInstance().AddCallback([this](const Input::MouseEvent& e) {
+	Input::InputManager::GetInstance().AddCallback([this](const Input::MouseEvent &e)
+												   {
 		debug_trace_coord = glm::vec2(e.x, e.y);
-		drawn = false;
-	});
+		drawn = false; });
 
 	/*ImGui_ImplVulkanH_Window *wd = &g_MainWindowData;*/
 	// SetupVulkanWindow(wd, surface, w, h);
@@ -203,7 +202,7 @@ void Application::Run()
 			if (m_FrameIndex == 1)
 				memset(m_AccumulationData, 0, m_Image->GetWidth() * m_Image->GetHeight() * sizeof(glm::vec4));
 
-			//glm::vec2 mouse = Input::InputManager::GetInstance().GetMousePosition();
+			// glm::vec2 mouse = Input::InputManager::GetInstance().GetMousePosition();
 
 			for (uint32_t y = 0; y < dimensions[1]; y++)
 			{
@@ -219,6 +218,9 @@ void Application::Run()
 					uint32_t idx = x + (y * dimensions[0]);
 
 					Math::Vector3<float> color = Math::Vector3<float>(0, 0, 0);
+					/*
+					if (flipped_y < dimensions[1] / 2)
+						color = Math::Vector3<float>(1, 0, 0);*/
 
 					/*	if (x == 535 && y == 318)*/
 					color = renderer->PerPixel(normalizedX, normalizedY, debug_pixel);
@@ -229,6 +231,10 @@ void Application::Run()
 					accumulatedColor /= (float)m_FrameIndex;
 
 					accumulatedColor = glm::clamp(accumulatedColor, glm::vec4(0.0f), glm::vec4(1.0f));
+
+					//if (x < dimensions[0] / 2)
+					//	accumulatedColor = glm::vec4(1, 0, 0, 1);
+
 					m_ImageData[idx] = Utils::ConvertToRGBA(accumulatedColor);
 				}
 			}
