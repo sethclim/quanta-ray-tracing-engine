@@ -38,7 +38,7 @@ Application::~Application()
 
 void Application::Init()
 {
-	debug = true;
+	debug = false;
 	debug_trace_coord = glm::vec2(-1, -1);
 
 	// Setup GLFW window
@@ -77,7 +77,7 @@ void Application::Init()
 		Materials::Material lightMaterial;
 		lightMaterial.Color = Math::Vector3<float>(1, 1, 1);
 		lightMaterial.EmissionColor = Math::Vector3<float>(1, 1, 1);
-		lightMaterial.EmissionStrength = 0.6f;
+		lightMaterial.EmissionStrength = 1.0f;
 
 		auto mat_one = std::make_shared<Materials::Lambertian>(mat);
 		auto mat_two = std::make_shared<Materials::Lambertian>(mat2);
@@ -85,7 +85,7 @@ void Application::Init()
 		auto mat_light = std::make_shared<Materials::Material>(lightMaterial);
 
 		Scene::Shapes::Sphere sphere;
-		sphere.Origin = Math::Vector3<float>(0.5, 0, 0);
+		sphere.Origin = Math::Vector3<float>(-0.5, 0, 0);
 		sphere.Material = mat_one;
 		sphere.id = 666;
 
@@ -101,14 +101,14 @@ void Application::Init()
 		sphere3.id = 2;
 
 		Scene::Shapes::Sphere sphere4;
-		sphere4.Origin = Math::Vector3<float>(1, 0, 0);
+		sphere4.Origin = Math::Vector3<float>(0.5, 0, 0);
 		sphere4.Material = mat_light;
 		sphere4.id = 2222;
 
 		scene.ray_targets.push_back(std::make_shared<Scene::Shapes::Sphere>(sphere));
 		// scene.ray_targets.push_back(std::make_shared<Scene::Shapes::Sphere>(sphere2));
 		// scene.ray_targets.push_back(std::make_shared<Scene::Shapes::Sphere>(sphere));
-		// scene.ray_targets.push_back(std::make_shared<Scene::Shapes::Sphere>(sphere4));
+		scene.ray_targets.push_back(std::make_shared<Scene::Shapes::Sphere>(sphere4));
 
 		renderer = std::make_unique<Renderer>(scene);
 	}
@@ -135,9 +135,10 @@ void Application::Init()
 	VulkanBackend::GetInstance().SetupVulkan(extensions, extensions_count, drawData.vertices, drawData.indices, debugBufferSize, debug);
 
 	Input::InputManager::GetInstance().AddCallback([this](const Input::MouseEvent &e)
-												   {
+	{
 		debug_trace_coord = glm::vec2(e.x, e.y);
-		drawn = false; });
+		drawn = false; 
+	});
 
 	/*ImGui_ImplVulkanH_Window *wd = &g_MainWindowData;*/
 	// SetupVulkanWindow(wd, surface, w, h);
@@ -186,8 +187,8 @@ void Application::Run()
 		std::vector<Utilities::DebugLine> d_lines;
 		Input::InputManager::GetInstance().ProcessEvents();
 
-		if (!drawn)
-		{
+		//if (!drawn)
+		//{
 			if (!m_Image || dimensions[0] != m_Image->GetWidth() || dimensions[1] != m_Image->GetHeight())
 			{
 				std::cout << "[dimensions x: " << dimensions[0] << " y: " << dimensions[1] << std::endl;
@@ -232,14 +233,14 @@ void Application::Run()
 
 					accumulatedColor = glm::clamp(accumulatedColor, glm::vec4(0.0f), glm::vec4(1.0f));
 
-					//if (x < dimensions[0] / 2)
+					// if (x < dimensions[0] / 2)
 					//	accumulatedColor = glm::vec4(1, 0, 0, 1);
 
 					m_ImageData[idx] = Utils::ConvertToRGBA(accumulatedColor);
 				}
 			}
 
-			drawn = true;
+			//drawn = true;
 
 			std::cout << "image generated " << std::endl;
 
@@ -257,7 +258,7 @@ void Application::Run()
 			VulkanBackend::GetInstance().drawFrame(drawData.indices, d_lines.size());
 
 			m_FrameIndex++;
-		}
+		//}
 	}
 
 	// m_gameController->CleanUp();

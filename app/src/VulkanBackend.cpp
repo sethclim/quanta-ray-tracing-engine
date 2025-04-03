@@ -1,5 +1,6 @@
 #include "VulkanBackend.hpp"
 #include <glm/ext/matrix_transform.hpp>
+#include <glm/ext/matrix_clip_space.hpp>
 // #define GLM_ENABLE_EXPERIMENTAL
 // #include <glm/gtx/string_cast.hpp>
 
@@ -696,11 +697,19 @@ void VulkanBackend::updateUniformBuffer(uint32_t currentImage)
     UniformBufferObject ubo{};
     ubo.model = glm::mat4(1.0f);
     ubo.view = glm::lookAt(
-        glm::vec3(0.0f, 0.0f, 2.0f),  // Camera position
-        glm::vec3(0.0f, 0.0f, 0.0f),  // Looking at the origin
-        glm::vec3(0.0f, 1.0f, 0.0f)   // Up vector
+        glm::vec3(0.0f, 0.0f, 2.0f), // Camera position
+        glm::vec3(0.0f, 0.0f, 0.0f), // Looking at the origin
+        glm::vec3(0.0f, 1.0f, 0.0f)  // Up vector
     );
-    ubo.proj = glm::mat4(1.0f);
+    // ubo.proj = glm::mat4(1.0f);
+
+    float fov = glm::radians(80.0f);
+    float aspectRatio = 1024.0f / 768.0f; // Width / Height of the window
+    float nearPlane = 0.1f;
+    float farPlane = 1000.0f;
+
+    ubo.proj = glm::perspective(fov, aspectRatio, nearPlane, farPlane);
+
     ubo.proj[1][1] *= -1;
 
     // std::cout << "ubo.proj " << glm::to_string(ubo.proj) << std::endl;
@@ -1111,7 +1120,7 @@ void VulkanBackend::updateDebugBuffer(std::vector<Utilities::DebugLine> &newLine
     for (const auto &line : newLines)
     {
         flatDebugVertices.push_back({glm::vec3(line.start.x, line.start.y, line.start.z)});
-        flatDebugVertices.push_back({ glm::vec3(line.end.x, line.end.y, line.end.z) });
+        flatDebugVertices.push_back({glm::vec3(line.end.x, line.end.y, line.end.z)});
     }
 
     // Copy debug lines into the mapped memory

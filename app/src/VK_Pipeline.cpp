@@ -62,7 +62,6 @@ VkPipeline PipelineBuilder::build_pipeline(
     VkPipelineVertexInputStateCreateInfo _vertexInputInfo = {};
     _vertexInputInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
 
-
     if (customVertexInfoDescriptions)
     {
         auto bindingDescription = customVertexInfoDescriptions->first;
@@ -83,7 +82,6 @@ VkPipeline PipelineBuilder::build_pipeline(
         _vertexInputInfo.pVertexBindingDescriptions = &bindingDescription;
         _vertexInputInfo.pVertexAttributeDescriptions = attributeDescriptions.data();
     }
-
 
     VkPipelineDynamicStateCreateInfo dynamicInfo = {};
     dynamicInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO;
@@ -171,7 +169,7 @@ void PipelineBuilder::set_raster_defaults()
 void PipelineBuilder::set_polygon_mode(VkPolygonMode mode)
 {
     _rasterizer.polygonMode = mode;
-    _rasterizer.lineWidth = 2.f;
+    _rasterizer.lineWidth = 4.f;
 }
 
 void PipelineBuilder::set_cull_mode(VkCullModeFlags cullMode, VkFrontFace frontFace)
