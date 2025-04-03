@@ -184,36 +184,37 @@ void Application::Run()
 			VulkanBackend::GetInstance().GetRenderContext().Width,
 			VulkanBackend::GetInstance().GetRenderContext().Height);
 
-		if (!m_Image || dimensions[0] != m_Image->GetWidth() || dimensions[1] != m_Image->GetHeight())
-		{
-			std::cout << "[dimensions x: " << dimensions[0] << " y: " << dimensions[1] << std::endl;
-
-			m_Image = std::make_shared<Image>(dimensions[0], dimensions[1], ImageFormat::RGBA);
-			delete[] m_ImageData;
-			m_ImageData = new uint32_t[dimensions[0] * dimensions[1]];
-			delete[] m_AccumulationData;
-			m_AccumulationData = new glm::vec4[dimensions[0] * dimensions[1]];
-		}
-
-		if (m_FrameIndex == 1)
-			memset(m_AccumulationData, 0, m_Image->GetWidth() * m_Image->GetHeight() * sizeof(glm::vec4));
-
-		//glm::vec2 mouse = Input::InputManager::GetInstance().GetMousePosition();
-
-		Input::InputManager::GetInstance().ProcessEvents();
-
 		std::vector<Utilities::DebugLine> d_lines;
+		Input::InputManager::GetInstance().ProcessEvents();
 
 		if (!drawn)
 		{
+			if (!m_Image || dimensions[0] != m_Image->GetWidth() || dimensions[1] != m_Image->GetHeight())
+			{
+				std::cout << "[dimensions x: " << dimensions[0] << " y: " << dimensions[1] << std::endl;
+
+				m_Image = std::make_shared<Image>(dimensions[0], dimensions[1], ImageFormat::RGBA);
+				delete[] m_ImageData;
+				m_ImageData = new uint32_t[dimensions[0] * dimensions[1]];
+				delete[] m_AccumulationData;
+				m_AccumulationData = new glm::vec4[dimensions[0] * dimensions[1]];
+			}
+
+			if (m_FrameIndex == 1)
+				memset(m_AccumulationData, 0, m_Image->GetWidth() * m_Image->GetHeight() * sizeof(glm::vec4));
+
+			//glm::vec2 mouse = Input::InputManager::GetInstance().GetMousePosition();
+
 			for (uint32_t y = 0; y < dimensions[1]; y++)
 			{
 				for (uint32_t x = 0; x < dimensions[0]; x++)
 				{
 					bool debug_pixel = (x == debug_trace_coord.x && y == debug_trace_coord.y);
 
+					float flipped_y = dimensions[1] - y;
+
 					float normalizedX = (float)x / (float)dimensions[0];
-					float normalizedY = (float)y / (float)dimensions[1];
+					float normalizedY = (float)flipped_y / (float)dimensions[1];
 
 					uint32_t idx = x + (y * dimensions[0]);
 
@@ -228,29 +229,29 @@ void Application::Run()
 					accumulatedColor /= (float)m_FrameIndex;
 
 					accumulatedColor = glm::clamp(accumulatedColor, glm::vec4(0.0f), glm::vec4(1.0f));
-					m_ImageData[idx] = Utils::ConvertToRGBA(glm::vec4(1.0f));
+					m_ImageData[idx] = Utils::ConvertToRGBA(accumulatedColor);
 				}
 			}
 
 			drawn = true;
 
 			std::cout << "image generated " << std::endl;
+
+			m_Image->SetData(m_ImageData);
+
+			d_lines = renderer->GetDebugLines();
+			if (debug)
+			{
+				vulkanBackend.updateDebugBuffer(d_lines);
+			}
+
+			glm::vec2 size = WindowController::GetInstance().GetSize();
+			editor->CalculateLayout(size.x, size.y);
+			DrawData drawData = editor->RenderEditor();
+			VulkanBackend::GetInstance().drawFrame(drawData.indices, d_lines.size());
+
+			m_FrameIndex++;
 		}
-
-		m_Image->SetData(m_ImageData);
-
-		d_lines = renderer->GetDebugLines();
-		if (debug)
-		{
-			vulkanBackend.updateDebugBuffer(d_lines);
-		}
-
-		glm::vec2 size = WindowController::GetInstance().GetSize();
-		editor->CalculateLayout(size.x, size.y);
-		DrawData drawData = editor->RenderEditor();
-		VulkanBackend::GetInstance().drawFrame(drawData.indices, d_lines.size());
-
-		m_FrameIndex++;
 	}
 
 	// m_gameController->CleanUp();

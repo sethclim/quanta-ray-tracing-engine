@@ -35,7 +35,7 @@ void PipelineBuilder::clear()
 VkPipeline PipelineBuilder::build_pipeline(
     VkDevice device,
     Quanta_ImplVulkanH_RenderContext &context,
-    std::optional<std::pair<VkVertexInputBindingDescription, std::vector<VkVertexInputAttributeDescription>>> customVertexInfoDescriptions)
+    std::optional<std::pair<VkVertexInputBindingDescription, std::array<VkVertexInputAttributeDescription, 1>>> customVertexInfoDescriptions)
 {
     // make viewport state from our stored viewport and scissor.
     // at the moment we wont support multiple viewports or scissors
@@ -62,24 +62,28 @@ VkPipeline PipelineBuilder::build_pipeline(
     VkPipelineVertexInputStateCreateInfo _vertexInputInfo = {};
     _vertexInputInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
 
-    VkVertexInputBindingDescription bindingDescription;
-    std::vector<VkVertexInputAttributeDescription> attributeDescriptions;
 
     if (customVertexInfoDescriptions)
     {
-        bindingDescription = customVertexInfoDescriptions->first;
-        attributeDescriptions = customVertexInfoDescriptions->second;
+        auto bindingDescription = customVertexInfoDescriptions->first;
+        auto attributeDescriptions = customVertexInfoDescriptions->second;
+
+        _vertexInputInfo.vertexBindingDescriptionCount = 1;
+        _vertexInputInfo.vertexAttributeDescriptionCount = static_cast<uint32_t>(attributeDescriptions.size());
+        _vertexInputInfo.pVertexBindingDescriptions = &bindingDescription;
+        _vertexInputInfo.pVertexAttributeDescriptions = attributeDescriptions.data();
     }
     else
     {
-        bindingDescription = RenderData::getBindingDescription();
-        attributeDescriptions = RenderData::getAttributeDescriptions();
+        auto bindingDescription = RenderData::getBindingDescription();
+        auto attributeDescriptions = RenderData::getAttributeDescriptions();
+
+        _vertexInputInfo.vertexBindingDescriptionCount = 1;
+        _vertexInputInfo.vertexAttributeDescriptionCount = static_cast<uint32_t>(attributeDescriptions.size());
+        _vertexInputInfo.pVertexBindingDescriptions = &bindingDescription;
+        _vertexInputInfo.pVertexAttributeDescriptions = attributeDescriptions.data();
     }
 
-    _vertexInputInfo.vertexBindingDescriptionCount = 1;
-    _vertexInputInfo.vertexAttributeDescriptionCount = static_cast<uint32_t>(attributeDescriptions.size());
-    _vertexInputInfo.pVertexBindingDescriptions = &bindingDescription;
-    _vertexInputInfo.pVertexAttributeDescriptions = attributeDescriptions.data();
 
     VkPipelineDynamicStateCreateInfo dynamicInfo = {};
     dynamicInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO;

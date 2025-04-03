@@ -17,7 +17,7 @@ void main() {
     float gradient = gl_VertexIndex % 2; // 0 for start vertex, 1 for end vertex
 
     // Define gradient colors
-    vec3 colorStart = vec3(1, 0, 0); // Red
+    vec3 colorStart = vec3(0, 1, 0); // Red
     vec3 colorEnd = vec3(0, 0, 1);   // Blue
 
 

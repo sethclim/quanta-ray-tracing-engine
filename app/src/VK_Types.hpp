@@ -14,7 +14,7 @@
 namespace RenderData
 {
     VkVertexInputBindingDescription getBindingDescription();
-    std::vector<VkVertexInputAttributeDescription> getAttributeDescriptions();
+    std::array<VkVertexInputAttributeDescription, 3> getAttributeDescriptions();
 
     struct DebugVertex
     {
@@ -22,7 +22,7 @@ namespace RenderData
     };
 
     VkVertexInputBindingDescription getDebugBindingDescription();
-    std::vector<VkVertexInputAttributeDescription> getDebugAttributeDescriptions();
+    std::array<VkVertexInputAttributeDescription, 1> getDebugAttributeDescriptions();
 }
 
 struct Quanta_ImplVulkanH_RenderContext

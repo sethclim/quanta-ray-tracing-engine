@@ -17,6 +17,7 @@ const int SAMPLES_PER_PIXEL = 1;
 
 Math::Vector3<float> Renderer::PerPixel(float image_x, float image_y, bool debug)
 {
+
     // convert to 0,0 in the centre
     float coordX = image_x * 2.0f - 1.0f;
     float coordY = image_y * 2.0f - 1.0f;
@@ -40,7 +41,7 @@ Math::Vector3<float> Renderer::PerPixel(float image_x, float image_y, bool debug
             if (info.HitPoint == Math::Vector3<float>(-1, -1, -1))
             {
                 if (i == 0)
-                    rayColor = Math::Vector3<float>(0, 1, 0);
+                    rayColor = Math::Vector3<float>(0, 0, 0);
                 break; 
             }
 
@@ -58,7 +59,7 @@ Math::Vector3<float> Renderer::PerPixel(float image_x, float image_y, bool debug
            if (debug && i == 0)
            {
                 /* std::cout << "hit: object: " << info.ObjectID << "x: " << info.HitPoint.x << " y " << info.HitPoint.y << " z " << info.HitPoint.z << std::endl; */
-                addDebugLine(info.HitPoint, info.Normal * 0.1);
+                addDebugLine(info.HitPoint, info.Normal);
            }
 
             rayColor = Math::Vector3<float>(0, 1, 0);
