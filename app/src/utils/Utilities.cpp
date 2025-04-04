@@ -31,5 +31,7 @@ namespace Utils
 
         // now that the file is loaded into the buffer, we can close it
         file.close();
+
+        return true;
     }
 }

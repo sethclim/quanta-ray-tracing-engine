@@ -47,10 +47,9 @@ add_library(editor
 # target_link_libraries(editor MapleUI)
 
 # Check available MapleUI targets
-get_target_property(TARGET_TYPE MapleUI::mapleui TYPE)
-message(STATUS "MapleUI::MapleUI Target Type: ${TARGET_TYPE}")
+# get_target_property(TARGET_TYPE MapleUI::mapleui TYPE)
+# message(STATUS "MapleUI::MapleUI Target Type: ${TARGET_TYPE}")
             
-target_include_directories(editor PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/")
 # target_include_directories(editor PUBLIC ${MapleUI_INCLUDE_DIRS})
 target_link_libraries(editor PRIVATE  MapleUI::mapleui)
 
@@ -63,3 +62,35 @@ target_link_libraries(editor PRIVATE Vulkan::Vulkan)
 target_link_libraries(editor PRIVATE glfw)
 
 target_link_libraries(editor PRIVATE RenderData)
+
+target_link_libraries(editor PRIVATE imgui)
+
+# target_include_directories(editor PRIVATE
+#     ${IMGUI_SOURCE_DIR}/
+#     ${IMGUI_SOURCE_DIR}/backends)
+
+target_include_directories(editor PUBLIC
+    $<TARGET_PROPERTY:imgui,INTERFACE_INCLUDE_DIRECTORIES>
+)
+
+
+
+if (TARGET imgui)
+message(STATUS "imgui target exists before linking!")
+else()
+message(FATAL_ERROR "imgui target does NOT exist before linking!")
+endif()
+
+# target_include_directories(editor PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/")
+
+get_target_property(INCLUDE_DIRS editor INCLUDE_DIRECTORIES)
+message(STATUS "Editor include dirs: ${INCLUDE_DIRS}")
+
+get_target_property(EDITOR_LINKED editor LINK_LIBRARIES)
+message(STATUS "Editor links: ${EDITOR_LINKED}")
+
+get_target_property(IMGUI_INCLUDES imgui INTERFACE_INCLUDE_DIRECTORIES)
+message(STATUS "imgui includes: ${IMGUI_INCLUDES}")
+
+get_target_property(EDITOR_INCLUDES editor INCLUDE_DIRECTORIES)
+message(STATUS "Editor include dirs: ${EDITOR_INCLUDES}")
