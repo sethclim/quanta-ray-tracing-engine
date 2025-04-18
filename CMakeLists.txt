@@ -11,6 +11,8 @@ set(DEPENDENCIES CACHE STRING "")
 add_subdirectory("${DEPENDENCIES}/glfw" glfw)
 add_subdirectory("${DEPENDENCIES}/glm" glm)
 
+find_package(Vulkan REQUIRED)
+
 add_subdirectory(vendor)
 add_subdirectory(render_data)
 add_subdirectory(quanta)

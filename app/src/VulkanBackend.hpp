@@ -14,6 +14,10 @@
 #include "VK_Pipeline.hpp"
 #include "VK_Types.hpp"
 
+#include "imgui.h"
+#define IMGUI_IMPL_VULKAN_SHADER
+#include "imgui_impl_glfw.h"
+#include "imgui_impl_vulkan.h"
 
 const int MAX_FRAMES_IN_FLIGHT = 2;
 
@@ -122,10 +126,10 @@ private:
 
     void createDebugBuffer(VkDevice device, VkDeviceSize bufferSize);
 
-    void drawDebugRays(VkCommandBuffer commandBuffer, int numLines); 
+    void drawDebugRays(VkCommandBuffer commandBuffer, int numLines);
 
 public:
-    void updateDebugBuffer(std::vector<Utilities::DebugLine>& newLines);
+    void updateDebugBuffer(std::vector<Utilities::DebugLine> &newLines);
     void createBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer &buffer, VkDeviceMemory &bufferMemory);
     uint32_t findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties);
     VkCommandBuffer beginSingleTimeCommands();
@@ -177,10 +181,10 @@ private:
 
     Quanta_ImplVulkanH_RenderContext context;
 
-    //Debug
+    // Debug
     VkBuffer debugVertexBuffer;
     VkDeviceMemory debugVertexBufferMemory;
-    Utilities::DebugLine* mappedDebugMemory = nullptr; // Pointer to mapped memory
+    Utilities::DebugLine *mappedDebugMemory = nullptr; // Pointer to mapped memory
 
     int maxDebugLines;
     bool debug;

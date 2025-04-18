@@ -3,6 +3,9 @@
 
 Editor::Editor() : maple(new Maple())
 {
+
+
+	std::cout << "SETUP IMGUI" << std::endl;
 }
 
 std::vector<int> Editor::CalculateLayout(int width, int height)
@@ -22,7 +25,7 @@ DrawData Editor::RenderEditor()
 
 	float left_x = -1.0;
 	float right_x = 1.0 * 0.5f;
-	//float right_x = 1.0;
+	// float right_x = 1.0;
 	float top_y = 1.0;
 	float bottom_y = -1.0;
 

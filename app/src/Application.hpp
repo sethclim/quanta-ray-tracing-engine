@@ -12,6 +12,10 @@
 #include "InputManager.hpp"
 #include "../../editor/editor.hpp"
 
+#include "imgui.h"
+#include "imgui_impl_glfw.h"
+#include "imgui_impl_vulkan.h"
+
 //#include "MapleUI/maple.hpp"
 
 void check_vk_result(VkResult err);

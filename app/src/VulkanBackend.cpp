@@ -1,6 +1,7 @@
 #include "VulkanBackend.hpp"
 #include <glm/ext/matrix_transform.hpp>
 #include <glm/ext/matrix_clip_space.hpp>
+#include "ImGUI.hpp"
 // #define GLM_ENABLE_EXPERIMENTAL
 // #include <glm/gtx/string_cast.hpp>
 
@@ -36,6 +37,26 @@ void VulkanBackend::SetupVulkan(const char **extensions, uint32_t extensions_cou
 
     maxDebugLines = 1572864;
     debug = _debug;
+
+    // Setup Platform/Renderer bindings
+    ImGui_ImplVulkan_InitInfo init_info = {};
+    init_info.Instance = g_Instance;
+    init_info.PhysicalDevice = g_PhysicalDevice;
+    init_info.Device = g_Device;
+    init_info.QueueFamily = g_QueueFamily;
+    init_info.Queue = g_GraphicsQueue;
+    init_info.PipelineCache = g_PipelineCache;
+    init_info.DescriptorPool = g_DescriptorPool;
+    init_info.Allocator = g_Allocator;
+    init_info.MinImageCount = context.MinImageCount;
+    init_info.ImageCount = context.MinImageCount;
+    init_info.RenderPass = context.RenderPass;
+    init_info.DescriptorPoolSize = 2;
+    init_info.CheckVkResultFn = check_vk_result;
+    ImGui_ImplVulkan_Init(&init_info);
+
+    ImGUI::CreateImGUIRenderPass(g_Device, context, swapChainImageFormat);
+    ImGUI::UploadImGUIFonts();
 }
 
 void VulkanBackend::drawFrame(const std::vector<uint16_t> indices, int debugLinesCount)
@@ -348,6 +369,8 @@ void VulkanBackend::createSwapChain()
         imageCount = swapChainSupport.capabilities.maxImageCount;
     }
 
+    context.MinImageCount = imageCount;
+
     VkSwapchainCreateInfoKHR createInfo{};
     createInfo.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
     createInfo.surface = context.Surface;
@@ -413,7 +436,7 @@ void VulkanBackend::createRenderPass()
     colorAttachment.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
     colorAttachment.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
     colorAttachment.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-    colorAttachment.finalLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
+    colorAttachment.finalLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
 
     VkAttachmentReference colorAttachmentRef{};
     colorAttachmentRef.attachment = 0;
