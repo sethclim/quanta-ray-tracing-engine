@@ -89,4 +89,12 @@ struct UniformBufferObject
     alignas(16) glm::mat4 proj;
 };
 
+struct AllocatedImage {
+    VkImage image;
+    VkImageView imageView;
+    //VmaAllocation allocation;
+    VkExtent3D imageExtent;
+    VkFormat imageFormat;
+};
+
 #endif

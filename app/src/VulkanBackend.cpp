@@ -2,6 +2,7 @@
 #include <glm/ext/matrix_transform.hpp>
 #include <glm/ext/matrix_clip_space.hpp>
 #include "ImGUI.hpp"
+
 // #define GLM_ENABLE_EXPERIMENTAL
 // #include <glm/gtx/string_cast.hpp>
 
@@ -38,25 +39,100 @@ void VulkanBackend::SetupVulkan(const char **extensions, uint32_t extensions_cou
     maxDebugLines = 1572864;
     debug = _debug;
 
-    // Setup Platform/Renderer bindings
+    //// Setup Platform/Renderer bindings
+    // ImGui_ImplVulkan_InitInfo init_info = {};
+    // init_info.Instance = g_Instance;
+    // init_info.Device = g_Device;
+    // init_info.PhysicalDevice = g_PhysicalDevice;
+    // init_info.QueueFamily = g_QueueFamily;
+    // init_info.Queue = g_GraphicsQueue;
+    // init_info.PipelineCache = g_PipelineCache;
+    // init_info.DescriptorPool = g_DescriptorPool;
+    // init_info.Allocator = g_Allocator;
+    // init_info.MinImageCount = context.MinImageCount;
+    // init_info.ImageCount = context.MinImageCount;
+    // init_info.RenderPass = context.RenderPass;
+    // init_info.DescriptorPoolSize = 2;
+    // init_info.CheckVkResultFn = check_vk_result;
+    // ImGui_ImplVulkan_Init(&init_info);
+
+    // ImGUI::CreateImGUIRenderPass(g_Device, context, swapChainImageFormat);
+    // ImGUI::UploadImGUIFonts();
+
+    init_imgui();
+}
+
+void VulkanBackend::init_imgui()
+{
+    // 1: create descriptor pool for IMGUI
+    //  the size of the pool is very oversize, but it's copied from imgui demo
+    //  itself.
+    VkDescriptorPoolSize pool_sizes[] = {{VK_DESCRIPTOR_TYPE_SAMPLER, 1000},
+                                         {VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1000},
+                                         {VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE, 1000},
+                                         {VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, 1000},
+                                         {VK_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER, 1000},
+                                         {VK_DESCRIPTOR_TYPE_STORAGE_TEXEL_BUFFER, 1000},
+                                         {VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1000},
+                                         {VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1000},
+                                         {VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC, 1000},
+                                         {VK_DESCRIPTOR_TYPE_STORAGE_BUFFER_DYNAMIC, 1000},
+                                         {VK_DESCRIPTOR_TYPE_INPUT_ATTACHMENT, 1000}};
+
+    VkDescriptorPoolCreateInfo pool_info = {};
+    pool_info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
+    pool_info.flags = VK_DESCRIPTOR_POOL_CREATE_FREE_DESCRIPTOR_SET_BIT;
+    pool_info.maxSets = 1000;
+    pool_info.poolSizeCount = (uint32_t)std::size(pool_sizes);
+    pool_info.pPoolSizes = pool_sizes;
+
+    VkDescriptorPool imguiPool;
+    VkResult err = vkCreateDescriptorPool(g_Device, &pool_info, nullptr, &imguiPool);
+    check_vk_result(err);
+
+    // 2: initialize imgui library
+
+    // this initializes the core structures of imgui
+    ImGui::CreateContext();
+    ImGuiIO &io = ImGui::GetIO();
+    (void)io;
+    io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard; // Enable Keyboard Controls
+    io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;  // Enable Gamepad Controls
+    io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
+
+    //// this initializes imgui for SDL
+    // ImGui_ImplSDL2_InitForVulkan(_window);
+
+    // ImGui_ImplGlfw_InitForVulkan(WindowController::GetInstance().GetWindow(), false);
+
+    // this initializes imgui for Vulkan
     ImGui_ImplVulkan_InitInfo init_info = {};
     init_info.Instance = g_Instance;
     init_info.PhysicalDevice = g_PhysicalDevice;
     init_info.Device = g_Device;
-    init_info.QueueFamily = g_QueueFamily;
     init_info.Queue = g_GraphicsQueue;
-    init_info.PipelineCache = g_PipelineCache;
-    init_info.DescriptorPool = g_DescriptorPool;
-    init_info.Allocator = g_Allocator;
-    init_info.MinImageCount = context.MinImageCount;
-    init_info.ImageCount = context.MinImageCount;
+    init_info.DescriptorPool = imguiPool;
+    init_info.MinImageCount = 3;
+    init_info.ImageCount = 3;
     init_info.RenderPass = context.RenderPass;
-    init_info.DescriptorPoolSize = 2;
-    init_info.CheckVkResultFn = check_vk_result;
+
+    // init_info.UseDynamicRendering = true;
+
+    // VkPipelineRenderingCreateInfoKHR vkPipelineREnderingCreateInfoKHR = {};
+    // vkPipelineREnderingCreateInfoKHR.sType = VK_STRUCTURE_TYPE_PIPELINE_RENDERING_CREATE_INFO;
+    // vkPipelineREnderingCreateInfoKHR.colorAttachmentCount = 1;
+    // vkPipelineREnderingCreateInfoKHR.pColorAttachmentFormats = &swapChainImageFormat;
+
+    //// dynamic rendering parameters for imgui to use
+    // init_info.PipelineRenderingCreateInfo = vkPipelineREnderingCreateInfoKHR;
+    // init_info.MSAASamples = VK_SAMPLE_COUNT_1_BIT;
+
     ImGui_ImplVulkan_Init(&init_info);
 
-    ImGUI::CreateImGUIRenderPass(g_Device, context, swapChainImageFormat);
-    ImGUI::UploadImGUIFonts();
+    ImGui_ImplVulkan_CreateFontsTexture();
+
+    vkDeviceWaitIdle(g_Device);
+    // ImGui_ImplVulkan_DestroyFontUploadObjects();
 }
 
 void VulkanBackend::drawFrame(const std::vector<uint16_t> indices, int debugLinesCount)
@@ -103,6 +179,28 @@ void VulkanBackend::drawFrame(const std::vector<uint16_t> indices, int debugLine
         throw std::runtime_error("failed to submit draw command buffer!");
     }
 
+    //// transition our main draw image into general layout so we can write into it
+    //// we will overwrite it all so we dont care about what was the older layout
+    // vkutil::transition_image(commandBuffers[context.currentFrame], _drawImage.image, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_GENERAL);
+
+    // VkClearColorValue clearValue;
+    // float flash = std::abs(std::sin(context.currentFrame / 120.f));
+    // clearValue = { { 0.0f, 0.0f, flash, 1.0f } };
+
+    // VkImageSubresourceRange subImage{};
+    // subImage.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+    // subImage.baseMipLevel = 0;
+    // subImage.levelCount = VK_REMAINING_MIP_LEVELS;
+    // subImage.baseArrayLayer = 0;
+    // subImage.layerCount = VK_REMAINING_ARRAY_LAYERS;
+
+    ////clear image
+    // vkCmdClearColorImage(commandBuffers[context.currentFrame], _drawImage.image, VK_IMAGE_LAYOUT_GENERAL, &clearValue, 1, &subImage);
+
+    ////transition the draw image and the swapchain image into their correct transfer layouts
+    // vkutil::transition_image(commandBuffers[context.currentFrame], _drawImage.image, VK_IMAGE_LAYOUT_GENERAL, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL);
+    // vkutil::transition_image(commandBuffers[context.currentFrame], swapChainImages[context.ImageIndex], VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
+
     VkPresentInfoKHR presentInfo{};
     presentInfo.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
 
@@ -126,6 +224,22 @@ void VulkanBackend::drawFrame(const std::vector<uint16_t> indices, int debugLine
     {
         throw std::runtime_error("failed to present swap chain image!");
     }
+
+    //// execute a copy from the draw image into the swapchain
+    // vkutil::copy_image_to_image(commandBuffers[context.currentFrame], _drawImage.image, swapChainImages[context.ImageIndex], swapChainExtent, swapChainExtent);
+
+    //// set swapchain image layout to Attachment Optimal so we can draw it
+    // vkutil::transition_image(commandBuffers[context.currentFrame], swapChainImages[context.ImageIndex], VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
+
+    ////draw imgui into the swapchain image
+    // draw_imgui(commandBuffers[context.currentFrame], swapChainImageViews[context.ImageIndex]);
+
+    //// set swapchain image layout to Present so we can draw it
+    // vkutil::transition_image(commandBuffers[context.currentFrame], swapChainImages[context.ImageIndex], VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL, VK_IMAGE_LAYOUT_PRESENT_SRC_KHR);
+
+    ////finalize the command buffer (we can no longer add commands, but it can now be executed)
+    // VkResult err = vkEndCommandBuffer(commandBuffers[context.currentFrame]);
+    // check_vk_result(err);
 
     context.currentFrame = (context.currentFrame + 1) % MAX_FRAMES_IN_FLIGHT;
 }
@@ -635,6 +749,7 @@ void VulkanBackend::recordCommandBuffer(VkCommandBuffer commandBuffer, const std
 {
     VkCommandBufferBeginInfo beginInfo{};
     beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+    beginInfo.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
 
     if (vkBeginCommandBuffer(commandBuffer, &beginInfo) != VK_SUCCESS)
     {
@@ -682,6 +797,8 @@ void VulkanBackend::recordCommandBuffer(VkCommandBuffer commandBuffer, const std
 
     if (debug)
         drawDebugRays(commandBuffer, debugLinesCount);
+
+    draw_imgui(commandBuffer);
 
     vkCmdEndRenderPass(commandBuffer);
 
@@ -912,13 +1029,13 @@ void VulkanBackend::createDescriptorPool()
     poolSizes[0].type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
     poolSizes[0].descriptorCount = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT);
     poolSizes[1].type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-    poolSizes[1].descriptorCount = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT);
+    poolSizes[1].descriptorCount = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT) * 2; // adding for imgui maybe
 
     VkDescriptorPoolCreateInfo poolInfo{};
     poolInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
     poolInfo.poolSizeCount = static_cast<uint32_t>(poolSizes.size());
     poolInfo.pPoolSizes = poolSizes.data();
-    poolInfo.maxSets = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT);
+    poolInfo.maxSets = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT) * 2; // adding for imgui maybe
 
     if (vkCreateDescriptorPool(g_Device, &poolInfo, nullptr, &descriptorPool) != VK_SUCCESS)
     {
@@ -1159,4 +1276,10 @@ void VulkanBackend::drawDebugRays(VkCommandBuffer commandBuffer, int numLines)
     vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, context.DebugPipeline);
     vkCmdBindVertexBuffers(commandBuffer, 0, 1, &debugVertexBuffer, offsets);
     vkCmdDraw(commandBuffer, numLines * 2, 1, 0, 0);
+}
+
+void VulkanBackend::draw_imgui(VkCommandBuffer cmd)
+{
+    ImGui::Render();
+    ImGui_ImplVulkan_RenderDrawData(ImGui::GetDrawData(), cmd);
 }
