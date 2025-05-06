@@ -38,6 +38,9 @@ Application::~Application()
 
 void Application::Init()
 {
+	debug = false;
+	debug_trace_coord = glm::vec2(-1, -1);
+
 	// Setup GLFW window
 	glfwSetErrorCallback(glfw_error_callback);
 
@@ -46,6 +49,7 @@ void Application::Init()
 	Input::InputManager::Init();
 
 	glfwSetCursorPosCallback(WindowController::GetInstance().GetWindow(), Input::cursor_position_callback);
+	glfwSetMouseButtonCallback(WindowController::GetInstance().GetWindow(), Input::mouse_button_callback);
 
 	editor = std::make_unique<Editor>();
 	glm::vec2 size = WindowController::GetInstance().GetSize();
@@ -61,11 +65,16 @@ void Application::Init()
 		mat.EmissionStrength = 0.0f;
 
 		Materials::Lambertian mat2;
-		mat2.Color = Math::Vector3<float>(1, 1, 0);
-		mat2.EmissionColor = Math::Vector3<float>(1, 1, 1);
+		mat2.Color = Math::Vector3<float>(0, 1, 1);
+		mat2.EmissionColor = Math::Vector3<float>(0, 0, 0);
 		mat2.EmissionStrength = 0.0f;
 
-		Materials::Metal mat3 = Materials::Metal(Math::Vector3<float>(1, 0, 0));
+		Materials::Lambertian floor_mat;
+		floor_mat.Color = Math::Vector3<float>(1, 1, 1);
+		floor_mat.EmissionColor = Math::Vector3<float>(0, 0, 0);
+		floor_mat.EmissionStrength = 0.0f;
+
+		Materials::Metal mat3 = Materials::Metal(Math::Vector3<float>(1, 1, 1));
 		/*mat3.Color = Math::Vector3<float>(1, 1, 1);
 		mat3.EmissionColor = Math::Vector3<float>(1, 1, 1);
 		mat3.EmissionStrength = 0.0f;*/
@@ -73,37 +82,46 @@ void Application::Init()
 		Materials::Material lightMaterial;
 		lightMaterial.Color = Math::Vector3<float>(1, 1, 1);
 		lightMaterial.EmissionColor = Math::Vector3<float>(1, 1, 1);
-		lightMaterial.EmissionStrength = 0.6f;
+		lightMaterial.EmissionStrength = 1.0f;
 
 		auto mat_one = std::make_shared<Materials::Lambertian>(mat);
 		auto mat_two = std::make_shared<Materials::Lambertian>(mat2);
+		auto mat_floor = std::make_shared<Materials::Lambertian>(floor_mat);
 		auto mat_three = std::make_shared<Materials::Metal>(mat3);
 		auto mat_light = std::make_shared<Materials::Material>(lightMaterial);
 
 		Scene::Shapes::Sphere sphere;
-		sphere.Origin = Math::Vector3<float>(0, 0, 0);
+		sphere.Origin = Math::Vector3<float>(-0.5, 0, -1);
 		sphere.Material = mat_one;
-		sphere.id = 0;
+		sphere.id = 666;
+
+		Scene::Shapes::Sphere floor;
+		floor.Origin = Math::Vector3<float>(0, 12, -4);
+		floor.Material = mat_floor;
+		floor.Radius = 10.0f;
+		floor.id = 456;
 
 		Scene::Shapes::Sphere sphere2;
-		sphere2.Origin = Math::Vector3<float>(1, 1, 0);
+		sphere2.Origin = Math::Vector3<float>(1, 0, 0);
 		sphere2.Material = mat_two;
 		sphere2.id = 1;
 
 		Scene::Shapes::Sphere sphere3;
-		sphere3.Origin = Math::Vector3<float>(1, -2, 1);
+		sphere3.Origin = Math::Vector3<float>(-0.2, 0.2, -0.3);
 		sphere3.Material = mat_three;
-		sphere3.Radius = 1.8f;
+		sphere3.Radius = 0.6f;
 		sphere3.id = 2;
 
 		Scene::Shapes::Sphere sphere4;
-		sphere4.Origin = Math::Vector3<float>(-1, 1.7, 1);
+		sphere4.Origin = Math::Vector3<float>(0.5, -0.5, -1);
 		sphere4.Material = mat_light;
-		sphere4.Radius = 1.0f;
+		sphere4.Radius = 1.3f;
 		sphere4.id = 2222;
 
-		// scene.ray_targets.push_back(std::make_shared<Scene::Shapes::Sphere>(sphere));
-		// scene.ray_targets.push_back(std::make_shared<Scene::Shapes::Sphere>(sphere2));
+		scene.ray_targets.push_back(std::make_shared<Scene::Shapes::Sphere>(floor));
+
+		scene.ray_targets.push_back(std::make_shared<Scene::Shapes::Sphere>(sphere));
+		scene.ray_targets.push_back(std::make_shared<Scene::Shapes::Sphere>(sphere2));
 		scene.ray_targets.push_back(std::make_shared<Scene::Shapes::Sphere>(sphere3));
 		scene.ray_targets.push_back(std::make_shared<Scene::Shapes::Sphere>(sphere4));
 
@@ -127,7 +145,14 @@ void Application::Init()
 		&renderContext.Width,
 		&renderContext.Height);
 
-	VulkanBackend::GetInstance().SetupVulkan(extensions, extensions_count, drawData.vertices, drawData.indices);
+	VkDeviceSize debugBufferSize = sizeof(Utilities::DebugLine) * 1572864;
+
+	VulkanBackend::GetInstance().SetupVulkan(extensions, extensions_count, drawData.vertices, drawData.indices, debugBufferSize, debug);
+
+	Input::InputManager::GetInstance().AddCallback([this](const Input::MouseEvent &e)
+												   {
+		debug_trace_coord = glm::vec2(e.x, e.y);
+		drawn = false; });
 
 	/*ImGui_ImplVulkanH_Window *wd = &g_MainWindowData;*/
 	// SetupVulkanWindow(wd, surface, w, h);
@@ -146,6 +171,8 @@ void Application::Run()
 
 	VulkanBackend &vulkanBackend = VulkanBackend::GetInstance();
 
+	drawn = false;
+
 	while (glfwWindowShouldClose(WindowController::GetInstance().GetWindow()) == 0 && m_Running)
 	{
 		// PROCESS INPUT
@@ -155,7 +182,7 @@ void Application::Run()
 
 		float deltaTime = std::min(frameTime, fpsLimit);
 
-		/*     m_gameController->ProcessInput(deltaTime);*/
+		/* m_gameController->ProcessInput(deltaTime);*/
 		// m_gameController->Update(deltaTime);
 
 		// Utilities::FPSCounter::CalculateFrameRate();
@@ -171,8 +198,14 @@ void Application::Run()
 			VulkanBackend::GetInstance().GetRenderContext().Width,
 			VulkanBackend::GetInstance().GetRenderContext().Height);
 
+		std::vector<Utilities::DebugLine> d_lines;
+		Input::InputManager::GetInstance().ProcessEvents();
+
+		// if (!drawn)
+		//{
 		if (!m_Image || dimensions[0] != m_Image->GetWidth() || dimensions[1] != m_Image->GetHeight())
 		{
+			std::cout << "[dimensions x: " << dimensions[0] << " y: " << dimensions[1] << std::endl;
 
 			m_Image = std::make_shared<Image>(dimensions[0], dimensions[1], ImageFormat::RGBA);
 			delete[] m_ImageData;
@@ -184,16 +217,29 @@ void Application::Run()
 		if (m_FrameIndex == 1)
 			memset(m_AccumulationData, 0, m_Image->GetWidth() * m_Image->GetHeight() * sizeof(glm::vec4));
 
+		// glm::vec2 mouse = Input::InputManager::GetInstance().GetMousePosition();
+
 		for (uint32_t y = 0; y < dimensions[1]; y++)
 		{
 			for (uint32_t x = 0; x < dimensions[0]; x++)
 			{
+				/*	bool debug_pixel = (x == debug_trace_coord.x && y == debug_trace_coord.y);*/
+
+				float flipped_y = dimensions[1] - y;
 
 				float normalizedX = (float)x / (float)dimensions[0];
-				float normalizedY = (float)y / (float)dimensions[1];
+				float normalizedY = (float)flipped_y / (float)dimensions[1];
 
 				uint32_t idx = x + (y * dimensions[0]);
-				Math::Vector3<float> color = renderer->PerPixel(normalizedX, normalizedY);
+				bool debug_pixel = idx % 1000;
+
+				Math::Vector3<float> color = Math::Vector3<float>(0, 0, 0);
+				/*
+				if (flipped_y < dimensions[1] / 2)
+					color = Math::Vector3<float>(1, 0, 0);*/
+
+				/*	if (x == 535 && y == 318)*/
+				color = renderer->PerPixel(normalizedX, normalizedY, debug_pixel);
 
 				m_AccumulationData[x + y * m_Image->GetWidth()] += glm::vec4(color.x, color.y, color.z, 1.0f);
 
@@ -201,18 +247,32 @@ void Application::Run()
 				accumulatedColor /= (float)m_FrameIndex;
 
 				accumulatedColor = glm::clamp(accumulatedColor, glm::vec4(0.0f), glm::vec4(1.0f));
+
+				// if (x < dimensions[0] / 2)
+				//	accumulatedColor = glm::vec4(1, 0, 0, 1);
+
 				m_ImageData[idx] = Utils::ConvertToRGBA(accumulatedColor);
 			}
 		}
 
+		// drawn = true;
+		std::cout << "image generated " << std::endl;
+
 		m_Image->SetData(m_ImageData);
+
+		d_lines = renderer->GetDebugLines();
+		if (debug)
+		{
+			vulkanBackend.updateDebugBuffer(d_lines);
+		}
 
 		glm::vec2 size = WindowController::GetInstance().GetSize();
 		editor->CalculateLayout(size.x, size.y);
 		DrawData drawData = editor->RenderEditor();
-		VulkanBackend::GetInstance().drawFrame(drawData.indices);
+		VulkanBackend::GetInstance().drawFrame(drawData.indices, d_lines.size());
 
 		m_FrameIndex++;
+		//}
 	}
 
 	// m_gameController->CleanUp();

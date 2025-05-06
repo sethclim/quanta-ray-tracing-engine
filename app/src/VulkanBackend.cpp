@@ -1,8 +1,10 @@
 #include "VulkanBackend.hpp"
-//#define GLM_ENABLE_EXPERIMENTAL
-//#include <glm/gtx/string_cast.hpp>
+#include <glm/ext/matrix_transform.hpp>
+#include <glm/ext/matrix_clip_space.hpp>
+// #define GLM_ENABLE_EXPERIMENTAL
+// #include <glm/gtx/string_cast.hpp>
 
-void VulkanBackend::SetupVulkan(const char **extensions, uint32_t extensions_count, const std::vector<Vertex> vertices, const std::vector<uint16_t> indices)
+void VulkanBackend::SetupVulkan(const char **extensions, uint32_t extensions_count, const std::vector<Vertex> vertices, const std::vector<uint16_t> indices, int debugBufferSize, bool _debug)
 {
     createInstance(extensions, extensions_count);
     createSurface();
@@ -13,6 +15,10 @@ void VulkanBackend::SetupVulkan(const char **extensions, uint32_t extensions_cou
     createRenderPass();
     createDescriptorSetLayout();
     createGraphicsPipeline();
+
+    if (_debug)
+        createDebugPipeline();
+
     createFramebuffers();
     createCommandPool();
 
@@ -24,9 +30,15 @@ void VulkanBackend::SetupVulkan(const char **extensions, uint32_t extensions_cou
 
     createCommandBuffers();
     createSyncObjects();
+
+    if (_debug)
+        createDebugBuffer(g_Device, debugBufferSize);
+
+    maxDebugLines = 1572864;
+    debug = _debug;
 }
 
-void VulkanBackend::drawFrame(const std::vector<uint16_t> indices)
+void VulkanBackend::drawFrame(const std::vector<uint16_t> indices, int debugLinesCount)
 {
     vkWaitForFences(g_Device, 1, &context.inFlightFences[context.currentFrame], VK_TRUE, UINT64_MAX);
 
@@ -47,7 +59,7 @@ void VulkanBackend::drawFrame(const std::vector<uint16_t> indices)
     vkResetFences(g_Device, 1, &context.inFlightFences[context.currentFrame]);
 
     vkResetCommandBuffer(commandBuffers[context.currentFrame], /*VkCommandBufferResetFlagBits*/ 0);
-    recordCommandBuffer(commandBuffers[context.currentFrame], indices);
+    recordCommandBuffer(commandBuffers[context.currentFrame], indices, debugLinesCount);
 
     VkSubmitInfo submitInfo{};
     submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
@@ -468,7 +480,7 @@ void VulkanBackend::createGraphicsPipeline()
     PipelineBuilder _pipelineBuilder = PipelineBuilder();
     auto folder_path = std::filesystem::path("../../app/src/shaders/");
     auto folder_abs = std::filesystem::absolute(folder_path);
-    
+
     VkShaderModule vertShaderModule;
     VkShaderModule fragShaderModule;
 
@@ -483,7 +495,36 @@ void VulkanBackend::createGraphicsPipeline()
     _pipelineBuilder.set_multisampling_none();
     _pipelineBuilder.disable_blending();
 
-    context.GraphicsPipeline._pipeline = _pipelineBuilder.build_pipeline(g_Device, context);
+    context.GraphicsPipeline = _pipelineBuilder.build_pipeline(g_Device, context);
+
+    vkDestroyShaderModule(g_Device, fragShaderModule, nullptr);
+    vkDestroyShaderModule(g_Device, vertShaderModule, nullptr);
+}
+
+void VulkanBackend::createDebugPipeline()
+{
+    PipelineBuilder _pipelineBuilder = PipelineBuilder();
+    auto folder_path = std::filesystem::path("../../app/src/shaders/");
+    auto folder_abs = std::filesystem::absolute(folder_path);
+
+    VkShaderModule vertShaderModule;
+    VkShaderModule fragShaderModule;
+
+    vkutil::load_shader_module(folder_abs.string() + "debug.vert.spv", g_Device, vertShaderModule);
+    vkutil::load_shader_module(folder_abs.string() + "debug.frag.spv", g_Device, fragShaderModule);
+
+    _pipelineBuilder.set_shaders(vertShaderModule, fragShaderModule);
+    _pipelineBuilder.set_input_topology(VK_PRIMITIVE_TOPOLOGY_LINE_LIST);
+    _pipelineBuilder.set_raster_defaults();
+    _pipelineBuilder.set_polygon_mode(VK_POLYGON_MODE_FILL);
+    _pipelineBuilder.set_cull_mode(VK_CULL_MODE_BACK_BIT, VK_FRONT_FACE_COUNTER_CLOCKWISE);
+    _pipelineBuilder.set_multisampling_none();
+    _pipelineBuilder.enable_blending_alphablend();
+
+    auto debugBindingDesc = RenderData::getDebugBindingDescription();
+    auto debugAttributeDesc = RenderData::getDebugAttributeDescriptions();
+
+    context.DebugPipeline = _pipelineBuilder.build_pipeline(g_Device, context, std::pair(debugBindingDesc, debugAttributeDesc));
 
     vkDestroyShaderModule(g_Device, fragShaderModule, nullptr);
     vkDestroyShaderModule(g_Device, vertShaderModule, nullptr);
@@ -567,7 +608,7 @@ void VulkanBackend::createCommandBuffers()
     }
 }
 
-void VulkanBackend::recordCommandBuffer(VkCommandBuffer commandBuffer, const std::vector<uint16_t> indices)
+void VulkanBackend::recordCommandBuffer(VkCommandBuffer commandBuffer, const std::vector<uint16_t> indices, int debugLinesCount)
 {
     VkCommandBufferBeginInfo beginInfo{};
     beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
@@ -590,7 +631,7 @@ void VulkanBackend::recordCommandBuffer(VkCommandBuffer commandBuffer, const std
 
     vkCmdBeginRenderPass(commandBuffer, &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
 
-    vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, context.GraphicsPipeline._pipeline);
+    vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, context.GraphicsPipeline);
 
     VkViewport viewport{};
     viewport.x = 0.0f;
@@ -613,9 +654,12 @@ void VulkanBackend::recordCommandBuffer(VkCommandBuffer commandBuffer, const std
     vkCmdBindIndexBuffer(commandBuffer, indexBuffer, 0, VK_INDEX_TYPE_UINT16);
 
 
-    vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, context.GraphicsPipeline._pipelineLayout, 0, 1, &descriptorSets[context.currentFrame], 0, nullptr);
+    vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, context.PipelineLayout, 0, 1, &descriptorSets[context.currentFrame], 0, nullptr);
 
     vkCmdDrawIndexed(commandBuffer, static_cast<uint32_t>(indices.size()), 1, 0, 0, 0);
+
+    if (debug)
+        drawDebugRays(commandBuffer, debugLinesCount);
 
     vkCmdEndRenderPass(commandBuffer);
 
@@ -653,11 +697,23 @@ void VulkanBackend::updateUniformBuffer(uint32_t currentImage)
 {
     UniformBufferObject ubo{};
     ubo.model = glm::mat4(1.0f);
-    ubo.view = glm::mat4(1.0f);
-    ubo.proj = glm::mat4(1.0f);
+    ubo.view = glm::lookAt(
+        glm::vec3(0.0f, 0.0f, 2.0f), // Camera position
+        glm::vec3(0.0f, 0.0f, 0.0f), // Looking at the origin
+        glm::vec3(0.0f, 1.0f, 0.0f)  // Up vector
+    );
+    // ubo.proj = glm::mat4(1.0f);
+
+    float fov = glm::radians(80.0f);
+    float aspectRatio = 1024.0f / 768.0f; // Width / Height of the window
+    float nearPlane = 0.1f;
+    float farPlane = 1000.0f;
+
+    ubo.proj = glm::perspective(fov, aspectRatio, nearPlane, farPlane);
+
     ubo.proj[1][1] *= -1;
 
-    //std::cout << "ubo.proj " << glm::to_string(ubo.proj) << std::endl;
+    // std::cout << "ubo.proj " << glm::to_string(ubo.proj) << std::endl;
 
     memcpy(uniformBuffersMapped[currentImage], &ubo, sizeof(ubo));
 }
@@ -1041,4 +1097,44 @@ VkShaderModule VulkanBackend::createShaderModule(const std::vector<char> &code)
     }
 
     return shaderModule;
+}
+
+void VulkanBackend::createDebugBuffer(VkDevice device, VkDeviceSize bufferSize)
+{
+
+    createBuffer(bufferSize,
+                 VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT,
+                 VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
+                 debugVertexBuffer, debugVertexBufferMemory);
+
+    // **Keep memory mapped for fast updates**
+    vkMapMemory(device, debugVertexBufferMemory, 0, bufferSize, 0, (void **)&mappedDebugMemory);
+}
+
+void VulkanBackend::updateDebugBuffer(std::vector<Utilities::DebugLine> &newLines)
+{
+    assert(newLines.size() <= maxDebugLines); // Prevent buffer overflow
+
+    std::vector<RenderData::DebugVertex> flatDebugVertices;
+    flatDebugVertices.reserve(newLines.size() * 2);
+
+    for (const auto &line : newLines)
+    {
+        flatDebugVertices.push_back({glm::vec3(line.start.x, line.start.y, line.start.z)});
+        flatDebugVertices.push_back({glm::vec3(line.end.x, line.end.y, line.end.z)});
+    }
+
+    // Copy debug lines into the mapped memory
+    memcpy(mappedDebugMemory, flatDebugVertices.data(), flatDebugVertices.size() * sizeof(RenderData::DebugVertex));
+}
+
+void VulkanBackend::drawDebugRays(VkCommandBuffer commandBuffer, int numLines)
+{
+    if (numLines == 0)
+        return; // Skip rendering if no debug lines
+
+    VkDeviceSize offsets[] = {0};
+    vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, context.DebugPipeline);
+    vkCmdBindVertexBuffers(commandBuffer, 0, 1, &debugVertexBuffer, offsets);
+    vkCmdDraw(commandBuffer, numLines * 2, 1, 0, 0);
 }

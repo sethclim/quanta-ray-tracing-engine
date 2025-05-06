@@ -27,6 +27,9 @@ namespace Materials
          {
              auto scatter_direction = Utilities::Random::Random_Unit_Vector() + hit_info.Normal;
 
+
+            /*auto scatter_direction = hit_info.Normal;*/
+
             // Catch degenerate scatter direction
             if (Math::near_zero(scatter_direction))
                 scatter_direction = hit_info.Normal;

@@ -21,7 +21,8 @@ DrawData Editor::RenderEditor()
 	// float vp_h = height * 0.2f;
 
 	float left_x = -1.0;
-	float right_x = 1.0 * 0.5f;
+	/*float right_x = 1.0 * 0.5f;*/
+	float right_x = 1.0;
 	float top_y = 1.0;
 	float bottom_y = -1.0;
 
@@ -32,15 +33,15 @@ DrawData Editor::RenderEditor()
 
 	const std::vector<Vertex> _vertices = {
 		// Viewport
-		{{left_x, bottom_y}, {1.0f, 0.0f, 0.0f}, {1.0f, 0.0f}},
-		{{right_x, bottom_y}, {0.0f, 1.0f, 0.0f}, {0.0f, 0.0f}},
-		{{right_x, top_y}, {0.0f, 0.0f, 1.0f}, {0.0f, 1.0f}},
-		{{left_x, top_y}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f}},
+		{{left_x, bottom_y}, {1.0f, 0.0f, 0.0f}, {0.0f, 0.0f}},
+		{{right_x, bottom_y}, {0.0f, 1.0f, 0.0f}, {1.0f, 0.0f}},
+		{{right_x, top_y}, {0.0f, 0.0f, 1.0f}, {1.0f, 1.0f}},
+		{{left_x, top_y}, {1.0f, 1.0f, 1.0f}, {0.0f, 1.0f}},
 		// button
-		{{btn_left_x, btn_bottom_y}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f}},
-		{{btn_right_x, btn_bottom_y}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f}},
-		{{btn_right_x, btn_top_y}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f}},
-		{{btn_left_x, btn_top_y}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f}},
+		//{{btn_left_x, btn_bottom_y}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f}},
+		//{{btn_right_x, btn_bottom_y}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f}},
+		//{{btn_right_x, btn_top_y}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f}},
+		//{{btn_left_x, btn_top_y}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f}},
 	};
 
 	dd.vertices = _vertices;

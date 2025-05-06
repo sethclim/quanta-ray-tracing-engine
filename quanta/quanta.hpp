@@ -17,6 +17,14 @@ const uint32_t RED = 0x000000ff;
 const uint32_t BLUE = 0x00ff0000;
 const uint32_t BLACK = 0x00000000;
 
+namespace Utilities
+{
+    struct DebugLine {
+        Math::Vector3<float> start;
+        Math::Vector3<float> end;
+    };
+}
+
 class Renderer
 {
 public:
@@ -25,9 +33,17 @@ public:
         m_Scene = scene;
     }
 
-    Math::Vector3<float> PerPixel(float x, float y);
+    Math::Vector3<float> PerPixel(float x, float y, bool debug);
     HitInfo TraceRay(const Ray &ray);
 
+    std::vector<Utilities::DebugLine> GetDebugLines() { return debugLines; }
+
 private:
-    Scene::SceneGraph m_Scene;
+    void addDebugLine(Math::Vector3<float> start, Math::Vector3<float> end) {
+        debugLines.push_back({ start, end });
+        //std::cout << "Debug Line Length " << debugLines.size() << std::endl;
+    }
+
+    Scene::SceneGraph m_Scene;  
+    std::vector<Utilities::DebugLine> debugLines;
 };

@@ -30,6 +30,8 @@ namespace Scene
             {
                 Math::Vector3<float> offsetRayOrigin = (Math::Vector3<float>)ray.Origin - Origin;
 
+                //std::cout << "offsetRayOrigin [x:" << offsetRayOrigin.x << " y: " << offsetRayOrigin.y << " z: " << offsetRayOrigin.z << "]" << std::endl;
+
                 float a = Math::LengthSquared(ray.Direction);
                 float b = 2.0f * Math::Dot(offsetRayOrigin, ray.Direction);
                 float c = Math::LengthSquared(offsetRayOrigin) - Math::Sqr(Radius);

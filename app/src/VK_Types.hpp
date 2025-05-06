@@ -1,47 +1,29 @@
 
-#pragma once
+#ifndef VKTYPES_H
+#define VKTYPES_H
 
 #include <vulkan/vulkan.h>
 #include <glm/glm.hpp>
+#include <array>
 
-struct Vertex
+#include "../../render_data/render_data.hpp"
+
+#include <optional>
+#include <cstddef>
+
+namespace RenderData
 {
-    glm::vec2 pos;
-    glm::vec3 color;
-    glm::vec2 texCoord;
+    VkVertexInputBindingDescription getBindingDescription();
+    std::array<VkVertexInputAttributeDescription, 3> getAttributeDescriptions();
 
-    static VkVertexInputBindingDescription getBindingDescription()
+    struct DebugVertex
     {
-        VkVertexInputBindingDescription bindingDescription{};
-        bindingDescription.binding = 0;
-        bindingDescription.stride = sizeof(Vertex);
-        bindingDescription.inputRate = VK_VERTEX_INPUT_RATE_VERTEX;
+        glm::vec3 position;
+    };
 
-        return bindingDescription;
-    }
-
-    static std::array<VkVertexInputAttributeDescription, 3> getAttributeDescriptions()
-    {
-        std::array<VkVertexInputAttributeDescription, 3> attributeDescriptions{};
-
-        attributeDescriptions[0].binding = 0;
-        attributeDescriptions[0].location = 0;
-        attributeDescriptions[0].format = VK_FORMAT_R32G32_SFLOAT;
-        attributeDescriptions[0].offset = offsetof(Vertex, pos);
-
-        attributeDescriptions[1].binding = 0;
-        attributeDescriptions[1].location = 1;
-        attributeDescriptions[1].format = VK_FORMAT_R32G32B32_SFLOAT;
-        attributeDescriptions[1].offset = offsetof(Vertex, color);
-
-        attributeDescriptions[2].binding = 0;
-        attributeDescriptions[2].location = 2;
-        attributeDescriptions[2].format = VK_FORMAT_R32G32_SFLOAT;
-        attributeDescriptions[2].offset = offsetof(Vertex, texCoord);
-
-        return attributeDescriptions;
-    }
-};
+    VkVertexInputBindingDescription getDebugBindingDescription();
+    std::array<VkVertexInputAttributeDescription, 1> getDebugAttributeDescriptions();
+}
 
 struct MaterialPipeline
 {
@@ -59,9 +41,11 @@ struct Quanta_ImplVulkanH_RenderContext
     // VkPresentModeKHR    PresentMode;
     VkRenderPass RenderPass;
     VkDescriptorSetLayout descriptorSetLayout;
-    // VkPipeline GraphicsPipeline; // The window pipeline may uses a different VkRenderPass than the one passed in ImGui_ImplVulkan_InitInfo
-    // VkPipelineLayout PipelineLayout;
-    MaterialPipeline GraphicsPipeline;
+    VkPipeline GraphicsPipeline; // The window pipeline may uses a different VkRenderPass than the one passed in ImGui_ImplVulkan_InitInfo
+    VkPipelineLayout PipelineLayout;
+
+    VkPipeline DebugPipeline; // Debug pipeline for drawing rays
+
     // bool                UseDynamicRendering;
     // bool                ClearEnable;
     // VkClearValue        ClearValue;
@@ -109,3 +93,5 @@ struct UniformBufferObject
     alignas(16) glm::mat4 view;
     alignas(16) glm::mat4 proj;
 };
+
+#endif

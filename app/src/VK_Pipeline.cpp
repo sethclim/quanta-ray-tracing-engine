@@ -9,7 +9,7 @@ void PipelineBuilder::clear()
 
     _inputAssembly = {};
     _inputAssembly.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
-    
+
     _rasterizer = {};
     _rasterizer.sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO;
 
@@ -26,14 +26,16 @@ void PipelineBuilder::clear()
     _renderInfo = {};
     _renderInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_RENDERING_CREATE_INFO;
 
-
     _pipelineLayoutCreateInfo = {};
     _pipelineLayoutCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
 
     _shaderStages.clear();
 }
 
-VkPipeline PipelineBuilder::build_pipeline(VkDevice device, Quanta_ImplVulkanH_RenderContext& context)
+VkPipeline PipelineBuilder::build_pipeline(
+    VkDevice device,
+    Quanta_ImplVulkanH_RenderContext &context,
+    std::optional<std::pair<VkVertexInputBindingDescription, std::array<VkVertexInputAttributeDescription, 1>>> customVertexInfoDescriptions)
 {
     // make viewport state from our stored viewport and scissor.
     // at the moment we wont support multiple viewports or scissors
@@ -55,26 +57,37 @@ VkPipeline PipelineBuilder::build_pipeline(VkDevice device, Quanta_ImplVulkanH_R
     colorBlending.attachmentCount = 1;
     colorBlending.pAttachments = &_colorBlendAttachment;
 
-    //ADD something to create this and call after set shaders IG
-    // completely clear VertexInputStateCreateInfo, as we have no need for it
+    // ADD something to create this and call after set shaders IG
+    //  completely clear VertexInputStateCreateInfo, as we have no need for it
     VkPipelineVertexInputStateCreateInfo _vertexInputInfo = {};
     _vertexInputInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
 
-    auto bindingDescription = Vertex::getBindingDescription();
-    auto attributeDescriptions = Vertex::getAttributeDescriptions();
+    if (customVertexInfoDescriptions)
+    {
+        auto bindingDescription = customVertexInfoDescriptions->first;
+        auto attributeDescriptions = customVertexInfoDescriptions->second;
 
-    _vertexInputInfo.vertexBindingDescriptionCount = 1;
-    _vertexInputInfo.vertexAttributeDescriptionCount = static_cast<uint32_t>(attributeDescriptions.size());
-    _vertexInputInfo.pVertexBindingDescriptions = &bindingDescription;
-    _vertexInputInfo.pVertexAttributeDescriptions = attributeDescriptions.data();
-    
-    
+        _vertexInputInfo.vertexBindingDescriptionCount = 1;
+        _vertexInputInfo.vertexAttributeDescriptionCount = static_cast<uint32_t>(attributeDescriptions.size());
+        _vertexInputInfo.pVertexBindingDescriptions = &bindingDescription;
+        _vertexInputInfo.pVertexAttributeDescriptions = attributeDescriptions.data();
+    }
+    else
+    {
+        auto bindingDescription = RenderData::getBindingDescription();
+        auto attributeDescriptions = RenderData::getAttributeDescriptions();
+
+        _vertexInputInfo.vertexBindingDescriptionCount = 1;
+        _vertexInputInfo.vertexAttributeDescriptionCount = static_cast<uint32_t>(attributeDescriptions.size());
+        _vertexInputInfo.pVertexBindingDescriptions = &bindingDescription;
+        _vertexInputInfo.pVertexAttributeDescriptions = attributeDescriptions.data();
+    }
+
     VkPipelineDynamicStateCreateInfo dynamicInfo = {};
     dynamicInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO;
     VkDynamicState state[] = {VK_DYNAMIC_STATE_VIEWPORT, VK_DYNAMIC_STATE_SCISSOR};
     dynamicInfo.pDynamicStates = &state[0];
     dynamicInfo.dynamicStateCount = 2;
-
 
     _pipelineLayoutCreateInfo.setLayoutCount = 1;
     _pipelineLayoutCreateInfo.pSetLayouts = &context.descriptorSetLayout;
@@ -84,7 +97,7 @@ VkPipeline PipelineBuilder::build_pipeline(VkDevice device, Quanta_ImplVulkanH_R
         throw std::runtime_error("failed to create pipeline layout!");
     }
 
-    context.GraphicsPipeline._pipelineLayout = _pipelineLayout;
+    context.PipelineLayout = _pipelineLayout;
 
     //< build_pipeline_1
 
@@ -125,7 +138,6 @@ VkPipeline PipelineBuilder::build_pipeline(VkDevice device, Quanta_ImplVulkanH_R
     {
         return newPipeline;
     }
-
 }
 
 void PipelineBuilder::set_shaders(VkShaderModule vertexShader, VkShaderModule fragmentShader)
@@ -139,7 +151,6 @@ void PipelineBuilder::set_shaders(VkShaderModule vertexShader, VkShaderModule fr
         vkinit::pipeline_shader_stage_create_info(VK_SHADER_STAGE_FRAGMENT_BIT, fragmentShader));
 }
 
-
 void PipelineBuilder::set_input_topology(VkPrimitiveTopology topology)
 {
     _inputAssembly.topology = topology;
@@ -148,7 +159,6 @@ void PipelineBuilder::set_input_topology(VkPrimitiveTopology topology)
     _inputAssembly.primitiveRestartEnable = VK_FALSE;
 }
 
-
 void PipelineBuilder::set_raster_defaults()
 {
     _rasterizer.depthClampEnable = VK_FALSE;
@@ -156,11 +166,10 @@ void PipelineBuilder::set_raster_defaults()
     _rasterizer.depthBiasEnable = VK_FALSE;
 }
 
-
 void PipelineBuilder::set_polygon_mode(VkPolygonMode mode)
 {
     _rasterizer.polygonMode = mode;
-    _rasterizer.lineWidth = 1.f;
+    _rasterizer.lineWidth = 2.f;
 }
 
 void PipelineBuilder::set_cull_mode(VkCullModeFlags cullMode, VkFrontFace frontFace)
@@ -252,9 +261,9 @@ void PipelineBuilder::enable_depthtest(bool depthWriteEnable, VkCompareOp op)
     _depthStencil.maxDepthBounds = 1.f;
 }
 
-bool vkutil::load_shader_module(const std::string& filePath,
+bool vkutil::load_shader_module(const std::string &filePath,
                                 VkDevice device,
-                                VkShaderModule & outShaderModule)
+                                VkShaderModule &outShaderModule)
 {
     std::vector<uint32_t> buffer;
 
