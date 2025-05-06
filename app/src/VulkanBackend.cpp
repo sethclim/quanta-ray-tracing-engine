@@ -1,7 +1,6 @@
 #include "VulkanBackend.hpp"
 #include <glm/ext/matrix_transform.hpp>
 #include <glm/ext/matrix_clip_space.hpp>
-#include "ImGUI.hpp"
 
 // #define GLM_ENABLE_EXPERIMENTAL
 // #include <glm/gtx/string_cast.hpp>
@@ -99,6 +98,10 @@ void VulkanBackend::init_imgui()
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard; // Enable Keyboard Controls
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;  // Enable Gamepad Controls
     io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
+
+    // Scale style sizes for high-DPI monitors
+    ImGuiStyle &imgui_style = ImGui::GetStyle();
+    imgui_style.ScaleAllSizes(ImGUI::getDPIScale());
 
     //// this initializes imgui for SDL
     // ImGui_ImplSDL2_InitForVulkan(_window);

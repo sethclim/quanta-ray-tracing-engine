@@ -213,8 +213,8 @@ void Application::Run()
 			VulkanBackend::GetInstance().GetRenderContext().Height);
 
 		std::vector<Utilities::DebugLine> d_lines;
-		Input::InputManager::GetInstance().ProcessEvents();
 
+		Input::InputManager::GetInstance().ProcessEvents();
 		// if (!drawn)
 		//{
 		if (!m_Image || dimensions[0] != m_Image->GetWidth() || dimensions[1] != m_Image->GetHeight())
@@ -231,43 +231,43 @@ void Application::Run()
 		if (m_FrameIndex == 1)
 			memset(m_AccumulationData, 0, m_Image->GetWidth() * m_Image->GetHeight() * sizeof(glm::vec4));
 
-		 glm::vec2 mouse = Input::InputManager::GetInstance().GetMousePosition();
+		glm::vec2 mouse = Input::InputManager::GetInstance().GetMousePosition();
 
-		 for (uint32_t y = 0; y < dimensions[1]; y++)
-		{
-			for (uint32_t x = 0; x < dimensions[0]; x++)
-			{
-				/*	bool debug_pixel = (x == debug_trace_coord.x && y == debug_trace_coord.y);*/
+		// for (uint32_t y = 0; y < dimensions[1]; y++)
+		//{
+		//	for (uint32_t x = 0; x < dimensions[0]; x++)
+		//	{
+		//		/*	bool debug_pixel = (x == debug_trace_coord.x && y == debug_trace_coord.y);*/
 
-				float flipped_y = dimensions[1] - y;
+		//		float flipped_y = dimensions[1] - y;
 
-				float normalizedX = (float)x / (float)dimensions[0];
-				float normalizedY = (float)flipped_y / (float)dimensions[1];
+		//		float normalizedX = (float)x / (float)dimensions[0];
+		//		float normalizedY = (float)flipped_y / (float)dimensions[1];
 
-				uint32_t idx = x + (y * dimensions[0]);
-				bool debug_pixel = idx % 1000;
+		//		uint32_t idx = x + (y * dimensions[0]);
+		//		bool debug_pixel = idx % 1000;
 
-				Math::Vector3<float> color = Math::Vector3<float>(0, 0, 0);
-				/*
-				if (flipped_y < dimensions[1] / 2)
-					color = Math::Vector3<float>(1, 0, 0);*/
+		//		Math::Vector3<float> color = Math::Vector3<float>(0, 0, 0);
+		//		/*
+		//		if (flipped_y < dimensions[1] / 2)
+		//			color = Math::Vector3<float>(1, 0, 0);*/
 
-				/*	if (x == 535 && y == 318)*/
-				color = renderer->PerPixel(normalizedX, normalizedY, debug_pixel);
+		//		/*	if (x == 535 && y == 318)*/
+		//		color = renderer->PerPixel(normalizedX, normalizedY, debug_pixel);
 
-				m_AccumulationData[x + y * m_Image->GetWidth()] += glm::vec4(color.x, color.y, color.z, 1.0f);
+		//		m_AccumulationData[x + y * m_Image->GetWidth()] += glm::vec4(color.x, color.y, color.z, 1.0f);
 
-				glm::vec4 accumulatedColor = m_AccumulationData[x + y * m_Image->GetWidth()];
-				accumulatedColor /= (float)m_FrameIndex;
+		//		glm::vec4 accumulatedColor = m_AccumulationData[x + y * m_Image->GetWidth()];
+		//		accumulatedColor /= (float)m_FrameIndex;
 
-				accumulatedColor = glm::clamp(accumulatedColor, glm::vec4(0.0f), glm::vec4(1.0f));
+		//		accumulatedColor = glm::clamp(accumulatedColor, glm::vec4(0.0f), glm::vec4(1.0f));
 
-				// if (x < dimensions[0] / 2)
-				//	accumulatedColor = glm::vec4(1, 0, 0, 1);
+		//		// if (x < dimensions[0] / 2)
+		//		//	accumulatedColor = glm::vec4(1, 0, 0, 1);
 
-				m_ImageData[idx] = Utils::ConvertToRGBA(accumulatedColor);
-			}
-		}
+		//		m_ImageData[idx] = Utils::ConvertToRGBA(accumulatedColor);
+		//	}
+		//}
 
 		// drawn = true;
 		std::cout << "image generated " << std::endl;

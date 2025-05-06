@@ -26,6 +26,7 @@ add_executable(app
     src/VK_Initializers.cpp
     src/VK_Initializers.hpp
     src/ImGUI.hpp
+    src/ImGUI.cpp
     src/utils/Utilities.hpp
     src/utils/Utilities.cpp
 )
