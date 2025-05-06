@@ -25,6 +25,12 @@ namespace RenderData
     std::array<VkVertexInputAttributeDescription, 1> getDebugAttributeDescriptions();
 }
 
+struct MaterialPipeline
+{
+    VkPipeline _pipeline;
+    VkPipelineLayout _pipelineLayout;
+};
+
 struct Quanta_ImplVulkanH_RenderContext
 {
     int Width;
@@ -89,10 +95,11 @@ struct UniformBufferObject
     alignas(16) glm::mat4 proj;
 };
 
-struct AllocatedImage {
+struct AllocatedImage
+{
     VkImage image;
     VkImageView imageView;
-    //VmaAllocation allocation;
+    // VmaAllocation allocation;
     VkExtent3D imageExtent;
     VkFormat imageFormat;
 };
