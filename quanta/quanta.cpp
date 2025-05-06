@@ -12,10 +12,7 @@ Math::Vector3<float> Reflect(Math::Vector3<float> &N, Math::Vector3<float> &Ri)
     return Ri - (N * 2.0f * Math::Dot(Ri, N));
 }
 
-const int MAX_BOUNCES = 50;
-const int SAMPLES_PER_PIXEL = 30;
-
-Math::Vector3<float> Renderer::PerPixel(float image_x, float image_y, bool debug)
+Math::Vector3<float> Renderer::PerPixel(float image_x, float image_y, int samples_per_pixel, int max_bounces,  bool debug)
 {
 
     // convert to 0,0 in the centre
@@ -36,12 +33,12 @@ Math::Vector3<float> Renderer::PerPixel(float image_x, float image_y, bool debug
 
     Math::Vector3<float> pixel_color(0, 0, 0);
 
-    for (int sample = 0; sample < SAMPLES_PER_PIXEL; sample++)
+    for (int sample = 0; sample < samples_per_pixel; sample++)
     {
         Math::Vector3<float> incomingLight = Math::Vector3<float>(0, 0, 0);
         Math::Vector3<float> rayColor = Math::Vector3<float>(1, 1, 1);
 
-        for (int i = 0; i < MAX_BOUNCES; i++)
+        for (int i = 0; i < max_bounces; i++)
         {
             HitInfo info = TraceRay(ray);
 

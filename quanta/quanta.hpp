@@ -33,7 +33,7 @@ public:
         m_Scene = scene;
     }
 
-    Math::Vector3<float> PerPixel(float x, float y, bool debug);
+    Math::Vector3<float> PerPixel(float x, float y, int samples_per_pixel, int max_bounces, bool debug);
     HitInfo TraceRay(const Ray &ray);
 
     std::vector<Utilities::DebugLine> GetDebugLines() { return debugLines; }

@@ -27,7 +27,7 @@ void WindowController::NewWindow()
 	//glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	//glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 
-	M_ASSERT((m_WindowHandle = glfwCreateWindow(1024, 768, "A sample scene", NULL, NULL)) != nullptr, "Failed to open GLFW window.");
+	M_ASSERT((m_WindowHandle = glfwCreateWindow(2048, 1536, "Quanta Raytracing Engine", NULL, NULL)) != nullptr, "Failed to open GLFW window.");
 	glfwMakeContextCurrent(m_WindowHandle);
 	glfwSetWindowUserPointer(m_WindowHandle, this);
 	glfwSetFramebufferSizeCallback(m_WindowHandle, framebufferResizeCallback);

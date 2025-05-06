@@ -188,6 +188,8 @@ void Application::Run()
 	bool        useRaytracer = false;
 	const char* items[] = { "Pixel Debug", "All", "None"};
 	static int  item_current = 2;
+	int samples_per_pixel = 6;
+	int max_bounces = 3;
 
 	while (glfwWindowShouldClose(WindowController::GetInstance().GetWindow()) == 0 && m_Running)
 	{
@@ -262,7 +264,7 @@ void Application::Run()
 						color = Math::Vector3<float>(1, 0, 0);*/
 
 					/*	if (x == 535 && y == 318)*/
-					color = renderer->PerPixel(normalizedX, normalizedY, debug_pixel);
+					color = renderer->PerPixel(normalizedX, normalizedY, samples_per_pixel, max_bounces, debug_pixel);
 
 					m_AccumulationData[x + y * m_Image->GetWidth()] += glm::vec4(color.x, color.y, color.z, 1.0f);
 
@@ -308,6 +310,10 @@ void Application::Run()
 		changed |= ImGui::Checkbox("Raytracer Mode", &useRaytracer);
 
 		ImGui::Combo("Debug Mode", &item_current, items, IM_ARRAYSIZE(items));
+
+		ImGui::SeparatorText("Render Settings");
+		ImGui::DragInt("Samples per Pixel 0..50", &samples_per_pixel, 1, 1, 50, "%d%", ImGuiSliderFlags_AlwaysClamp);
+		ImGui::DragInt("Max Bounces 0..30", &max_bounces, 1, 1, 3, "%d%", ImGuiSliderFlags_AlwaysClamp);
 
 		ImGUI::Panel::End();
 
