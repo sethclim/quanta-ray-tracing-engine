@@ -93,6 +93,8 @@ void VulkanBackend::init_imgui()
 
     // this initializes the core structures of imgui
     ImGui::CreateContext();
+    ImGUI::setStyle(false);
+
     ImGuiIO &io = ImGui::GetIO();
     (void)io;
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard; // Enable Keyboard Controls

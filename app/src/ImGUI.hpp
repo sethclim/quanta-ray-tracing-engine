@@ -109,6 +109,13 @@ namespace ImGUI
             }
         }
     };
+
+    //--------------------------------------------------------------------------------------------------
+    //
+    // Setting common style across samples
+    //
+    void setStyle(bool useLinearColor = false);
+
 }
 
 #endif

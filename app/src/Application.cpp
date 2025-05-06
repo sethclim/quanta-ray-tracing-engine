@@ -23,7 +23,6 @@ namespace Utils
 		uint32_t result = (a << 24) | (b << 16) | (g << 8) | r;
 		return result;
 	}
-
 }
 
 Application::Application()
@@ -186,7 +185,9 @@ void Application::Run()
 	VulkanBackend &vulkanBackend = VulkanBackend::GetInstance();
 
 	drawn = false;
-	bool      useRaytracer = false;
+	bool        useRaytracer = false;
+	const char* items[] = { "Pixel Debug", "All", "None"};
+	static int  item_current = 3;
 
 	while (glfwWindowShouldClose(WindowController::GetInstance().GetWindow()) == 0 && m_Running)
 	{
@@ -241,7 +242,6 @@ void Application::Run()
 			{
 				for (uint32_t x = 0; x < dimensions[0]; x++)
 				{
-					/*	bool debug_pixel = (x == debug_trace_coord.x && y == debug_trace_coord.y);*/
 
 					float flipped_y = dimensions[1] - y;
 
@@ -249,7 +249,12 @@ void Application::Run()
 					float normalizedY = (float)flipped_y / (float)dimensions[1];
 
 					uint32_t idx = x + (y * dimensions[0]);
-					bool debug_pixel = idx % 1000;
+					bool debug_pixel = false;
+					if(item_current == 0)
+						debug_pixel = (x == debug_trace_coord.x && y == debug_trace_coord.y);
+					else if(item_current == 1)
+						debug_pixel = idx % 1000;
+
 
 					Math::Vector3<float> color = Math::Vector3<float>(0, 0, 0);
 					/*
@@ -301,7 +306,9 @@ void Application::Run()
 		ImGUI::Panel::Begin();
 
 		bool changed = false;
-		changed |= ImGui::Checkbox("Ray Tracer mode", &useRaytracer);
+		changed |= ImGui::Checkbox("Raytracer Mode", &useRaytracer);
+
+		ImGui::Combo("Debug Mode", &item_current, items, IM_ARRAYSIZE(items));
 
 		ImGUI::Panel::End();
 		// make imgui calculate internal draw structures
