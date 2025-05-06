@@ -483,7 +483,7 @@ void VulkanBackend::createGraphicsPipeline()
     _pipelineBuilder.set_multisampling_none();
     _pipelineBuilder.disable_blending();
 
-    context.GraphicsPipeline = _pipelineBuilder.build_pipeline(g_Device, context);
+    context.GraphicsPipeline._pipeline = _pipelineBuilder.build_pipeline(g_Device, context);
 
     vkDestroyShaderModule(g_Device, fragShaderModule, nullptr);
     vkDestroyShaderModule(g_Device, vertShaderModule, nullptr);
@@ -590,7 +590,7 @@ void VulkanBackend::recordCommandBuffer(VkCommandBuffer commandBuffer, const std
 
     vkCmdBeginRenderPass(commandBuffer, &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
 
-    vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, context.GraphicsPipeline);
+    vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, context.GraphicsPipeline._pipeline);
 
     VkViewport viewport{};
     viewport.x = 0.0f;
@@ -612,7 +612,8 @@ void VulkanBackend::recordCommandBuffer(VkCommandBuffer commandBuffer, const std
 
     vkCmdBindIndexBuffer(commandBuffer, indexBuffer, 0, VK_INDEX_TYPE_UINT16);
 
-    vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, context.PipelineLayout, 0, 1, &descriptorSets[context.currentFrame], 0, nullptr);
+
+    vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, context.GraphicsPipeline._pipelineLayout, 0, 1, &descriptorSets[context.currentFrame], 0, nullptr);
 
     vkCmdDrawIndexed(commandBuffer, static_cast<uint32_t>(indices.size()), 1, 0, 0, 0);
 

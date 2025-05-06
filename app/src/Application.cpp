@@ -94,7 +94,7 @@ void Application::Init()
 		sphere3.Origin = Math::Vector3<float>(1, -2, 1);
 		sphere3.Material = mat_three;
 		sphere3.Radius = 1.8f;
-		sphere3.id = 2;  
+		sphere3.id = 2;
 
 		Scene::Shapes::Sphere sphere4;
 		sphere4.Origin = Math::Vector3<float>(-1, 1.7, 1);
@@ -102,8 +102,8 @@ void Application::Init()
 		sphere4.Radius = 1.0f;
 		sphere4.id = 2222;
 
-		//scene.ray_targets.push_back(std::make_shared<Scene::Shapes::Sphere>(sphere));
-		//scene.ray_targets.push_back(std::make_shared<Scene::Shapes::Sphere>(sphere2));
+		// scene.ray_targets.push_back(std::make_shared<Scene::Shapes::Sphere>(sphere));
+		// scene.ray_targets.push_back(std::make_shared<Scene::Shapes::Sphere>(sphere2));
 		scene.ray_targets.push_back(std::make_shared<Scene::Shapes::Sphere>(sphere3));
 		scene.ray_targets.push_back(std::make_shared<Scene::Shapes::Sphere>(sphere4));
 

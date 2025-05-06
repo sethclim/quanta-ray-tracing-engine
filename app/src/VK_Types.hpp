@@ -43,6 +43,12 @@ struct Vertex
     }
 };
 
+struct MaterialPipeline
+{
+    VkPipeline _pipeline;
+    VkPipelineLayout _pipelineLayout;
+};
+
 struct Quanta_ImplVulkanH_RenderContext
 {
     int Width;
@@ -53,8 +59,9 @@ struct Quanta_ImplVulkanH_RenderContext
     // VkPresentModeKHR    PresentMode;
     VkRenderPass RenderPass;
     VkDescriptorSetLayout descriptorSetLayout;
-    VkPipeline GraphicsPipeline; // The window pipeline may uses a different VkRenderPass than the one passed in ImGui_ImplVulkan_InitInfo
-    VkPipelineLayout PipelineLayout;
+    // VkPipeline GraphicsPipeline; // The window pipeline may uses a different VkRenderPass than the one passed in ImGui_ImplVulkan_InitInfo
+    // VkPipelineLayout PipelineLayout;
+    MaterialPipeline GraphicsPipeline;
     // bool                UseDynamicRendering;
     // bool                ClearEnable;
     // VkClearValue        ClearValue;
@@ -72,7 +79,7 @@ struct Quanta_ImplVulkanH_RenderContext
 
     Quanta_ImplVulkanH_RenderContext()
     {
-        memset((void*)this, 0, sizeof(*this));
+        memset((void *)this, 0, sizeof(*this));
         // PresentMode = (VkPresentModeKHR)~0;     // Ensure we get an error if user doesn't set this.
         // ClearEnable = true;
     }

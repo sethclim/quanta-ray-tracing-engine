@@ -84,7 +84,7 @@ VkPipeline PipelineBuilder::build_pipeline(VkDevice device, Quanta_ImplVulkanH_R
         throw std::runtime_error("failed to create pipeline layout!");
     }
 
-    context.PipelineLayout = _pipelineLayout;
+    context.GraphicsPipeline._pipelineLayout = _pipelineLayout;
 
     //< build_pipeline_1
 
