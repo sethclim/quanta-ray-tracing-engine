@@ -73,6 +73,42 @@ namespace ImGUI
     // If GLFW has been initialized, returns the DPI scale of the primary monitor. Otherwise, returns 1.
     //
     float getDPIScale();
+
+    //--------------------------------------------------------------------------------------------------
+    // Creating a window panel
+    // - Panel will be on the left or the right side of the window.
+    // - It fills the height of the window, and stays on the side it was created.
+    //
+    class Panel /*static*/
+    {
+        static ImGuiID dockspaceID;
+
+    public:
+        // Side where the panel will be
+        enum class Side
+        {
+            Left,
+            Right,
+        };
+
+
+        // Starting the panel, equivalent to ImGui::Begin for a window. Need ImGui::end()
+        static void Begin(Side side = Side::Right, float alpha = 0.5f, char* name = nullptr);
+
+        // Mirror begin but can use directly End()
+        static void End() { ImGui::End(); }
+
+        // Return the position and size of the central display
+        static void CentralDimension(ImVec2& pos, ImVec2& size)
+        {
+            auto dock_main = ImGui::DockBuilderGetCentralNode(dockspaceID);
+            if (dock_main)
+            {
+                pos = dock_main->Pos;
+                size = dock_main->Size;
+            }
+        }
+    };
 }
 
 #endif
