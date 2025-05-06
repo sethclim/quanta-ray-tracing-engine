@@ -93,7 +93,7 @@ void VulkanBackend::init_imgui()
 
     // this initializes the core structures of imgui
     ImGui::CreateContext();
-    ImGUI::setStyle(false);
+    ImGUI::setStyle(true);
 
     ImGuiIO &io = ImGui::GetIO();
     (void)io;
@@ -866,8 +866,8 @@ VkSurfaceFormatKHR VulkanBackend::chooseSwapSurfaceFormat(const std::vector<VkSu
 {
     for (const auto &availableFormat : availableFormats)
     {
-        //VK_FORMAT_B8G8R8A8_SRGB before VK_FORMAT_B8G8R8A8_UNORM for ImGUI does this affect my render?
-        if (availableFormat.format == VK_FORMAT_B8G8R8A8_UNORM && availableFormat.colorSpace == VK_COLOR_SPACE_SRGB_NONLINEAR_KHR)
+        // VK_FORMAT_B8G8R8A8_SRGB before VK_FORMAT_B8G8R8A8_UNORM for ImGUI does this affect my render?
+        if (availableFormat.format == VK_FORMAT_B8G8R8A8_SRGB && availableFormat.colorSpace == VK_COLOR_SPACE_SRGB_NONLINEAR_KHR)
         {
             return availableFormat;
         }

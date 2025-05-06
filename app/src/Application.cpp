@@ -187,7 +187,7 @@ void Application::Run()
 	drawn = false;
 	bool        useRaytracer = false;
 	const char* items[] = { "Pixel Debug", "All", "None"};
-	static int  item_current = 3;
+	static int  item_current = 2;
 
 	while (glfwWindowShouldClose(WindowController::GetInstance().GetWindow()) == 0 && m_Running)
 	{
@@ -300,9 +300,8 @@ void Application::Run()
 		ImGui_ImplGlfw_NewFrame();
 		ImGui::NewFrame();
 
-		////some imgui UI to test
-		//ImGui::ShowDemoWindow();
-
+		//----------------------------------------------------------------------------
+		// ImGui UI Instructions
 		ImGUI::Panel::Begin();
 
 		bool changed = false;
@@ -311,8 +310,8 @@ void Application::Run()
 		ImGui::Combo("Debug Mode", &item_current, items, IM_ARRAYSIZE(items));
 
 		ImGUI::Panel::End();
-		// make imgui calculate internal draw structures
-		// ImGui::Render();
+
+		//----------------------------------------------------------------------------
 
 		VulkanBackend::GetInstance().drawFrame(drawData.indices, d_lines.size());
 
