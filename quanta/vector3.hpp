@@ -40,8 +40,7 @@ namespace Math
             return res;
         }
 
-
-        void operator+=(Vector3<T> const& obj)
+        void operator+=(Vector3<T> const &obj)
         {
             x = x + obj.x;
             y = y + obj.y;
@@ -66,14 +65,14 @@ namespace Math
             return res;
         }
 
-        void operator*=(Vector3 const& obj)
+        void operator*=(Vector3 const &obj)
         {
             x = x * obj.x;
             y = y * obj.y;
             z = z * obj.z;
         }
 
-        Vector3 operator/(Vector3 const& obj)
+        Vector3 operator/(Vector3 const &obj)
         {
             Vector3 res = Vector3();
             res.x = x / obj.x;
@@ -100,7 +99,7 @@ namespace Math
             return res;
         }
 
-        Vector3 operator+(T const& scale)
+        Vector3 operator+(T const &scale)
         {
             Vector3 res = Vector3();
             res.x = x + scale;
@@ -109,7 +108,16 @@ namespace Math
             return res;
         }
 
-        bool operator==(Vector3<T> const& obj)
+        Vector3 operator-(T const &scale)
+        {
+            Vector3 res = Vector3();
+            res.x = x - scale;
+            res.y = y - scale;
+            res.z = z - scale;
+            return res;
+        }
+
+        bool operator==(Vector3<T> const &obj)
         {
             return x == obj.x && y == obj.y && z == obj.z;
         }
@@ -148,5 +156,13 @@ namespace Math
     Vector3<T> Max(Vector3<T> a, T maxVal) { return Vector3(std::max(a.x, maxVal), std::max(a.y, maxVal), std::max(a.z, maxVal)); }
 
     template <typename T>
-    Vector3<T> Clamp(Vector3<T> x,T minVal, T maxVal) { return Min(Max(x, minVal), maxVal); }
+    Vector3<T> Clamp(Vector3<T> x, T minVal, T maxVal) { return Min(Max(x, minVal), maxVal); }
+
+    template <typename T>
+    bool near_zero(Vector3<T> v)
+    {
+        // Return true if the vector is close to zero in all dimensions.
+        auto s = 1e-8;
+        return (std::fabs(v.x) < s) && (std::fabs(v.y) < s) && (std::fabs(v.z) < s);
+    }
 }

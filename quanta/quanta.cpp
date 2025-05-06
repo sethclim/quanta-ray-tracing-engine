@@ -1,15 +1,5 @@
 #include "quanta.hpp"
 
-static uint32_t ConvertToRGBA(const Math::Vector3<float> &color)
-{
-    uint8_t r = (color.x * 255.0f);
-    uint8_t g = (color.y * 255.0f);
-    uint8_t b = (color.z * 255.0f);
-    uint8_t a = (255.0f);
-
-    return (a << 24) | (b << 16) | (g << 8) | r;
-}
-
 /// <summary>
 /// Finds the reflected ray
 /// </summary>
@@ -36,7 +26,8 @@ Math::Vector3<float> Renderer::PerPixel(float image_x, float image_y)
     ray.Direction = Math::Vector3<float>(coordX, coordY, -1.0f);
 
     Math::Vector3<float> pixel_color(0, 0, 0);
-    for (int sample = 0; sample < SAMPLES_PER_PIXEL; sample++) {
+    for (int sample = 0; sample < SAMPLES_PER_PIXEL; sample++)
+    {
 
         Math::Vector3<float> incomingLight = Math::Vector3<float>(0, 0, 0);
         Math::Vector3<float> rayColor = Math::Vector3<float>(1, 1, 1);
@@ -46,56 +37,36 @@ Math::Vector3<float> Renderer::PerPixel(float image_x, float image_y)
             HitInfo info = TraceRay(ray);
 
             if (info.HitPoint == Math::Vector3<float>(-1, -1, -1))
-            {
                 break;
-            }
 
             if (i == 0 && info.ObjectID == 2222)
-            {
                 break;
-            }
 
-            /*if (i > 0 && info.ObjectID == 2222)
+            // ray.Origin = (info.HitPoint + 0.001f);
+            // // ray.Direction = Reflect(info.Normal, ray.Direction);
+            // // ray.Direction = Utilities::Random::Random_On_Hemisphere(info.Normal);
+            // ray.Direction = info.Normal + Utilities::Random::Random_Unit_Vector();
+
+            Math::Vector3<float> attenuation;
+            Ray ray2;
+            if (info.Material->scatter(ray, info, attenuation, ray2))
             {
-                std::cout << "HIT THE LIGHT" << std::endl;
-            } */
+                Math::Vector3<float>
+                    emittedLight = info.Material->EmissionColor * info.Material->EmissionStrength;
 
-            /* if(i > 0)
-                 std::cout << "[Hit] index: " << i << " ID: " << info.ObjectID << " x " << image_x << " y " << image_y << std::endl;*/
+                rayColor *= attenuation;
 
-            ray.Origin = (info.HitPoint + 0.001f);
-            //ray.Direction = Reflect(info.Normal, ray.Direction);
-            ray.Direction = Utilities::Random::Random_On_Hemisphere(info.Normal);
+                incomingLight += rayColor * emittedLight;
 
-            //ray.Direction = info.Normal;
-
-            //std::cout << "ray.Direction: " << ray.Direction.ToString() << std::endl;
-
-            Math::Vector3<float> emittedLight = info.Material.EmissionColor * info.Material.EmissionStrength;
-
-            //incomingLight += emittedLight * rayColor;
-            //incomingLight = emittedLight;
-
-            rayColor *= info.Material.Color;
-
-            /* if (info.ObjectID == 0)
-                std::cout << "Hit: id " << i << " " << info.ObjectID << incomingLight.ToString() << std::endl; */
-
-                //Math::Vector3<float> res = Math::Clamp(info.Normal, 0.0f, 1.0f);
-            
-            incomingLight += (rayColor * emittedLight);
-            //if (i == 0)
-            //{
-            //    //incomingLight += (rayColor * emittedLight);
-            //    incomingLight += rayColor * emittedLight;
-            //    //incomingLight += Math::Clamp(info.Normal, 0.0f, 1.0f);
-            //}
-            //else
-            //{
-            //    //incomingLight += emittedLight;
-            //    incomingLight += (rayColor * emittedLight);
-            //    //incomingLight += rayColor;
-            //}
+                ray.Origin = ray2.Origin;
+                ray.Direction = ray2.Direction;
+            }
+            else
+            {
+                Math::Vector3<float>
+                    emittedLight = info.Material->EmissionColor * info.Material->EmissionStrength;
+                incomingLight += rayColor * emittedLight;
+            }
         }
 
         pixel_color += incomingLight;
@@ -106,36 +77,17 @@ Math::Vector3<float> Renderer::PerPixel(float image_x, float image_y)
 
 HitInfo Renderer::TraceRay(const Ray &ray)
 {
-    for (int i = 0; i < m_Scene.Spheres.size(); i++)
+    Utilities::Interval ray_t = Utilities::Interval(0.001, std::numeric_limits<double>::infinity());
+    double closest_so_far = ray_t.max;
+    for (const auto &object : m_Scene.ray_targets)
     {
-        Scene::Shapes::Sphere sphere = m_Scene.Spheres[i];
 
-        Math::Vector3<float> offsetRayOrigin = (Math::Vector3<float>)ray.Origin - sphere.Origin;
+        HitInfo info = object->hit(ray, Utilities::Interval(ray_t.min, closest_so_far));
 
-        float a = Math::LengthSquared(ray.Direction);
-        float b = 2.0f * Math::Dot(offsetRayOrigin, ray.Direction);
-        float c = Math::LengthSquared(offsetRayOrigin) - Math::Sqr(sphere.Radius);
-
-        float discriminant = Math::Sqr(b) - 4.0f * a * c;
-
-        if (discriminant < 0.0f)
+        if (info.HitPoint == Math::Vector3<float>(-1, -1, -1))
             continue;
 
-        // int ans = (-b + sqrt((b * b) - (4 * a * c))) / (2 * a);
-        float t0 = (-b + std::sqrt(discriminant)) / (2.0f * a);
-        float t1 = (-b - std::sqrt(discriminant)) / (2.0f * a);
-
-        HitInfo hitInfo;
-
-        hitInfo.HitPoint = (Math::Vector3<float>)ray.Origin + (Math::Vector3<float>)ray.Direction * t1;
-
-        hitInfo.Normal = Math::Normalize(hitInfo.HitPoint - sphere.Origin);
-
-        hitInfo.Material = sphere.Material;
-
-        hitInfo.ObjectID = sphere.id;
-
-        return hitInfo;
+        return info;
     }
 
     HitInfo hitInfo;

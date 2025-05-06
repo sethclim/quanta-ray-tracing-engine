@@ -55,52 +55,57 @@ void Application::Init()
 	{
 		Scene::SceneGraph scene;
 
-		Scene::Material mat;
+		Materials::Lambertian mat;
 		mat.Color = Math::Vector3<float>(1.0, 0, 0);
 		mat.EmissionColor = Math::Vector3<float>(0, 0, 0);
 		mat.EmissionStrength = 0.0f;
 
-		Scene::Material mat2;
+		Materials::Lambertian mat2;
 		mat2.Color = Math::Vector3<float>(1, 1, 0);
 		mat2.EmissionColor = Math::Vector3<float>(1, 1, 1);
 		mat2.EmissionStrength = 0.0f;
 
-		Scene::Material mat3;
-		mat3.Color = Math::Vector3<float>(1, 1, 1);
+		Materials::Metal mat3 = Materials::Metal(Math::Vector3<float>(1, 0, 0));
+		/*mat3.Color = Math::Vector3<float>(1, 1, 1);
 		mat3.EmissionColor = Math::Vector3<float>(1, 1, 1);
-		mat3.EmissionStrength = 0.0f;
+		mat3.EmissionStrength = 0.0f;*/
 
-		Scene::Material lightMaterial;
+		Materials::Material lightMaterial;
 		lightMaterial.Color = Math::Vector3<float>(1, 1, 1);
 		lightMaterial.EmissionColor = Math::Vector3<float>(1, 1, 1);
 		lightMaterial.EmissionStrength = 0.6f;
 
+		auto mat_one = std::make_shared<Materials::Lambertian>(mat);
+		auto mat_two = std::make_shared<Materials::Lambertian>(mat2);
+		auto mat_three = std::make_shared<Materials::Metal>(mat3);
+		auto mat_light = std::make_shared<Materials::Material>(lightMaterial);
+
 		Scene::Shapes::Sphere sphere;
 		sphere.Origin = Math::Vector3<float>(0, 0, 0);
-		sphere.Material = mat;
+		sphere.Material = mat_one;
 		sphere.id = 0;
 
 		Scene::Shapes::Sphere sphere2;
 		sphere2.Origin = Math::Vector3<float>(1, 1, 0);
-		sphere2.Material = mat2;
+		sphere2.Material = mat_two;
 		sphere2.id = 1;
 
 		Scene::Shapes::Sphere sphere3;
 		sphere3.Origin = Math::Vector3<float>(1, -2, 1);
-		sphere3.Material = mat3;
+		sphere3.Material = mat_three;
 		sphere3.Radius = 1.8f;
-		sphere3.id = 2;  
+		sphere3.id = 2;
 
 		Scene::Shapes::Sphere sphere4;
 		sphere4.Origin = Math::Vector3<float>(-1, 1.7, 1);
-		sphere4.Material = lightMaterial;
+		sphere4.Material = mat_light;
 		sphere4.Radius = 1.0f;
 		sphere4.id = 2222;
 
-		scene.Spheres.push_back(sphere);
-		scene.Spheres.push_back(sphere2);
-		scene.Spheres.push_back(sphere3);
-		scene.Spheres.push_back(sphere4);
+		// scene.ray_targets.push_back(std::make_shared<Scene::Shapes::Sphere>(sphere));
+		// scene.ray_targets.push_back(std::make_shared<Scene::Shapes::Sphere>(sphere2));
+		scene.ray_targets.push_back(std::make_shared<Scene::Shapes::Sphere>(sphere3));
+		scene.ray_targets.push_back(std::make_shared<Scene::Shapes::Sphere>(sphere4));
 
 		renderer = std::make_unique<Renderer>(scene);
 	}
