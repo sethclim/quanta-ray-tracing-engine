@@ -23,7 +23,6 @@ namespace Utils
 		uint32_t result = (a << 24) | (b << 16) | (g << 8) | r;
 		return result;
 	}
-
 }
 
 Application::Application()
@@ -48,8 +47,23 @@ void Application::Init()
 
 	Input::InputManager::Init();
 
-	glfwSetCursorPosCallback(WindowController::GetInstance().GetWindow(), Input::cursor_position_callback);
-	glfwSetMouseButtonCallback(WindowController::GetInstance().GetWindow(), Input::mouse_button_callback);
+	// Setup Dear ImGui context
+	IMGUI_CHECKVERSION();
+	ImGui::CreateContext();
+	ImGuiIO &io = ImGui::GetIO();
+	(void)io;
+	// io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
+	// io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
+
+	// Setup Dear ImGui style
+	ImGui::StyleColorsDark();
+	// ImGui::StyleColorsClassic();
+
+	GLFWwindow *glfwWindow = WindowController::GetInstance().GetWindow();
+	ImGui_ImplGlfw_InitForVulkan(glfwWindow, false);
+
+	glfwSetCursorPosCallback(glfwWindow, Input::cursor_position_callback);
+	glfwSetMouseButtonCallback(glfwWindow, Input::mouse_button_callback);
 
 	editor = std::make_unique<Editor>();
 	glm::vec2 size = WindowController::GetInstance().GetSize();
@@ -59,10 +73,10 @@ void Application::Init()
 	{
 		Scene::SceneGraph scene;
 
-		Materials::Lambertian mat;
-		mat.Color = Math::Vector3<float>(1.0, 0, 0);
-		mat.EmissionColor = Math::Vector3<float>(0, 0, 0);
-		mat.EmissionStrength = 0.0f;
+		Materials::Metal mat = Materials::Metal(Math::Vector3<float>(0.7, 0.0, 0.0));
+		// mat.Color = Math::Vector3<float>(1.0, 0, 0);
+		// mat.EmissionColor = Math::Vector3<float>(0, 0, 0);
+		// mat.EmissionStrength = 0.0f;
 
 		Materials::Lambertian mat2;
 		mat2.Color = Math::Vector3<float>(0, 1, 1);
@@ -74,7 +88,7 @@ void Application::Init()
 		floor_mat.EmissionColor = Math::Vector3<float>(0, 0, 0);
 		floor_mat.EmissionStrength = 0.0f;
 
-		Materials::Metal mat3 = Materials::Metal(Math::Vector3<float>(1, 1, 1));
+		Materials::Metal mat3 = Materials::Metal(Math::Vector3<float>(0.7, 0.7, 0.7));
 		/*mat3.Color = Math::Vector3<float>(1, 1, 1);
 		mat3.EmissionColor = Math::Vector3<float>(1, 1, 1);
 		mat3.EmissionStrength = 0.0f;*/
@@ -84,14 +98,14 @@ void Application::Init()
 		lightMaterial.EmissionColor = Math::Vector3<float>(1, 1, 1);
 		lightMaterial.EmissionStrength = 1.0f;
 
-		auto mat_one = std::make_shared<Materials::Lambertian>(mat);
+		auto mat_one = std::make_shared<Materials::Metal>(mat);
 		auto mat_two = std::make_shared<Materials::Lambertian>(mat2);
 		auto mat_floor = std::make_shared<Materials::Lambertian>(floor_mat);
 		auto mat_three = std::make_shared<Materials::Metal>(mat3);
 		auto mat_light = std::make_shared<Materials::Material>(lightMaterial);
 
 		Scene::Shapes::Sphere sphere;
-		sphere.Origin = Math::Vector3<float>(-0.5, 0, -1);
+		sphere.Origin = Math::Vector3<float>(-0.5, 0.8, -1);
 		sphere.Material = mat_one;
 		sphere.id = 666;
 
@@ -113,13 +127,12 @@ void Application::Init()
 		sphere3.id = 2;
 
 		Scene::Shapes::Sphere sphere4;
-		sphere4.Origin = Math::Vector3<float>(0.5, -0.5, -1);
+		sphere4.Origin = Math::Vector3<float>(0.5, -0.5, 0.5);
 		sphere4.Material = mat_light;
 		sphere4.Radius = 1.3f;
 		sphere4.id = 2222;
 
 		scene.ray_targets.push_back(std::make_shared<Scene::Shapes::Sphere>(floor));
-
 		scene.ray_targets.push_back(std::make_shared<Scene::Shapes::Sphere>(sphere));
 		scene.ray_targets.push_back(std::make_shared<Scene::Shapes::Sphere>(sphere2));
 		scene.ray_targets.push_back(std::make_shared<Scene::Shapes::Sphere>(sphere3));
@@ -154,7 +167,7 @@ void Application::Init()
 		debug_trace_coord = glm::vec2(e.x, e.y);
 		drawn = false; });
 
-	/*ImGui_ImplVulkanH_Window *wd = &g_MainWindowData;*/
+	// ImGui_ImplVulkanH_Window *wd = &g_MainWindowData;
 	// SetupVulkanWindow(wd, surface, w, h);
 
 	// s_AllocatedCommandBuffers.resize(wd->ImageCount);
@@ -172,6 +185,9 @@ void Application::Run()
 	VulkanBackend &vulkanBackend = VulkanBackend::GetInstance();
 
 	drawn = false;
+	bool        useRaytracer = false;
+	const char* items[] = { "Pixel Debug", "All", "None"};
+	static int  item_current = 2;
 
 	while (glfwWindowShouldClose(WindowController::GetInstance().GetWindow()) == 0 && m_Running)
 	{
@@ -186,6 +202,7 @@ void Application::Run()
 		// m_gameController->Update(deltaTime);
 
 		// Utilities::FPSCounter::CalculateFrameRate();
+		// Utilities::FPSCounter::CalculateFrameRate();
 
 		// RENDER
 		// glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -199,8 +216,8 @@ void Application::Run()
 			VulkanBackend::GetInstance().GetRenderContext().Height);
 
 		std::vector<Utilities::DebugLine> d_lines;
-		Input::InputManager::GetInstance().ProcessEvents();
 
+		Input::InputManager::GetInstance().ProcessEvents();
 		// if (!drawn)
 		//{
 		if (!m_Image || dimensions[0] != m_Image->GetWidth() || dimensions[1] != m_Image->GetHeight())
@@ -217,41 +234,48 @@ void Application::Run()
 		if (m_FrameIndex == 1)
 			memset(m_AccumulationData, 0, m_Image->GetWidth() * m_Image->GetHeight() * sizeof(glm::vec4));
 
-		// glm::vec2 mouse = Input::InputManager::GetInstance().GetMousePosition();
+		glm::vec2 mouse = Input::InputManager::GetInstance().GetMousePosition();
 
-		for (uint32_t y = 0; y < dimensions[1]; y++)
+		if(useRaytracer)
 		{
-			for (uint32_t x = 0; x < dimensions[0]; x++)
+			for (uint32_t y = 0; y < dimensions[1]; y++)
 			{
-				/*	bool debug_pixel = (x == debug_trace_coord.x && y == debug_trace_coord.y);*/
+				for (uint32_t x = 0; x < dimensions[0]; x++)
+				{
 
-				float flipped_y = dimensions[1] - y;
+					float flipped_y = dimensions[1] - y;
 
-				float normalizedX = (float)x / (float)dimensions[0];
-				float normalizedY = (float)flipped_y / (float)dimensions[1];
+					float normalizedX = (float)x / (float)dimensions[0];
+					float normalizedY = (float)flipped_y / (float)dimensions[1];
 
-				uint32_t idx = x + (y * dimensions[0]);
-				bool debug_pixel = idx % 1000;
+					uint32_t idx = x + (y * dimensions[0]);
+					bool debug_pixel = false;
+					if(item_current == 0)
+						debug_pixel = (x == debug_trace_coord.x && y == debug_trace_coord.y);
+					else if(item_current == 1)
+						debug_pixel = idx % 1000;
 
-				Math::Vector3<float> color = Math::Vector3<float>(0, 0, 0);
-				/*
-				if (flipped_y < dimensions[1] / 2)
-					color = Math::Vector3<float>(1, 0, 0);*/
 
-				/*	if (x == 535 && y == 318)*/
-				color = renderer->PerPixel(normalizedX, normalizedY, debug_pixel);
+					Math::Vector3<float> color = Math::Vector3<float>(0, 0, 0);
+					/*
+					if (flipped_y < dimensions[1] / 2)
+						color = Math::Vector3<float>(1, 0, 0);*/
 
-				m_AccumulationData[x + y * m_Image->GetWidth()] += glm::vec4(color.x, color.y, color.z, 1.0f);
+					/*	if (x == 535 && y == 318)*/
+					color = renderer->PerPixel(normalizedX, normalizedY, debug_pixel);
 
-				glm::vec4 accumulatedColor = m_AccumulationData[x + y * m_Image->GetWidth()];
-				accumulatedColor /= (float)m_FrameIndex;
+					m_AccumulationData[x + y * m_Image->GetWidth()] += glm::vec4(color.x, color.y, color.z, 1.0f);
 
-				accumulatedColor = glm::clamp(accumulatedColor, glm::vec4(0.0f), glm::vec4(1.0f));
+					glm::vec4 accumulatedColor = m_AccumulationData[x + y * m_Image->GetWidth()];
+					accumulatedColor /= (float)m_FrameIndex;
 
-				// if (x < dimensions[0] / 2)
-				//	accumulatedColor = glm::vec4(1, 0, 0, 1);
+					accumulatedColor = glm::clamp(accumulatedColor, glm::vec4(0.0f), glm::vec4(1.0f));
 
-				m_ImageData[idx] = Utils::ConvertToRGBA(accumulatedColor);
+					// if (x < dimensions[0] / 2)
+					//	accumulatedColor = glm::vec4(1, 0, 0, 1);
+
+					m_ImageData[idx] = Utils::ConvertToRGBA(accumulatedColor);
+				}
 			}
 		}
 
@@ -269,6 +293,26 @@ void Application::Run()
 		glm::vec2 size = WindowController::GetInstance().GetSize();
 		editor->CalculateLayout(size.x, size.y);
 		DrawData drawData = editor->RenderEditor();
+
+		// imgui new frame
+		ImGui_ImplVulkan_NewFrame();
+		// ImGui_ImplSDL2_NewFrame();
+		ImGui_ImplGlfw_NewFrame();
+		ImGui::NewFrame();
+
+		//----------------------------------------------------------------------------
+		// ImGui UI Instructions
+		ImGUI::Panel::Begin();
+
+		bool changed = false;
+		changed |= ImGui::Checkbox("Raytracer Mode", &useRaytracer);
+
+		ImGui::Combo("Debug Mode", &item_current, items, IM_ARRAYSIZE(items));
+
+		ImGUI::Panel::End();
+
+		//----------------------------------------------------------------------------
+
 		VulkanBackend::GetInstance().drawFrame(drawData.indices, d_lines.size());
 
 		m_FrameIndex++;

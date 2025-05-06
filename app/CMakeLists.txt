@@ -25,6 +25,8 @@ add_executable(app
     src/VK_Types.cpp
     src/VK_Initializers.cpp
     src/VK_Initializers.hpp
+    src/ImGUI.hpp
+    src/ImGUI.cpp
     src/utils/Utilities.hpp
     src/utils/Utilities.cpp
 )
@@ -33,11 +35,10 @@ target_link_libraries(app PRIVATE quanta)
 target_link_libraries(app PRIVATE glfw)
 target_link_libraries(app PUBLIC editor)
 target_link_libraries(app PRIVATE glm::glm-header-only)
+target_link_libraries(app PRIVATE imgui)
 
 target_include_directories(app PRIVATE ${QUANTA_INCLUDE_DIR})
 
-find_package(Vulkan REQUIRED)
 
 target_link_libraries(app PRIVATE Vulkan::Vulkan)
-
 target_link_libraries(app PRIVATE stb_image)

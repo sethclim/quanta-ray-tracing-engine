@@ -11,11 +11,13 @@ set(DEPENDENCIES CACHE STRING "")
 add_subdirectory("${DEPENDENCIES}/glfw" glfw)
 add_subdirectory("${DEPENDENCIES}/glm" glm)
 
+find_package(Vulkan REQUIRED)
+
+add_subdirectory(vendor)
+add_subdirectory(render_data)
 add_subdirectory(quanta)
 add_subdirectory(editor)
 add_subdirectory(app)
-add_subdirectory(vendor)
-add_subdirectory(render_data)
 
 target_compile_features(app PRIVATE cxx_std_17)
 target_compile_features(quanta PRIVATE cxx_std_17)

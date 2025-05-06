@@ -12,8 +12,8 @@ Math::Vector3<float> Reflect(Math::Vector3<float> &N, Math::Vector3<float> &Ri)
     return Ri - (N * 2.0f * Math::Dot(Ri, N));
 }
 
-const int MAX_BOUNCES = 4;
-const int SAMPLES_PER_PIXEL = 10;
+const int MAX_BOUNCES = 50;
+const int SAMPLES_PER_PIXEL = 30;
 
 Math::Vector3<float> Renderer::PerPixel(float image_x, float image_y, bool debug)
 {

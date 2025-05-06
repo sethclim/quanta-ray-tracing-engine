@@ -55,6 +55,7 @@ struct Quanta_ImplVulkanH_RenderContext
     // uint32_t            SemaphoreIndex;         // Current set of swapchain wait semaphores we're using (needs to be distinct from per frame data)
     // ImGui_ImplVulkanH_Frame* Frames;
     // ImGui_ImplVulkanH_FrameSemaphores* FrameSemaphores;
+    uint32_t MinImageCount;
 
     std::vector<VkSemaphore> imageAvailableSemaphores;
     std::vector<VkSemaphore> renderFinishedSemaphores;
@@ -92,6 +93,15 @@ struct UniformBufferObject
     alignas(16) glm::mat4 model;
     alignas(16) glm::mat4 view;
     alignas(16) glm::mat4 proj;
+};
+
+struct AllocatedImage
+{
+    VkImage image;
+    VkImageView imageView;
+    // VmaAllocation allocation;
+    VkExtent3D imageExtent;
+    VkFormat imageFormat;
 };
 
 #endif
