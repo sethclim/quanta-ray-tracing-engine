@@ -28,7 +28,7 @@ public:
     VkPipeline build_pipeline(
         VkDevice device,
         Quanta_ImplVulkanH_RenderContext &context,
-        std::optional<std::pair<VkVertexInputBindingDescription, std::array<VkVertexInputAttributeDescription, 1>>>  customVertexInfoDescriptions = std::nullopt);
+        std::optional<std::pair<VkVertexInputBindingDescription, std::array<VkVertexInputAttributeDescription, 1>>> customVertexInfoDescriptions = std::nullopt);
 
     void set_shaders(VkShaderModule vertexShader, VkShaderModule fragmentShader);
     void set_input_topology(VkPrimitiveTopology topology);

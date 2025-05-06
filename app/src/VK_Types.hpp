@@ -25,6 +25,12 @@ namespace RenderData
     std::array<VkVertexInputAttributeDescription, 1> getDebugAttributeDescriptions();
 }
 
+struct MaterialPipeline
+{
+    VkPipeline _pipeline;
+    VkPipelineLayout _pipelineLayout;
+};
+
 struct Quanta_ImplVulkanH_RenderContext
 {
     int Width;
