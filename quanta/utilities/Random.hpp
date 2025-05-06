@@ -7,33 +7,33 @@ namespace Utilities
 {
     namespace Random
     {
-        inline double random_double()
+        inline double Random_Double()
         {
             // Returns a random real in [0,1).
             return std::rand() / (RAND_MAX + 1.0);
         }
 
-        inline double random_double(double min, double max)
+        inline double Random_Double(double min, double max)
         {
-            // Returns a random real in [min,max).
-            return min + (max - min) * random_double();
+            // Returns a random real in [min,max)
+            return min + (max - min) * Random_Double();
         }
 
-        inline Math::Vector3<float> random_vec3()
+        inline Math::Vector3<float> Random_Vec3()
         {
-            return Math::Vector3<float>(random_double(), random_double(), random_double());
+            return Math::Vector3<float>(Random_Double(), Random_Double(), Random_Double());
         }
 
-        inline Math::Vector3<float> random_vec3(double min, double max)
+        inline Math::Vector3<float> Random_Vec3(double min, double max)
         {
-            return Math::Vector3<float>(random_double(min, max), random_double(min, max), random_double(min, max));
+            return Math::Vector3<float>(Random_Double(min, max), Random_Double(min, max), Random_Double(min, max));
         }
 
-        inline Math::Vector3<float> random_unit_vector()
+        inline Math::Vector3<float> Random_Unit_Vector()
         {
             while (true)
             {
-                auto p = random_vec3(-1, 1);
+                auto p = Random_Vec3(-1, 1);
                 auto lensq = LengthSquared(p);
                 if (1e-160 < lensq && lensq <= 1)
                     return p / sqrt(lensq);
@@ -42,7 +42,7 @@ namespace Utilities
 
         inline Math::Vector3<float> Random_On_Hemisphere(const Math::Vector3<float> &normal)
         {
-            Math::Vector3<float> on_unit_sphere = random_unit_vector();
+            Math::Vector3<float> on_unit_sphere = Random_Unit_Vector();
             if (Dot(on_unit_sphere, normal) > 0.0) // In the same hemisphere as the normal
                 return on_unit_sphere;
             else

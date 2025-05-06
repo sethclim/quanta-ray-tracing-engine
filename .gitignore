@@ -1,3 +1,4 @@
 quanta-vs/
 .vscode/
 build/
+build.ps1
