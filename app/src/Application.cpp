@@ -71,7 +71,6 @@ void Application::Init()
 
 	DrawData drawData = editor->RenderEditor();
 	{
-		Scene::SceneGraph scene;
 
 		Materials::Metal mat = Materials::Metal(Math::Vector3<float>(0.7, 0.0, 0.0));
 		// mat.Color = Math::Vector3<float>(1.0, 0, 0);
@@ -314,6 +313,22 @@ void Application::Run()
 		ImGui::SeparatorText("Render Settings");
 		ImGui::DragInt("Samples per Pixel 0..50", &samples_per_pixel, 1, 1, 50, "%d%", ImGuiSliderFlags_AlwaysClamp);
 		ImGui::DragInt("Max Bounces 0..30", &max_bounces, 1, 1, 3, "%d%", ImGuiSliderFlags_AlwaysClamp);
+
+		ImGui::SeparatorText("Scene Settings");
+		
+		for (size_t i = 0; i < scene.ray_targets.size(); ++i) {
+			ImGui::PushID(i);
+			auto val = scene.ray_targets[i];
+			auto res = std::dynamic_pointer_cast<Scene::Shapes::Sphere>(val);
+			if (res) {
+				ImGui::Text("Sphere \n");
+				Math::Vector3 _origin = res.get()->Origin;
+				auto pos = glm::vec3(_origin.x, _origin.y, _origin.z);
+				ImGui::DragFloat3("Origin", glm::value_ptr(pos), 0.1f);
+				ImGui::DragFloat("Radius", &res.get()->Radius, 1.0f, 0.01f, 100.0f, "%.2f", ImGuiSliderFlags_AlwaysClamp);
+			}
+			ImGui::PopID();
+		}
 
 		ImGUI::Panel::End();
 
