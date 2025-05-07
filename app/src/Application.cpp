@@ -189,6 +189,7 @@ void Application::Run()
 	static int  item_current = 2;
 	int samples_per_pixel = 6;
 	int max_bounces = 3;
+	bool accumulate = true;
 
 	while (glfwWindowShouldClose(WindowController::GetInstance().GetWindow()) == 0 && m_Running)
 	{
@@ -265,7 +266,10 @@ void Application::Run()
 					/*	if (x == 535 && y == 318)*/
 					color = renderer->PerPixel(normalizedX, normalizedY, samples_per_pixel, max_bounces, debug_pixel);
 
-					m_AccumulationData[x + y * m_Image->GetWidth()] += glm::vec4(color.x, color.y, color.z, 1.0f);
+					if(accumulate)
+						m_AccumulationData[x + y * m_Image->GetWidth()] += glm::vec4(color.x, color.y, color.z, 1.0f);
+					else
+						m_AccumulationData[x + y * m_Image->GetWidth()] = glm::vec4(color.x, color.y, color.z, 1.0f);
 
 					glm::vec4 accumulatedColor = m_AccumulationData[x + y * m_Image->GetWidth()];
 					accumulatedColor /= (float)m_FrameIndex;
@@ -305,16 +309,18 @@ void Application::Run()
 		// ImGui UI Instructions
 		ImGUI::Panel::Begin();
 
+		ImGui::SeparatorText("RENDER SETTINGS");
+		ImGui::DragInt("Samples per Pixel 0..50", &samples_per_pixel, 1, 1, 50, "%d%", ImGuiSliderFlags_AlwaysClamp);
+		ImGui::DragInt("Max Bounces 0..30", &max_bounces, 1, 1, 3, "%d%", ImGuiSliderFlags_AlwaysClamp);
+		ImGui::Checkbox("Accumulate", &accumulate);
+
+		ImGui::SeparatorText("DEBUG SETTINGS");
 		bool changed = false;
-		changed |= ImGui::Checkbox("Raytracer Mode", &useRaytracer);
 
 		ImGui::Combo("Debug Mode", &item_current, items, IM_ARRAYSIZE(items));
 
-		ImGui::SeparatorText("Render Settings");
-		ImGui::DragInt("Samples per Pixel 0..50", &samples_per_pixel, 1, 1, 50, "%d%", ImGuiSliderFlags_AlwaysClamp);
-		ImGui::DragInt("Max Bounces 0..30", &max_bounces, 1, 1, 3, "%d%", ImGuiSliderFlags_AlwaysClamp);
 
-		ImGui::SeparatorText("Scene Settings");
+		ImGui::SeparatorText("SCENE SETTINGS");
 		
 		for (size_t i = 0; i < scene.ray_targets.size(); ++i) {
 			ImGui::PushID(i);
@@ -330,6 +336,7 @@ void Application::Run()
 			ImGui::PopID();
 		}
 
+		changed |= ImGui::Checkbox("Trace rays", &useRaytracer);
 		ImGUI::Panel::End();
 
 		//----------------------------------------------------------------------------
