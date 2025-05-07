@@ -86,9 +86,9 @@ void VulkanBackend::init_imgui()
     imgui_style.ScaleAllSizes(ImGUI::getDPIScale());
 
     // this initializes imgui for SDL
-     //ImGui_ImplSDL2_InitForVulkan(_window);
+    // ImGui_ImplSDL2_InitForVulkan(_window);
 
-     ImGui_ImplGlfw_InitForVulkan(WindowController::GetInstance().GetWindow(), false);
+    ImGui_ImplGlfw_InitForVulkan(WindowController::GetInstance().GetWindow(), false);
 
     // this initializes imgui for Vulkan
     ImGui_ImplVulkan_InitInfo init_info = {};
@@ -535,7 +535,7 @@ void VulkanBackend::createRenderPass()
     colorAttachment.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
     colorAttachment.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
     colorAttachment.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-    colorAttachment.finalLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+    colorAttachment.finalLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
 
     VkAttachmentReference colorAttachmentRef{};
     colorAttachmentRef.attachment = 0;
