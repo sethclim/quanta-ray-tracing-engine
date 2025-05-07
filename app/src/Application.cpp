@@ -94,37 +94,37 @@ void Application::Init()
 		lightMaterial.EmissionColor = Math::Vector3<float>(1, 1, 1);
 		lightMaterial.EmissionStrength = 1.0f;
 
-		auto mat_one = std::make_shared<Materials::Metal>(mat);
-		auto mat_two = std::make_shared<Materials::Lambertian>(mat2);
-		auto mat_floor = std::make_shared<Materials::Lambertian>(floor_mat);
-		auto mat_three = std::make_shared<Materials::Metal>(mat3);
-		auto mat_light = std::make_shared<Materials::Material>(lightMaterial);
+		scene.materials.push_back(std::make_shared<Materials::Metal>(mat));
+		scene.materials.push_back(std::make_shared<Materials::Lambertian>(mat2));
+		scene.materials.push_back(std::make_shared<Materials::Lambertian>(floor_mat));
+		scene.materials.push_back(std::make_shared<Materials::Metal>(mat3));
+		scene.materials.push_back(std::make_shared<Materials::Material>(lightMaterial));
 
 		Scene::Shapes::Sphere sphere;
 		sphere.Origin = Math::Vector3<float>(-0.5, 0.8, -1);
-		sphere.Material = mat_one;
+		sphere.Material = scene.materials[0];
 		sphere.id = 666;
 
 		Scene::Shapes::Sphere floor;
 		floor.Origin = Math::Vector3<float>(0, 12, -4);
-		floor.Material = mat_floor;
+		floor.Material = scene.materials[2];
 		floor.Radius = 10.0f;
 		floor.id = 456;
 
 		Scene::Shapes::Sphere sphere2;
 		sphere2.Origin = Math::Vector3<float>(1, 0, 0);
-		sphere2.Material = mat_two;
+		sphere2.Material = scene.materials[1];
 		sphere2.id = 1;
 
 		Scene::Shapes::Sphere sphere3;
 		sphere3.Origin = Math::Vector3<float>(-0.2, 0.2, -0.3);
-		sphere3.Material = mat_three;
+		sphere3.Material = scene.materials[3];
 		sphere3.Radius = 0.6f;
 		sphere3.id = 2;
 
 		Scene::Shapes::Sphere sphere4;
 		sphere4.Origin = Math::Vector3<float>(0.5, -0.5, 0.5);
-		sphere4.Material = mat_light;
+		sphere4.Material = scene.materials[4];
 		sphere4.Radius = 1.3f;
 		sphere4.id = 2222;
 
@@ -320,19 +320,44 @@ void Application::Run()
 
 		ImGui::SeparatorText("SCENE SETTINGS");
 
+
+		ImGui::Text("Objects");
 		for (size_t i = 0; i < scene.ray_targets.size(); ++i)
 		{
 			ImGui::PushID(i);
 			auto val = scene.ray_targets[i];
-			auto res = std::dynamic_pointer_cast<Scene::Shapes::Sphere>(val);
-			if (res)
+			auto sphere = std::dynamic_pointer_cast<Scene::Shapes::Sphere>(val);
+			if (sphere)
 			{
 				ImGui::Text("Sphere \n");
-				Math::Vector3 _origin = res.get()->Origin;
+				Math::Vector3 _origin = sphere.get()->Origin;
 				auto pos = glm::vec3(_origin.x, _origin.y, _origin.z);
 				ImGui::DragFloat3("Origin", glm::value_ptr(pos), 0.1f);
-				ImGui::DragFloat("Radius", &res.get()->Radius, 1.0f, 0.01f, 100.0f, "%.2f", ImGuiSliderFlags_AlwaysClamp);
+				ImGui::DragFloat("Radius", &sphere.get()->Radius, 1.0f, 0.01f, 100.0f, "%.2f", ImGuiSliderFlags_AlwaysClamp);
 			}
+			ImGui::PopID();
+		}
+
+		ImGui::Text("Materials");
+
+		for (size_t i = 0; i < scene.materials.size(); i++)
+		{
+			ImGui::PushID(i);
+
+			ImGui::Text("Material \n");
+
+			std::shared_ptr<Materials::Material> material = scene.materials[i];
+
+			float* color_ptr = &material.get()->Color.x;
+			ImGui::ColorEdit3("Color", color_ptr);
+
+			ImGui::DragFloat("Emission Strength", &material.get()->EmissionStrength, 0.05f, 0.0f, 1.0f);
+			float* emission_color_ptr = &material.get()->EmissionColor.x;
+			ImGui::ColorEdit3("Emission Color", emission_color_ptr);
+			//ImGui::DragFloat("Roughness", &material.Roughness, 0.05f, 0.0f, 1.0f);
+			//ImGui::DragFloat("Metallic", &material.Metallic, 0.05f, 0.0f, 1.0f);
+
+			ImGui::Separator();
 			ImGui::PopID();
 		}
 
