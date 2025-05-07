@@ -69,27 +69,27 @@ void Application::Init()
 	DrawData drawData = editor->RenderEditor();
 	{
 
-		Materials::Metal mat = Materials::Metal(Math::Vector3<float>(0.7, 0.0, 0.0));
+		Materials::Metal mat = Materials::Metal("Metal 1", Math::Vector3<float>(0.7, 0.0, 0.0));
 		// mat.Color = Math::Vector3<float>(1.0, 0, 0);
 		// mat.EmissionColor = Math::Vector3<float>(0, 0, 0);
 		// mat.EmissionStrength = 0.0f;
 
-		Materials::Lambertian mat2;
+		Materials::Lambertian mat2 = Materials::Lambertian("Lambertian 1");
 		mat2.Color = Math::Vector3<float>(0, 1, 1);
 		mat2.EmissionColor = Math::Vector3<float>(0, 0, 0);
 		mat2.EmissionStrength = 0.0f;
 
-		Materials::Lambertian floor_mat;
+		Materials::Lambertian floor_mat = Materials::Lambertian("Floor");
 		floor_mat.Color = Math::Vector3<float>(1, 1, 1);
 		floor_mat.EmissionColor = Math::Vector3<float>(0, 0, 0);
 		floor_mat.EmissionStrength = 0.0f;
 
-		Materials::Metal mat3 = Materials::Metal(Math::Vector3<float>(0.7, 0.7, 0.7));
+		Materials::Metal mat3 = Materials::Metal("Metal 2", Math::Vector3<float>(0.7, 0.7, 0.7));
 		/*mat3.Color = Math::Vector3<float>(1, 1, 1);
 		mat3.EmissionColor = Math::Vector3<float>(1, 1, 1);
 		mat3.EmissionStrength = 0.0f;*/
 
-		Materials::Material lightMaterial;
+		Materials::Material lightMaterial = Materials::Material("Light");
 		lightMaterial.Color = Math::Vector3<float>(1, 1, 1);
 		lightMaterial.EmissionColor = Math::Vector3<float>(1, 1, 1);
 		lightMaterial.EmissionStrength = 1.0f;
@@ -320,7 +320,6 @@ void Application::Run()
 
 		ImGui::SeparatorText("SCENE SETTINGS");
 
-
 		ImGui::Text("Objects");
 		for (size_t i = 0; i < scene.ray_targets.size(); ++i)
 		{
@@ -334,6 +333,21 @@ void Application::Run()
 				auto pos = glm::vec3(_origin.x, _origin.y, _origin.z);
 				ImGui::DragFloat3("Origin", glm::value_ptr(pos), 0.1f);
 				ImGui::DragFloat("Radius", &sphere.get()->Radius, 1.0f, 0.01f, 100.0f, "%.2f", ImGuiSliderFlags_AlwaysClamp);
+
+				if (ImGui::BeginCombo("Material", sphere.get()->Material ? sphere.get()->Material->GetName().c_str() : "None"))
+				{
+					for (size_t i = 0; i < scene.materials.size(); ++i)
+					{
+						bool isSelected = (scene.materials[i] == sphere.get()->Material);
+						if (ImGui::Selectable(scene.materials[i]->GetName().c_str(), isSelected))
+						{
+							sphere.get()->Material = scene.materials[i]; // Update shared_ptr
+						}
+						if (isSelected)
+							ImGui::SetItemDefaultFocus();
+					}
+					ImGui::EndCombo();
+				}
 			}
 			ImGui::PopID();
 		}
@@ -348,14 +362,14 @@ void Application::Run()
 
 			std::shared_ptr<Materials::Material> material = scene.materials[i];
 
-			float* color_ptr = &material.get()->Color.x;
+			float *color_ptr = &material.get()->Color.x;
 			ImGui::ColorEdit3("Color", color_ptr);
 
 			ImGui::DragFloat("Emission Strength", &material.get()->EmissionStrength, 0.05f, 0.0f, 1.0f);
-			float* emission_color_ptr = &material.get()->EmissionColor.x;
+			float *emission_color_ptr = &material.get()->EmissionColor.x;
 			ImGui::ColorEdit3("Emission Color", emission_color_ptr);
-			//ImGui::DragFloat("Roughness", &material.Roughness, 0.05f, 0.0f, 1.0f);
-			//ImGui::DragFloat("Metallic", &material.Metallic, 0.05f, 0.0f, 1.0f);
+			// ImGui::DragFloat("Roughness", &material.Roughness, 0.05f, 0.0f, 1.0f);
+			// ImGui::DragFloat("Metallic", &material.Metallic, 0.05f, 0.0f, 1.0f);
 
 			ImGui::Separator();
 			ImGui::PopID();

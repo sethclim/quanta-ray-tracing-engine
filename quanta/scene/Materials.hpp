@@ -12,17 +12,27 @@ namespace Materials
         float EmissionStrength = 0.0f;
         Math::Vector3<float> EmissionColor = Math::Vector3<float>(1.0f, 1.0f, 1.0f);
 
+        Material(const std::string& name): _name(name) {}
+
+        const std::string& GetName() const { return _name; }
+        void SetName(const std::string& name) { _name = name; }
+
         virtual ~Material() = default;
 
         virtual bool scatter(const Ray &r_in, const HitInfo &rec, Math::Vector3<float> &attenuation, Ray &scattered) const
         {
             return false;
         }
+    private:
+        std::string _name;
     };
 
     class Lambertian : public Material
     {
      public:
+
+         Lambertian(const std::string& name) : Material(name){}
+
          bool scatter(const Ray &r_in, const HitInfo &hit_info, Math::Vector3<float> &attenuation, Ray &scattered) const override
          {
              auto scatter_direction = Utilities::Random::Random_Unit_Vector() + hit_info.Normal;
@@ -47,7 +57,7 @@ namespace Materials
     class Metal : public Material
     {
      public:
-         Metal(const Math::Vector3<float> &albedo) : albedo(albedo) {}
+         Metal(const std::string& name, const Math::Vector3<float> &albedo) : Material(name), albedo(albedo) {}
 
         bool scatter(const Ray &r_in, const HitInfo &hit_info, Math::Vector3<float> &attenuation, Ray &scattered)
             const override
