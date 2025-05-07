@@ -1,11 +1,11 @@
 #include "Application.hpp"
 
 // static ImGui_ImplVulkanH_Window g_MainWindowData;
-static int g_MinImageCount = 2;
-static bool g_SwapChainRebuild = false;
+// static int g_MinImageCount = 2;
+// static bool g_SwapChainRebuild = false;
 
 // Per-frame-in-flight
-static std::vector<std::vector<VkCommandBuffer>> s_AllocatedCommandBuffers;
+// static std::vector<std::vector<VkCommandBuffer>> s_AllocatedCommandBuffers;
 static std::vector<std::vector<std::function<void()>>> s_ResourceFreeQueue;
 
 static uint32_t s_CurrentFrameIndex = 0;
@@ -60,10 +60,7 @@ void Application::Init()
 	// ImGui::StyleColorsClassic();
 
 	GLFWwindow *glfwWindow = WindowController::GetInstance().GetWindow();
-	ImGui_ImplGlfw_InitForVulkan(glfwWindow, false);
-
-	glfwSetCursorPosCallback(glfwWindow, Input::cursor_position_callback);
-	glfwSetMouseButtonCallback(glfwWindow, Input::mouse_button_callback);
+	// ImGui_ImplGlfw_InitForVulkan(glfwWindow, false);
 
 	editor = std::make_unique<Editor>();
 	glm::vec2 size = WindowController::GetInstance().GetSize();
@@ -161,6 +158,9 @@ void Application::Init()
 
 	VulkanBackend::GetInstance().SetupVulkan(extensions, extensions_count, drawData.vertices, drawData.indices, debugBufferSize, debug);
 
+	glfwSetCursorPosCallback(glfwWindow, Input::cursor_position_callback);
+	glfwSetMouseButtonCallback(glfwWindow, Input::mouse_button_callback);
+
 	Input::InputManager::GetInstance().AddCallback([this](const Input::MouseEvent &e)
 												   {
 		debug_trace_coord = glm::vec2(e.x, e.y);
@@ -184,9 +184,9 @@ void Application::Run()
 	VulkanBackend &vulkanBackend = VulkanBackend::GetInstance();
 
 	drawn = false;
-	bool        useRaytracer = false;
-	const char* items[] = { "Pixel Debug", "All", "None"};
-	static int  item_current = 2;
+	bool useRaytracer = false;
+	const char *items[] = {"Pixel Debug", "All", "None"};
+	static int item_current = 2;
 	int samples_per_pixel = 6;
 	int max_bounces = 3;
 	bool accumulate = true;
@@ -238,7 +238,7 @@ void Application::Run()
 
 		glm::vec2 mouse = Input::InputManager::GetInstance().GetMousePosition();
 
-		if(useRaytracer)
+		if (useRaytracer)
 		{
 			for (uint32_t y = 0; y < dimensions[1]; y++)
 			{
@@ -252,11 +252,10 @@ void Application::Run()
 
 					uint32_t idx = x + (y * dimensions[0]);
 					bool debug_pixel = false;
-					if(item_current == 0)
+					if (item_current == 0)
 						debug_pixel = (x == debug_trace_coord.x && y == debug_trace_coord.y);
-					else if(item_current == 1)
+					else if (item_current == 1)
 						debug_pixel = idx % 1000;
-
 
 					Math::Vector3<float> color = Math::Vector3<float>(0, 0, 0);
 					/*
@@ -266,7 +265,7 @@ void Application::Run()
 					/*	if (x == 535 && y == 318)*/
 					color = renderer->PerPixel(normalizedX, normalizedY, samples_per_pixel, max_bounces, debug_pixel);
 
-					if(accumulate)
+					if (accumulate)
 						m_AccumulationData[x + y * m_Image->GetWidth()] += glm::vec4(color.x, color.y, color.z, 1.0f);
 					else
 						m_AccumulationData[x + y * m_Image->GetWidth()] = glm::vec4(color.x, color.y, color.z, 1.0f);
@@ -319,14 +318,15 @@ void Application::Run()
 
 		ImGui::Combo("Debug Mode", &item_current, items, IM_ARRAYSIZE(items));
 
-
 		ImGui::SeparatorText("SCENE SETTINGS");
-		
-		for (size_t i = 0; i < scene.ray_targets.size(); ++i) {
+
+		for (size_t i = 0; i < scene.ray_targets.size(); ++i)
+		{
 			ImGui::PushID(i);
 			auto val = scene.ray_targets[i];
 			auto res = std::dynamic_pointer_cast<Scene::Shapes::Sphere>(val);
-			if (res) {
+			if (res)
+			{
 				ImGui::Text("Sphere \n");
 				Math::Vector3 _origin = res.get()->Origin;
 				auto pos = glm::vec3(_origin.x, _origin.y, _origin.z);
@@ -347,12 +347,12 @@ void Application::Run()
 		//}
 	}
 
-	// m_gameController->CleanUp();
+	//// m_gameController->CleanUp();
 }
 
 void Application::Close()
 {
-	m_Running = false;
+	/*m_Running = false;*/
 }
 
 void Application::Shutdown()

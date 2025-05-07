@@ -38,26 +38,6 @@ void VulkanBackend::SetupVulkan(const char **extensions, uint32_t extensions_cou
     maxDebugLines = 1572864;
     debug = _debug;
 
-    //// Setup Platform/Renderer bindings
-    // ImGui_ImplVulkan_InitInfo init_info = {};
-    // init_info.Instance = g_Instance;
-    // init_info.Device = g_Device;
-    // init_info.PhysicalDevice = g_PhysicalDevice;
-    // init_info.QueueFamily = g_QueueFamily;
-    // init_info.Queue = g_GraphicsQueue;
-    // init_info.PipelineCache = g_PipelineCache;
-    // init_info.DescriptorPool = g_DescriptorPool;
-    // init_info.Allocator = g_Allocator;
-    // init_info.MinImageCount = context.MinImageCount;
-    // init_info.ImageCount = context.MinImageCount;
-    // init_info.RenderPass = context.RenderPass;
-    // init_info.DescriptorPoolSize = 2;
-    // init_info.CheckVkResultFn = check_vk_result;
-    // ImGui_ImplVulkan_Init(&init_info);
-
-    // ImGUI::CreateImGUIRenderPass(g_Device, context, swapChainImageFormat);
-    // ImGUI::UploadImGUIFonts();
-
     init_imgui();
 }
 
@@ -105,10 +85,10 @@ void VulkanBackend::init_imgui()
     ImGuiStyle &imgui_style = ImGui::GetStyle();
     imgui_style.ScaleAllSizes(ImGUI::getDPIScale());
 
-    //// this initializes imgui for SDL
-    // ImGui_ImplSDL2_InitForVulkan(_window);
+    // this initializes imgui for SDL
+     //ImGui_ImplSDL2_InitForVulkan(_window);
 
-    // ImGui_ImplGlfw_InitForVulkan(WindowController::GetInstance().GetWindow(), false);
+     ImGui_ImplGlfw_InitForVulkan(WindowController::GetInstance().GetWindow(), false);
 
     // this initializes imgui for Vulkan
     ImGui_ImplVulkan_InitInfo init_info = {};
@@ -369,11 +349,11 @@ void VulkanBackend::createInstance(const char **glfwExtensions, uint32_t extensi
     VkDebugUtilsMessengerCreateInfoEXT debugCreateInfo{};
     if (enableValidationLayers)
     {
-        // createInfo.enabledLayerCount = static_cast<uint32_t>(validationLayers.size());
-        // createInfo.ppEnabledLayerNames = validationLayers.data();
+        createInfo.enabledLayerCount = static_cast<uint32_t>(validationLayers.size());
+        createInfo.ppEnabledLayerNames = validationLayers.data();
 
         /*populateDebugMessengerCreateInfo(debugCreateInfo);*/
-        createInfo.pNext = (VkDebugUtilsMessengerCreateInfoEXT *)&debugCreateInfo;
+        // createInfo.pNext = (VkDebugUtilsMessengerCreateInfoEXT *)&debugCreateInfo;
     }
     else
     {

@@ -31,8 +31,6 @@ public:
 	void Close();
 
 	static VkInstance GetInstance();
-	// static VkPhysicalDevice GetPhysicalDevice();
-	// static VkDevice GetDevice();
 
 	static VkCommandBuffer GetCommandBuffer(bool begin);
 	static void FlushCommandBuffer(VkCommandBuffer commandBuffer);
@@ -47,9 +45,6 @@ private:
 	float m_LastFrameTime;
 
 	uint32_t m_FrameIndex = 1;
-
-	// VulkanBackend& m_VulkanBackend;
-	// VulkanBackend::Quanta_ImplVulkanH_RenderContext m_Quanta_ImplVulkanH_RenderContext;
 
 	std::shared_ptr<Image> m_Image;
 	uint32_t *m_ImageData = nullptr;

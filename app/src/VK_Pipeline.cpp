@@ -25,9 +25,11 @@ void PipelineBuilder::clear()
 
     _renderInfo = {};
     _renderInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_RENDERING_CREATE_INFO;
+    _renderInfo.pNext = nullptr;
 
     _pipelineLayoutCreateInfo = {};
     _pipelineLayoutCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
+    _pipelineLayoutCreateInfo.pNext = nullptr;
 
     _shaderStages.clear();
 }
@@ -62,6 +64,23 @@ VkPipeline PipelineBuilder::build_pipeline(
     VkPipelineVertexInputStateCreateInfo _vertexInputInfo = {};
     _vertexInputInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
 
+    std::array<VkVertexInputAttributeDescription, 3> attributeDescriptions = {};
+
+    attributeDescriptions[0].binding = 0;
+    attributeDescriptions[0].location = 0;
+    attributeDescriptions[0].format = VK_FORMAT_R32G32_SFLOAT;
+    attributeDescriptions[0].offset = offsetof(Vertex, pos);
+
+    attributeDescriptions[1].binding = 0;
+    attributeDescriptions[1].location = 1;
+    attributeDescriptions[1].format = VK_FORMAT_R32G32_SFLOAT;
+    attributeDescriptions[1].offset = offsetof(Vertex, texCoord);
+
+    attributeDescriptions[2].binding = 0;
+    attributeDescriptions[2].location = 2;
+    attributeDescriptions[2].format = VK_FORMAT_R32G32B32_SFLOAT;
+    attributeDescriptions[2].offset = offsetof(Vertex, color);
+
     if (customVertexInfoDescriptions)
     {
         auto bindingDescription = customVertexInfoDescriptions->first;
@@ -75,7 +94,11 @@ VkPipeline PipelineBuilder::build_pipeline(
     else
     {
         auto bindingDescription = RenderData::getBindingDescription();
-        auto attributeDescriptions = RenderData::getAttributeDescriptions();
+        // auto attributeDescriptions = RenderData::getAttributeDescriptions();
+
+        // pCreateInfos[0].pVertexInputState->pVertexAttributeDescriptions[2].format
+
+        /*     std::cout << "attributeDescriptions[2].format " << attributeDescriptions[2].format << std::endl;*/
 
         _vertexInputInfo.vertexBindingDescriptionCount = 1;
         _vertexInputInfo.vertexAttributeDescriptionCount = static_cast<uint32_t>(attributeDescriptions.size());
@@ -88,6 +111,7 @@ VkPipeline PipelineBuilder::build_pipeline(
     VkDynamicState state[] = {VK_DYNAMIC_STATE_VIEWPORT, VK_DYNAMIC_STATE_SCISSOR};
     dynamicInfo.pDynamicStates = &state[0];
     dynamicInfo.dynamicStateCount = 2;
+    dynamicInfo.pNext = nullptr;
 
     _pipelineLayoutCreateInfo.setLayoutCount = 1;
     _pipelineLayoutCreateInfo.pSetLayouts = &context.descriptorSetLayout;
@@ -99,16 +123,13 @@ VkPipeline PipelineBuilder::build_pipeline(
 
     context.PipelineLayout = _pipelineLayout;
 
-    //< build_pipeline_1
-
-    //> build_pipeline_2
     // build the actual pipeline
     // we now use all of the info structs we have been writing into into this one
     // to create the pipeline
     VkGraphicsPipelineCreateInfo pipelineInfo = {};
     pipelineInfo.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
     // connect the renderInfo to the pNext extension mechanism
-    pipelineInfo.pNext = &_renderInfo;
+    // pipelineInfo.pNext = &_renderInfo;
 
     pipelineInfo.stageCount = (uint32_t)_shaderStages.size();
     pipelineInfo.pStages = _shaderStages.data();
@@ -169,7 +190,7 @@ void PipelineBuilder::set_raster_defaults()
 void PipelineBuilder::set_polygon_mode(VkPolygonMode mode)
 {
     _rasterizer.polygonMode = mode;
-    _rasterizer.lineWidth = 2.f;
+    _rasterizer.lineWidth = 1.0f;
 }
 
 void PipelineBuilder::set_cull_mode(VkCullModeFlags cullMode, VkFrontFace frontFace)

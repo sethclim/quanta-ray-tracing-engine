@@ -21,15 +21,13 @@
 #include "imgui_impl_vulkan.h"
 #include "ImGUI.hpp"
 
-//#include "VK_Images.hpp"
-
 const int MAX_FRAMES_IN_FLIGHT = 2;
 
-#ifdef NDEBUG
-const bool enableValidationLayers = false;
-#else
+// #ifdef NDEBUG
+// const bool enableValidationLayers = false;
+// #else
 const bool enableValidationLayers = true;
-#endif
+// #endif
 
 const std::vector<const char *> validationLayers = {
     "VK_LAYER_KHRONOS_validation"};
@@ -186,7 +184,7 @@ private:
     std::vector<VkImageView> swapChainImageViews;
     std::vector<VkFramebuffer> swapChainFramebuffers;
     bool framebufferResized = false;
-     
+
     Quanta_ImplVulkanH_RenderContext context;
 
     // Debug
@@ -197,7 +195,7 @@ private:
     int maxDebugLines;
     bool debug;
 
-    //draw resources
+    // draw resources
     AllocatedImage _drawImage;
 };
 

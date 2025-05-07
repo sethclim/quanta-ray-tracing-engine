@@ -4,8 +4,7 @@
 Editor::Editor() : maple(new Maple())
 {
 
-
-	std::cout << "SETUP IMGUI" << std::endl;
+	// std::cout << "SETUP IMGUI" << std::endl;
 }
 
 std::vector<int> Editor::CalculateLayout(int width, int height)
@@ -36,10 +35,10 @@ DrawData Editor::RenderEditor()
 
 	const std::vector<Vertex> _vertices = {
 		// Viewport
-		{{left_x, bottom_y}, {1.0f, 0.0f, 0.0f}, {0.0f, 0.0f}},
-		{{right_x, bottom_y}, {0.0f, 1.0f, 0.0f}, {1.0f, 0.0f}},
-		{{right_x, top_y}, {0.0f, 0.0f, 1.0f}, {1.0f, 1.0f}},
-		{{left_x, top_y}, {1.0f, 1.0f, 1.0f}, {0.0f, 1.0f}},
+		{{left_x, bottom_y}, {0.0f, 0.0f}, {1.0f, 0.0f, 0.0f}},
+		{{right_x, bottom_y}, {1.0f, 0.0f}, {0.0f, 1.0f, 0.0f}},
+		{{right_x, top_y}, {1.0f, 1.0f}, {0.0f, 0.0f, 1.0f}},
+		{{left_x, top_y}, {0.0f, 1.0f}, {1.0f, 1.0f, 1.0f}},
 		//// button
 		//{{btn_left_x, btn_bottom_y}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f}},
 		//{{btn_right_x, btn_bottom_y}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f}},
