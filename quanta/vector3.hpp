@@ -22,22 +22,13 @@ namespace Math
     public:
         T x, y, z;
 
-        Vector3() {}
+        constexpr Vector3() : x{}, y{}, z{} {}
 
-        Vector3(T _x, T _y, T _z)
-        {
-            x = _x;
-            y = _y;
-            z = _z;
-        }
+        constexpr Vector3(T x, T y, T z) : x(x), y(y), z(z) {}
 
-        Vector3<T> operator+(Vector3<T> const &obj)
+        Vector3<T> operator+(Vector3<T> const &other) const
         {
-            Vector3 res = Vector3();
-            res.x = x + obj.x;
-            res.y = y + obj.y;
-            res.z = z + obj.z;
-            return res;
+            return Vector3<T>{x + other.x, y + other.y, z + other.z};
         }
 
         void operator+=(Vector3<T> const &obj)
@@ -47,22 +38,14 @@ namespace Math
             z = z + obj.z;
         }
 
-        Vector3 operator-(Vector3 const &obj)
+        constexpr Vector3<T> operator-(Vector3 const &other) const
         {
-            Vector3 res = Vector3();
-            res.x = x - obj.x;
-            res.y = y - obj.y;
-            res.z = z - obj.z;
-            return res;
+            return Vector3<T>{x - other.x, y - other.y, z - other.z};
         }
 
-        Vector3 operator*(Vector3 const &obj)
+        constexpr Vector3<T> operator*(Vector3 const &other) const
         {
-            Vector3 res = Vector3();
-            res.x = x * obj.x;
-            res.y = y * obj.y;
-            res.z = z * obj.z;
-            return res;
+            return Vector3<T>{x* other.x, y* other.y, z* other.z};
         }
 
         void operator*=(Vector3 const &obj)
@@ -72,52 +55,32 @@ namespace Math
             z = z * obj.z;
         }
 
-        Vector3 operator/(Vector3 const &obj)
+        constexpr Vector3 operator/(Vector3 const &other) const
         {
-            Vector3 res = Vector3();
-            res.x = x / obj.x;
-            res.y = y / obj.y;
-            res.z = z / obj.z;
-            return res;
+            return Vector3<T>{x / other.x, y / other.y, z / other.z};
         }
 
-        Vector3<T> operator*(T const &scale)
+        constexpr Vector3<T> operator*(T const &scale) const
         {
-            Vector3<T> res = Vector3<T>();
-            res.x = x * scale;
-            res.y = y * scale;
-            res.z = z * scale;
-            return res;
+            return Vector3<T>{x* scale, y* scale, z* scale};
         }
 
-        Vector3 operator/(T const &scale)
+        constexpr Vector3 operator/(T const &scale) const
         {
-            Vector3 res = Vector3();
-            res.x = x / scale;
-            res.y = y / scale;
-            res.z = z / scale;
-            return res;
+            return Vector3<T>{x / scale, y / scale, z / scale};
         }
 
-        Vector3 operator+(T const &scale)
+        constexpr Vector3 operator+(T const &scale) const
         {
-            Vector3 res = Vector3();
-            res.x = x + scale;
-            res.y = y + scale;
-            res.z = z + scale;
-            return res;
+            return Vector3<T>{x + scale, y + scale, z + scale};
         }
 
-        Vector3 operator-(T const &scale)
+        constexpr Vector3 operator-(T const &scale) const
         {
-            Vector3 res = Vector3();
-            res.x = x - scale;
-            res.y = y - scale;
-            res.z = z - scale;
-            return res;
+            return Vector3<T>{x - scale, y - scale, z - scale};
         }
 
-        bool operator==(Vector3<T> const &obj)
+        bool operator==(Vector3<T> const &obj) const
         {
             return x == obj.x && y == obj.y && z == obj.z;
         }
