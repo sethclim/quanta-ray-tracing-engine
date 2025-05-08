@@ -58,6 +58,9 @@ private:
 	bool drawn;
 	bool debug;
 	glm::vec2 debug_trace_coord;
+
+	Utils::Timer m_Timer;
+	float m_LastRenderTime = 0.0f;
 };
 
 #endif

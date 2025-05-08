@@ -70,9 +70,6 @@ void Application::Init()
 	{
 
 		Materials::Metal mat = Materials::Metal("Metal 1", Math::Vector3<float>(0.7, 0.0, 0.0));
-		// mat.Color = Math::Vector3<float>(1.0, 0, 0);
-		// mat.EmissionColor = Math::Vector3<float>(0, 0, 0);
-		// mat.EmissionStrength = 0.0f;
 
 		Materials::Lambertian mat2 = Materials::Lambertian("Lambertian 1");
 		mat2.Color = Math::Vector3<float>(0, 1, 1);
@@ -85,9 +82,6 @@ void Application::Init()
 		floor_mat.EmissionStrength = 0.0f;
 
 		Materials::Metal mat3 = Materials::Metal("Metal 2", Math::Vector3<float>(0.7, 0.7, 0.7));
-		/*mat3.Color = Math::Vector3<float>(1, 1, 1);
-		mat3.EmissionColor = Math::Vector3<float>(1, 1, 1);
-		mat3.EmissionStrength = 0.0f;*/
 
 		Materials::Material lightMaterial = Materials::Material("Light");
 		lightMaterial.Color = Math::Vector3<float>(1, 1, 1);
@@ -193,6 +187,8 @@ void Application::Run()
 
 	while (glfwWindowShouldClose(WindowController::GetInstance().GetWindow()) == 0 && m_Running)
 	{
+		m_Timer.Reset();
+
 		// PROCESS INPUT
 		double newTime = glfwGetTime();
 		double frameTime = newTime - m_LastFrameTime;
@@ -358,9 +354,9 @@ void Application::Run()
 		{
 			ImGui::PushID(i);
 
-			ImGui::Text("Material \n");
-
 			std::shared_ptr<Materials::Material> material = scene.materials[i];
+
+			ImGui::Text(material.get()->GetName().c_str());
 
 			float *color_ptr = &material.get()->Color.x;
 			ImGui::ColorEdit3("Color", color_ptr);
@@ -375,6 +371,8 @@ void Application::Run()
 			ImGui::PopID();
 		}
 
+		ImGui::Text("Last Render: %.3fms", m_LastRenderTime);
+
 		changed |= ImGui::Checkbox("Trace rays", &useRaytracer);
 		ImGUI::Panel::End();
 
@@ -383,6 +381,8 @@ void Application::Run()
 		VulkanBackend::GetInstance().drawFrame(drawData.indices, d_lines.size());
 
 		m_FrameIndex++;
+
+		m_LastRenderTime =  m_Timer.ElapsedMillis();
 		//}
 	}
 

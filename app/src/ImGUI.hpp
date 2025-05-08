@@ -16,9 +16,9 @@
 
 namespace ImGUI
 {
-    //void CreateImGUIRenderPass(VkDevice g_Device, Quanta_ImplVulkanH_RenderContext context, VkFormat swapChainImageFormat)
+    // void CreateImGUIRenderPass(VkDevice g_Device, Quanta_ImplVulkanH_RenderContext context, VkFormat swapChainImageFormat)
     //{
-    //    VkAttachmentDescription attachment = {};
+    //     VkAttachmentDescription attachment = {};
 
     //    attachment.format = swapChainImageFormat;
     //    attachment.samples = VK_SAMPLE_COUNT_1_BIT;
@@ -61,12 +61,12 @@ namespace ImGUI
     //    }
     //}
 
-   /* void UploadImGUIFonts()
-    {
-        VkCommandBuffer commandBuffer = VulkanBackend::GetInstance().beginSingleTimeCommands();
-        ImGui_ImplVulkan_CreateFontsTexture();
-        VulkanBackend::GetInstance().endSingleTimeCommands(commandBuffer);
-    }*/
+    /* void UploadImGUIFonts()
+     {
+         VkCommandBuffer commandBuffer = VulkanBackend::GetInstance().beginSingleTimeCommands();
+         ImGui_ImplVulkan_CreateFontsTexture();
+         VulkanBackend::GetInstance().endSingleTimeCommands(commandBuffer);
+     }*/
 
     //--------------------------------------------------------------------------------------------------
     //
@@ -91,15 +91,14 @@ namespace ImGUI
             Right,
         };
 
-
         // Starting the panel, equivalent to ImGui::Begin for a window. Need ImGui::end()
-        static void Begin(Side side = Side::Right, float alpha = 0.5f, char* name = nullptr);
+        static void Begin(Side side = Side::Right, float alpha = 0.5f, char *name = nullptr);
 
         // Mirror begin but can use directly End()
         static void End() { ImGui::End(); }
 
         // Return the position and size of the central display
-        static void CentralDimension(ImVec2& pos, ImVec2& size)
+        static void CentralDimension(ImVec2 &pos, ImVec2 &size)
         {
             auto dock_main = ImGui::DockBuilderGetCentralNode(dockspaceID);
             if (dock_main)
