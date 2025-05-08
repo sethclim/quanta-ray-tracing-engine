@@ -94,35 +94,38 @@ namespace Math
     };
 
     template <typename T>
-    auto Length(Vector3<T> v) -> typename TupleLength<T>::type
+    using ScalarType = typename TupleLength<T>::type;
+
+    template <typename T>
+    constexpr ScalarType<T> Length(const Vector3<T>& v)
     {
         using std::sqrt;
         return sqrt(LengthSquared(v));
     }
 
     template <typename T>
-    Vector3<T> Normalize(Vector3<T> v) { return v / Length(v); }
+    constexpr Vector3<T> Normalize(const Vector3<T>& v) { return v / Length(v); }
 
     template <typename T>
-    T LengthSquared(Vector3<T> v) { return Sqr(v.x) + Sqr(v.y) + Sqr(v.z); }
+    constexpr T LengthSquared(const Vector3<T>& v) { return Sqr(v.x) + Sqr(v.y) + Sqr(v.z); }
 
     template <typename T>
     constexpr T Sqr(T v) { return v * v; }
 
     template <typename T>
-    T Dot(Vector3<T> a, Vector3<T> b) { return a.x * b.x + a.y * b.y + a.z * b.z; }
+    constexpr ScalarType<T> Dot(const Vector3<T>& a, const Vector3<T>& b) { return a.x * b.x + a.y * b.y + a.z * b.z; }
 
     template <typename T>
-    Vector3<T> Min(Vector3<T> a, T minVal) { return Vector3(std::min(a.x, minVal), std::min(a.y, minVal), std::min(a.z, minVal)); }
+    constexpr Vector3<T> Min(const Vector3<T>& a, T minVal) { return Vector3(std::min(a.x, minVal), std::min(a.y, minVal), std::min(a.z, minVal)); }
 
     template <typename T>
-    Vector3<T> Max(Vector3<T> a, T maxVal) { return Vector3(std::max(a.x, maxVal), std::max(a.y, maxVal), std::max(a.z, maxVal)); }
+    constexpr Vector3<T> Max(const Vector3<T>& a, T maxVal) { return Vector3(std::max(a.x, maxVal), std::max(a.y, maxVal), std::max(a.z, maxVal)); }
 
     template <typename T>
-    Vector3<T> Clamp(Vector3<T> x, T minVal, T maxVal) { return Min(Max(x, minVal), maxVal); }
+    constexpr Vector3<T> Clamp(const Vector3<T>& x, T minVal, T maxVal) { return Min(Max(x, minVal), maxVal); }
 
     template <typename T>
-    bool near_zero(Vector3<T> v)
+    bool near_zero(const Vector3<T>& v)
     {
         // Return true if the vector is close to zero in all dimensions.
         auto s = 1e-8;
