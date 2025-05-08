@@ -5,6 +5,7 @@
 #include "quanta.hpp"
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
+#include <glm/gtc/type_ptr.hpp>
 #include "WindowController.hpp"
 #include "VulkanBackend.hpp"
 #include "Random.hpp"
@@ -16,8 +17,7 @@
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_vulkan.h"
 
-
-//#include "MapleUI/maple.hpp"
+// #include "MapleUI/maple.hpp"
 
 void check_vk_result(VkResult err);
 
@@ -31,8 +31,6 @@ public:
 	void Close();
 
 	static VkInstance GetInstance();
-	// static VkPhysicalDevice GetPhysicalDevice();
-	// static VkDevice GetDevice();
 
 	static VkCommandBuffer GetCommandBuffer(bool begin);
 	static void FlushCommandBuffer(VkCommandBuffer commandBuffer);
@@ -48,19 +46,21 @@ private:
 
 	uint32_t m_FrameIndex = 1;
 
-	// VulkanBackend& m_VulkanBackend;
-	// VulkanBackend::Quanta_ImplVulkanH_RenderContext m_Quanta_ImplVulkanH_RenderContext;
-
 	std::shared_ptr<Image> m_Image;
 	uint32_t *m_ImageData = nullptr;
-	glm::vec4* m_AccumulationData = nullptr;
+	glm::vec4 *m_AccumulationData = nullptr;
 
 	std::unique_ptr<Renderer> renderer;
-	std::unique_ptr <Editor> editor;
+	std::unique_ptr<Editor> editor;
+
+	Scene::SceneGraph scene;
 
 	bool drawn;
 	bool debug;
 	glm::vec2 debug_trace_coord;
+
+	Utils::Timer m_Timer;
+	float m_LastRenderTime = 0.0f;
 };
 
 #endif
