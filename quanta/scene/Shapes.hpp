@@ -32,15 +32,15 @@ namespace Scene
 
                 //std::cout << "offsetRayOrigin [x:" << offsetRayOrigin.x << " y: " << offsetRayOrigin.y << " z: " << offsetRayOrigin.z << "]" << std::endl;
 
-                float a = Math::LengthSquared(ray.Direction);
-                float b = 2.0f * Math::Dot(offsetRayOrigin, ray.Direction);
-                float c = Math::LengthSquared(offsetRayOrigin) - Math::Sqr(Radius);
+                float a = ray.Direction.LengthSquared();
+                float b = 2.0f * offsetRayOrigin.Dot(ray.Direction);
+                float c = offsetRayOrigin.LengthSquared() - Math::Sqr(Radius);
 
                 float discriminant = Math::Sqr(b) - 4.0f * a * c;
                 if (discriminant < 0.0f)
                 {
                     HitInfo info{};
-                    info.HitPoint = Math::Vector3(-1.0f, -1.0f, -1.0f);
+                    info.HitPoint = Math::Vector3<float>(-1.0f, -1.0f, -1.0f);
                     return info;
                 }
 
@@ -53,7 +53,7 @@ namespace Scene
                     if (!ray_t.surrounds(t0))
                     {
                         HitInfo info{};
-                        info.HitPoint = Math::Vector3(-1.0f, -1.0f, -1.0f);
+                        info.HitPoint = Math::Vector3<float>(-1.0f, -1.0f, -1.0f);
                         return info;
                     }
                 }
@@ -61,7 +61,7 @@ namespace Scene
                 HitInfo hitInfo{};
 
                 hitInfo.HitPoint = (Math::Vector3<float>)ray.Origin + (Math::Vector3<float>)ray.Direction * t1;
-                hitInfo.Normal = Math::Normalize(hitInfo.HitPoint - Origin);
+                hitInfo.Normal = (hitInfo.HitPoint - Origin).Normalize();
                 hitInfo.Material = Material;
                 hitInfo.ObjectID = id;
 
