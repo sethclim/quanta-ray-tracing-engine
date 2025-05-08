@@ -70,20 +70,20 @@ void Application::Init()
 	{
 
 		Materials::Lambertian mat = Materials::Lambertian("Lambertian 0");
-		mat.Color = Math::Vector3<float>(0, 0, 1);
+		mat.Color = Math::Vector3<float>(1, 1, 1);
 
-		Materials::Lambertian mat2 = Materials::Lambertian("Lambertian 1");
-		mat2.Color = Math::Vector3<float>(0, 1, 0);
-		mat2.EmissionColor = Math::Vector3<float>(0, 0, 0);
-		mat2.EmissionStrength = 0.0f;
+		// Materials::Lambertian mat2 = Materials::Lambertian("Lambertian 1");
+		// mat2.Color = Math::Vector3<float>(0, 1, 0);
+		// mat2.EmissionColor = Math::Vector3<float>(0, 0, 0);
+		// mat2.EmissionStrength = 0.0f;
 
-		Materials::Lambertian floor_mat = Materials::Lambertian("Floor");
-		floor_mat.Color = Math::Vector3<float>(1, 1, 1);
-		floor_mat.EmissionColor = Math::Vector3<float>(0, 0, 0);
-		floor_mat.EmissionStrength = 0.0f;
+		// Materials::Lambertian floor_mat = Materials::Lambertian("Floor");
+		// floor_mat.Color = Math::Vector3<float>(1, 1, 1);
+		// floor_mat.EmissionColor = Math::Vector3<float>(0, 0, 0);
+		// floor_mat.EmissionStrength = 0.0f;
 
-		Materials::Lambertian mat3 = Materials::Lambertian("Lambertian 3");
-		mat3.Color = Math::Vector3<float>(1, 0, 0);
+		// Materials::Lambertian mat3 = Materials::Lambertian("Lambertian 3");
+		// mat3.Color = Math::Vector3<float>(1, 0, 0);
 
 		Materials::Material lightMaterial = Materials::Material("Light");
 		lightMaterial.Color = Math::Vector3<float>(1, 1, 1);
@@ -91,9 +91,9 @@ void Application::Init()
 		lightMaterial.EmissionStrength = 1.0f;
 
 		scene.materials.push_back(std::make_shared<Materials::Lambertian>(mat));
-		scene.materials.push_back(std::make_shared<Materials::Lambertian>(mat2));
-		scene.materials.push_back(std::make_shared<Materials::Lambertian>(floor_mat));
-		scene.materials.push_back(std::make_shared<Materials::Lambertian>(mat3));
+		// scene.materials.push_back(std::make_shared<Materials::Lambertian>(mat2));
+		// scene.materials.push_back(std::make_shared<Materials::Lambertian>(floor_mat));
+		// scene.materials.push_back(std::make_shared<Materials::Lambertian>(mat3));
 		scene.materials.push_back(std::make_shared<Materials::Material>(lightMaterial));
 
 		Scene::Shapes::Sphere sphere;
@@ -101,33 +101,33 @@ void Application::Init()
 		sphere.Material = scene.materials[0];
 		sphere.id = 666;
 
-		Scene::Shapes::Sphere floor;
-		floor.Origin = Math::Vector3<float>(0, 12, -4);
-		floor.Material = scene.materials[2];
-		floor.Radius = 10.0f;
-		floor.id = 456;
+		// Scene::Shapes::Sphere floor;
+		// floor.Origin = Math::Vector3<float>(0, 12, -4);
+		// floor.Material = scene.materials[2];
+		// floor.Radius = 10.0f;
+		// floor.id = 456;
 
-		Scene::Shapes::Sphere sphere2;
-		sphere2.Origin = Math::Vector3<float>(1, 0, 0);
-		sphere2.Material = scene.materials[1];
-		sphere2.id = 1;
+		// Scene::Shapes::Sphere sphere2;
+		// sphere2.Origin = Math::Vector3<float>(1, 0, 0);
+		// sphere2.Material = scene.materials[1];
+		// sphere2.id = 1;
 
-		Scene::Shapes::Sphere sphere3;
-		sphere3.Origin = Math::Vector3<float>(-0.2, 0.2, -0.3);
-		sphere3.Material = scene.materials[3];
-		sphere3.Radius = 0.6f;
-		sphere3.id = 2;
+		// Scene::Shapes::Sphere sphere3;
+		// sphere3.Origin = Math::Vector3<float>(-0.2, 0.2, -0.3);
+		// sphere3.Material = scene.materials[3];
+		// sphere3.Radius = 0.6f;
+		// sphere3.id = 2;
 
 		Scene::Shapes::Sphere sphere4;
 		sphere4.Origin = Math::Vector3<float>(0.5, -0.5, 0.5);
-		sphere4.Material = scene.materials[4];
+		sphere4.Material = scene.materials[1];
 		sphere4.Radius = 1.3f;
 		sphere4.id = 2222;
 
-		scene.ray_targets.push_back(std::make_shared<Scene::Shapes::Sphere>(floor));
+		// scene.ray_targets.push_back(std::make_shared<Scene::Shapes::Sphere>(floor));
 		scene.ray_targets.push_back(std::make_shared<Scene::Shapes::Sphere>(sphere));
-		scene.ray_targets.push_back(std::make_shared<Scene::Shapes::Sphere>(sphere2));
-		scene.ray_targets.push_back(std::make_shared<Scene::Shapes::Sphere>(sphere3));
+		// scene.ray_targets.push_back(std::make_shared<Scene::Shapes::Sphere>(sphere2));
+		// scene.ray_targets.push_back(std::make_shared<Scene::Shapes::Sphere>(sphere3));
 		scene.ray_targets.push_back(std::make_shared<Scene::Shapes::Sphere>(sphere4));
 
 		renderer = std::make_unique<Renderer>(scene);
@@ -180,7 +180,7 @@ void Application::Run()
 	VulkanBackend &vulkanBackend = VulkanBackend::GetInstance();
 
 	drawn = false;
-	bool useRaytracer = false;
+	bool useRaytracer = true;
 	const char *items[] = {"Pixel Debug", "All", "None"};
 	static int item_current = 2;
 	int samples_per_pixel = 6;
@@ -218,6 +218,8 @@ void Application::Run()
 		std::vector<Utilities::DebugLine> d_lines;
 
 		Input::InputManager::GetInstance().ProcessEvents();
+
+
 		// if (!drawn)
 		//{
 		if (!m_Image || dimensions[0] != m_Image->GetWidth() || dimensions[1] != m_Image->GetHeight())
@@ -232,7 +234,7 @@ void Application::Run()
 		}
 
 		if (m_FrameIndex == 1)
-			memset(m_AccumulationData, 0, m_Image->GetWidth() * m_Image->GetHeight() * sizeof(glm::vec4));
+			memset(m_AccumulationData, 0, static_cast<size_t>(m_Image->GetWidth()) * static_cast<size_t>(m_Image->GetHeight()) * sizeof(glm::vec4));
 
 		glm::vec2 mouse = Input::InputManager::GetInstance().GetMousePosition();
 
@@ -243,46 +245,46 @@ void Application::Run()
 				for (uint32_t x = 0; x < dimensions[0]; x++)
 				{
 
-					float flipped_y = dimensions[1] - y;
+					//float flipped_y = dimensions[1] - y;
 
-					float normalizedX = (float)x / (float)dimensions[0];
-					float normalizedY = (float)flipped_y / (float)dimensions[1];
+					//float normalizedX = (float)x / (float)dimensions[0];
+					//float normalizedY = (float)flipped_y / (float)dimensions[1];
 
 					uint32_t idx = x + (y * dimensions[0]);
-					bool debug_pixel = false;
-					if (item_current == 0)
-						debug_pixel = (x == debug_trace_coord.x && y == debug_trace_coord.y);
-					else if (item_current == 1)
-						debug_pixel = idx % 1000;
+					//bool debug_pixel = false;
+					//if (item_current == 0)
+					//	debug_pixel = (x == debug_trace_coord.x && y == debug_trace_coord.y);
+					//else if (item_current == 1)
+					//	debug_pixel = idx % 1000;
 
-					Math::Vector3<float> color = Math::Vector3<float>(0, 0, 0);
-					/*
-					if (flipped_y < dimensions[1] / 2)
-						color = Math::Vector3<float>(1, 0, 0);*/
+					//Math::Vector3<float> color = Math::Vector3<float>(0, 0, 0);
+					///*
+					//if (flipped_y < dimensions[1] / 2)
+					//	color = Math::Vector3<float>(1, 0, 0);*/
 
-					/*	if (x == 535 && y == 318)*/
-					color = renderer->PerPixel(normalizedX, normalizedY, samples_per_pixel, max_bounces, debug_pixel);
+					///*	if (x == 535 && y == 318)*/
+					//color = renderer->PerPixel(normalizedX, normalizedY, samples_per_pixel, max_bounces, debug_pixel);
 
-					if (accumulate)
-						m_AccumulationData[x + y * m_Image->GetWidth()] += glm::vec4(color.x, color.y, color.z, 1.0f);
-					else
-						m_AccumulationData[x + y * m_Image->GetWidth()] = glm::vec4(color.x, color.y, color.z, 1.0f);
+					//if (accumulate)
+					//	m_AccumulationData[x + y * m_Image->GetWidth()] += glm::vec4(color.x, color.y, color.z, 1.0f);
+					//else
+					//	m_AccumulationData[x + y * m_Image->GetWidth()] = glm::vec4(color.x, color.y, color.z, 1.0f);
 
-					glm::vec4 accumulatedColor = m_AccumulationData[x + y * m_Image->GetWidth()];
-					accumulatedColor /= (float)m_FrameIndex;
+					//glm::vec4 accumulatedColor = m_AccumulationData[x + y * m_Image->GetWidth()];
+					//accumulatedColor /= (float)m_FrameIndex;
 
-					accumulatedColor = glm::clamp(accumulatedColor, glm::vec4(0.0f), glm::vec4(1.0f));
+					//accumulatedColor = glm::clamp(accumulatedColor, glm::vec4(0.0f), glm::vec4(1.0f));
 
-					// if (x < dimensions[0] / 2)
-					//	accumulatedColor = glm::vec4(1, 0, 0, 1);
+					//// if (x < dimensions[0] / 2)
+					////	accumulatedColor = glm::vec4(1, 0, 0, 1);
 
-					m_ImageData[idx] = Utils::ConvertToRGBA(accumulatedColor);
+					m_ImageData[idx] = Utils::ConvertToRGBA(glm::vec4(1.0f, 0.0f,0.0f, 1.0f));
 				}
 			}
 		}
 
 		// drawn = true;
-		//std::cout << "image generated " << std::endl;
+		// std::cout << "image generated " << std::endl;
 
 		m_Image->SetData(m_ImageData);
 
@@ -384,7 +386,7 @@ void Application::Run()
 
 		m_FrameIndex++;
 
-		m_LastRenderTime =  m_Timer.ElapsedMillis();
+		m_LastRenderTime = m_Timer.ElapsedMillis();
 		//}
 	}
 
