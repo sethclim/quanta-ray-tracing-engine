@@ -41,7 +41,7 @@ namespace Materials
             /*auto scatter_direction = hit_info.Normal;*/
 
             // Catch degenerate scatter direction
-            if (Math::near_zero(scatter_direction))
+            if (scatter_direction.near_zero())
                 scatter_direction = hit_info.Normal;
 
             Ray ray;

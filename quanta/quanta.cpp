@@ -9,7 +9,7 @@
 Math::Vector3<float> Reflect(Math::Vector3<float> &N, Math::Vector3<float> &Ri)
 {
     // Rr = Ri - 2 N (Ri . N)
-    return Ri - (N * 2.0f * Math::Dot(Ri, N));
+    return Ri - (N * 2.0f * Ri.Dot(N));
 }
 
 Math::Vector3<float> Renderer::PerPixel(float image_x, float image_y, int samples_per_pixel, int max_bounces,  bool debug)
@@ -26,7 +26,7 @@ Math::Vector3<float> Renderer::PerPixel(float image_x, float image_y, int sample
 
     Ray ray;
     ray.Origin = camera;
-    ray.Direction = Math::Normalize(Math::Vector3<float>(coordX, coordY, -1.0f));
+    ray.Direction = Math::Vector3<float>(coordX, coordY, -1.0f).Normalize();
 
     // if(debug)
     //     addDebugLine(camera, ray.Direction * 2);

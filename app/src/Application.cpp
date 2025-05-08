@@ -69,10 +69,11 @@ void Application::Init()
 	DrawData drawData = editor->RenderEditor();
 	{
 
-		Materials::Metal mat = Materials::Metal("Metal 1", Math::Vector3<float>(0.7, 0.0, 0.0));
+		Materials::Lambertian mat = Materials::Lambertian("Lambertian 0");
+		mat.Color = Math::Vector3<float>(0, 0, 1);
 
 		Materials::Lambertian mat2 = Materials::Lambertian("Lambertian 1");
-		mat2.Color = Math::Vector3<float>(0, 1, 1);
+		mat2.Color = Math::Vector3<float>(0, 1, 0);
 		mat2.EmissionColor = Math::Vector3<float>(0, 0, 0);
 		mat2.EmissionStrength = 0.0f;
 
@@ -81,17 +82,18 @@ void Application::Init()
 		floor_mat.EmissionColor = Math::Vector3<float>(0, 0, 0);
 		floor_mat.EmissionStrength = 0.0f;
 
-		Materials::Metal mat3 = Materials::Metal("Metal 2", Math::Vector3<float>(0.7, 0.7, 0.7));
+		Materials::Lambertian mat3 = Materials::Lambertian("Lambertian 3");
+		mat3.Color = Math::Vector3<float>(1, 0, 0);
 
 		Materials::Material lightMaterial = Materials::Material("Light");
 		lightMaterial.Color = Math::Vector3<float>(1, 1, 1);
 		lightMaterial.EmissionColor = Math::Vector3<float>(1, 1, 1);
 		lightMaterial.EmissionStrength = 1.0f;
 
-		scene.materials.push_back(std::make_shared<Materials::Metal>(mat));
+		scene.materials.push_back(std::make_shared<Materials::Lambertian>(mat));
 		scene.materials.push_back(std::make_shared<Materials::Lambertian>(mat2));
 		scene.materials.push_back(std::make_shared<Materials::Lambertian>(floor_mat));
-		scene.materials.push_back(std::make_shared<Materials::Metal>(mat3));
+		scene.materials.push_back(std::make_shared<Materials::Lambertian>(mat3));
 		scene.materials.push_back(std::make_shared<Materials::Material>(lightMaterial));
 
 		Scene::Shapes::Sphere sphere;
@@ -280,7 +282,7 @@ void Application::Run()
 		}
 
 		// drawn = true;
-		std::cout << "image generated " << std::endl;
+		//std::cout << "image generated " << std::endl;
 
 		m_Image->SetData(m_ImageData);
 
@@ -320,12 +322,12 @@ void Application::Run()
 		for (size_t i = 0; i < scene.ray_targets.size(); ++i)
 		{
 			ImGui::PushID(i);
-			auto val = scene.ray_targets[i];
+			std::shared_ptr<Scene::Shapes::RayTarget> val = scene.ray_targets[i];
 			auto sphere = std::dynamic_pointer_cast<Scene::Shapes::Sphere>(val);
 			if (sphere)
 			{
 				ImGui::Text("Sphere \n");
-				Math::Vector3 _origin = sphere.get()->Origin;
+				Math::Vector3<float> _origin = sphere.get()->Origin;
 				auto pos = glm::vec3(_origin.x, _origin.y, _origin.z);
 				ImGui::DragFloat3("Origin", glm::value_ptr(pos), 0.1f);
 				ImGui::DragFloat("Radius", &sphere.get()->Radius, 1.0f, 0.01f, 100.0f, "%.2f", ImGuiSliderFlags_AlwaysClamp);
