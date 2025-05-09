@@ -1,7 +1,3 @@
-
-# set(MapleUI_DIR C:/Users/sethc/coding/cplusplus/graphics/MapleUI/_install/lib/cmake/MapleUI)
-# find_package(MapleUI REQUIRED)
-
 add_executable(app 
     src/main.cpp 
     src/Application.cpp   

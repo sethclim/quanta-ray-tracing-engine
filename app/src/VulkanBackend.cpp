@@ -595,6 +595,8 @@ void VulkanBackend::createDescriptorSetLayout()
     {
         throw std::runtime_error("failed to create descriptor set layout!");
     }
+
+    assert(context.descriptorSetLayout != VK_NULL_HANDLE);
 }
 
 void VulkanBackend::createGraphicsPipeline()
@@ -748,7 +750,7 @@ void VulkanBackend::recordCommandBuffer(VkCommandBuffer commandBuffer, const std
     renderPassInfo.renderArea.offset = {0, 0};
     renderPassInfo.renderArea.extent = swapChainExtent;
 
-    VkClearValue clearColor = {{{0.0f, 0.0f, 0.0f, 1.0f}}};
+    VkClearValue clearColor = {{{0.0f, 0.0f, 1.0f, 1.0f}}};
     renderPassInfo.clearValueCount = 1;
     renderPassInfo.pClearValues = &clearColor;
 

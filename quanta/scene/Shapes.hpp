@@ -21,7 +21,6 @@ namespace Scene
         public:
             float Radius = 0.5f;
             Math::Vector3<float> Origin;
-            //Materials::Material Material;
             int id;
 
             ~Sphere() {}

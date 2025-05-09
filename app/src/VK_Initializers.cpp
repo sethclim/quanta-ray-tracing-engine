@@ -7,6 +7,7 @@ VkPipelineShaderStageCreateInfo vkinit::pipeline_shader_stage_create_info(VkShad
     VkPipelineShaderStageCreateInfo info{};
     info.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
     info.pNext = nullptr;
+    info.flags = 0;
 
     // shader stage
     info.stage = stage;
@@ -14,6 +15,8 @@ VkPipelineShaderStageCreateInfo vkinit::pipeline_shader_stage_create_info(VkShad
     info.module = shaderModule;
     // the entry point of the shader
     info.pName = entry;
+    info.pSpecializationInfo = nullptr;
+
     return info;
 }
 

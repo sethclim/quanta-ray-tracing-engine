@@ -1,15 +1,11 @@
 #pragma once
 
 #include <vector>
-// #include "../app/src/VulkanBackend.hpp"
+
 #include "../app/src/InputManager.hpp"
 #include "../render_data/render_data.hpp"
-// #include "../app/src/VK_Types.hpp"
-//  #include "MapleUI/maple.hpp"
 
 #include <imgui.h>
-
-class Maple;
 
 struct DrawData
 {
@@ -34,6 +30,4 @@ public:
     DrawData RenderEditor();
 
     std::vector<int> dimensions;
-
-    Maple *maple;
 };

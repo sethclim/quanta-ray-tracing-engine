@@ -1,6 +1,8 @@
 #ifndef VKPIPELINE_H
 #define VKPIPELINE_H
 
+#include <fstream>
+
 #include "StandardIncludes.hpp"
 #include "VK_Types.hpp"
 #include "VK_Initializers.hpp"

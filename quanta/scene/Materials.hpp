@@ -12,10 +12,10 @@ namespace Materials
         float EmissionStrength = 0.0f;
         Math::Vector3<float> EmissionColor = Math::Vector3<float>(1.0f, 1.0f, 1.0f);
 
-        Material(const std::string& name): _name(name) {}
+        Material(const std::string &name) : _name(name) {}
 
-        const std::string& GetName() const { return _name; }
-        void SetName(const std::string& name) { _name = name; }
+        const std::string &GetName() const { return _name; }
+        void SetName(const std::string &name) { _name = name; }
 
         virtual ~Material() = default;
 
@@ -23,20 +23,19 @@ namespace Materials
         {
             return false;
         }
+
     private:
         std::string _name;
     };
 
     class Lambertian : public Material
     {
-     public:
+    public:
+        Lambertian(const std::string &name) : Material(name) {}
 
-         Lambertian(const std::string& name) : Material(name){}
-
-         bool scatter(const Ray &r_in, const HitInfo &hit_info, Math::Vector3<float> &attenuation, Ray &scattered) const override
-         {
-             auto scatter_direction = Utilities::Random::Random_Unit_Vector() + hit_info.Normal;
-
+        bool scatter(const Ray &r_in, const HitInfo &hit_info, Math::Vector3<float> &attenuation, Ray &scattered) const override
+        {
+            auto scatter_direction = Utilities::Random::Random_Unit_Vector() + hit_info.Normal;
 
             /*auto scatter_direction = hit_info.Normal;*/
 
@@ -56,8 +55,8 @@ namespace Materials
 
     class Metal : public Material
     {
-     public:
-         Metal(const std::string& name, const Math::Vector3<float> &albedo) : Material(name), albedo(albedo) {}
+    public:
+        Metal(const std::string &name, const Math::Vector3<float> &albedo) : Material(name), albedo(albedo) {}
 
         bool scatter(const Ray &r_in, const HitInfo &hit_info, Math::Vector3<float> &attenuation, Ray &scattered)
             const override
@@ -74,7 +73,7 @@ namespace Materials
             return true;
         }
 
-     private:
-         Math::Vector3<float> albedo;
-     };
+    private:
+        Math::Vector3<float> albedo;
+    };
 }

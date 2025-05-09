@@ -69,8 +69,8 @@ void Application::Init()
 	DrawData drawData = editor->RenderEditor();
 	{
 
-		Materials::Lambertian mat = Materials::Lambertian("Lambertian 0");
-		mat.Color = Math::Vector3<float>(0, 0, 1);
+		Materials::Metal mat = Materials::Metal("Metal 0", {1, 1, 1});
+		// mat.Color = Math::Vector3<float>(1, 1, 1);
 
 		Materials::Lambertian mat2 = Materials::Lambertian("Lambertian 1");
 		mat2.Color = Math::Vector3<float>(0, 1, 0);
@@ -90,7 +90,7 @@ void Application::Init()
 		lightMaterial.EmissionColor = Math::Vector3<float>(1, 1, 1);
 		lightMaterial.EmissionStrength = 1.0f;
 
-		scene.materials.push_back(std::make_shared<Materials::Lambertian>(mat));
+		scene.materials.push_back(std::make_shared<Materials::Metal>(mat));
 		scene.materials.push_back(std::make_shared<Materials::Lambertian>(mat2));
 		scene.materials.push_back(std::make_shared<Materials::Lambertian>(floor_mat));
 		scene.materials.push_back(std::make_shared<Materials::Lambertian>(mat3));
@@ -218,6 +218,7 @@ void Application::Run()
 		std::vector<Utilities::DebugLine> d_lines;
 
 		Input::InputManager::GetInstance().ProcessEvents();
+
 		// if (!drawn)
 		//{
 		if (!m_Image || dimensions[0] != m_Image->GetWidth() || dimensions[1] != m_Image->GetHeight())
@@ -232,7 +233,7 @@ void Application::Run()
 		}
 
 		if (m_FrameIndex == 1)
-			memset(m_AccumulationData, 0, m_Image->GetWidth() * m_Image->GetHeight() * sizeof(glm::vec4));
+			memset(m_AccumulationData, 0, static_cast<size_t>(m_Image->GetWidth()) * static_cast<size_t>(m_Image->GetHeight()) * sizeof(glm::vec4));
 
 		glm::vec2 mouse = Input::InputManager::GetInstance().GetMousePosition();
 
@@ -282,7 +283,9 @@ void Application::Run()
 		}
 
 		// drawn = true;
-		//std::cout << "image generated " << std::endl;
+		// std::cout << "image generated " << std::endl;
+
+		// std::cout << " First pixel: " << std::hex << m_ImageData[0] << std::endl;
 
 		m_Image->SetData(m_ImageData);
 
@@ -308,7 +311,7 @@ void Application::Run()
 
 		ImGui::SeparatorText("RENDER SETTINGS");
 		ImGui::DragInt("Samples per Pixel 0..50", &samples_per_pixel, 1, 1, 50, "%d%", ImGuiSliderFlags_AlwaysClamp);
-		ImGui::DragInt("Max Bounces 0..30", &max_bounces, 1, 1, 3, "%d%", ImGuiSliderFlags_AlwaysClamp);
+		ImGui::DragInt("Max Bounces 0..30", &max_bounces, 1, 1, 30, "%d%", ImGuiSliderFlags_AlwaysClamp);
 		ImGui::Checkbox("Accumulate", &accumulate);
 
 		ImGui::SeparatorText("DEBUG SETTINGS");
@@ -327,9 +330,8 @@ void Application::Run()
 			if (sphere)
 			{
 				ImGui::Text("Sphere \n");
-				Math::Vector3<float> _origin = sphere.get()->Origin;
-				auto pos = glm::vec3(_origin.x, _origin.y, _origin.z);
-				ImGui::DragFloat3("Origin", glm::value_ptr(pos), 0.1f);
+				float* _origin_ptr = &sphere.get()->Origin.x;
+				ImGui::DragFloat3("Origin", _origin_ptr, 0.1f);
 				ImGui::DragFloat("Radius", &sphere.get()->Radius, 1.0f, 0.01f, 100.0f, "%.2f", ImGuiSliderFlags_AlwaysClamp);
 
 				if (ImGui::BeginCombo("Material", sphere.get()->Material ? sphere.get()->Material->GetName().c_str() : "None"))
@@ -384,7 +386,7 @@ void Application::Run()
 
 		m_FrameIndex++;
 
-		m_LastRenderTime =  m_Timer.ElapsedMillis();
+		m_LastRenderTime = m_Timer.ElapsedMillis();
 		//}
 	}
 
