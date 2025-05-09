@@ -1,7 +1,6 @@
 # quanta-ray-tracing-engine
 
-<img src="https://github.com/user-attachments/assets/f20ffde5-9668-4cd0-a644-08284b64cc89" alt="editor" width="30%" height="auto">
-<img src="https://github.com/user-attachments/assets/37113925-4ee4-4ae2-aa66-45d0e991c627" alt="metal" width="30%" height="auto">
+<img src="https://github.com/user-attachments/assets/d49e5040-cf2b-42ee-a908-df0891c432c1" alt="editor" width="50%" height="auto">
 
 Raytracing engine written in C++ and Vulkan
 
@@ -58,3 +57,8 @@ repo: [github.com/g-truc/glm](https://github.com/g-truc/glm)
 repo: [github.com/ocornut/imgui](https://github.com/ocornut/imgui)
 
 ### Stb Image
+
+## Renders
+
+<img src="https://github.com/user-attachments/assets/f20ffde5-9668-4cd0-a644-08284b64cc89" alt="editor" width="30%" height="auto">
+<img src="https://github.com/user-attachments/assets/37113925-4ee4-4ae2-aa66-45d0e991c627" alt="metal" width="30%" height="auto">

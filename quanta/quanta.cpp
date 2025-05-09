@@ -115,20 +115,22 @@ Math::Vector3<float> Renderer::PerPixel(float image_x, float image_y, bool debug
 HitInfo Renderer::TraceRay(const Ray &ray)
 {
     Utilities::Interval ray_t = Utilities::Interval(0.001, std::numeric_limits<double>::infinity());
-    double closest_so_far = ray_t.max;
+    HitInfo closestHit;
+    closestHit.HitPoint = Math::Vector3<float>(-1, -1, -1);
+
     for (const auto &object : m_Scene.ray_targets)
     {
 
-        HitInfo info = object->hit(ray, Utilities::Interval(ray_t.min, closest_so_far));
+        HitInfo info = object->hit(ray, ray_t);
 
         if (info.HitPoint == Math::Vector3<float>(-1, -1, -1))
             continue;
 
-        return info;
+        closestHit = info;
     }
 
-    HitInfo hitInfo;
-    hitInfo.HitPoint = Math::Vector3<float>(-1, -1, -1);
-    // All misses
-    return hitInfo;
+    //HitInfo hitInfo; 
+    //hitInfo.HitPoint = Math::Vector3<float>(-1, -1, -1);
+    //// All misses
+    return closestHit;
 }
