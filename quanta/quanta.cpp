@@ -12,7 +12,7 @@ Math::Vector3<float> Reflect(Math::Vector3<float> &N, Math::Vector3<float> &Ri)
     return Ri - (N * 2.0f * Ri.Dot(N));
 }
 
-void Renderer::SetRenderSettings(uint32_t samplesPerPixel, uint32_t maxBounces) 
+void Renderer::SetRenderSettings(uint32_t samplesPerPixel, uint32_t maxBounces)
 {
     _samplesPerPixel = samplesPerPixel;
     _maxBounces = maxBounces;
@@ -115,20 +115,18 @@ Math::Vector3<float> Renderer::PerPixel(float image_x, float image_y, bool debug
 HitInfo Renderer::TraceRay(const Ray &ray)
 {
     Utilities::Interval ray_t = Utilities::Interval(0.001, std::numeric_limits<double>::infinity());
-    double closest_so_far = ray_t.max;
+    HitInfo closestHit = Miss();
+
     for (const auto &object : m_Scene.ray_targets)
     {
 
-        HitInfo info = object->hit(ray, Utilities::Interval(ray_t.min, closest_so_far));
+        HitInfo info = object->hit(ray, ray_t);
 
         if (info.HitPoint == Math::Vector3<float>(-1, -1, -1))
             continue;
 
-        return info;
+        closestHit = info;
     }
 
-    HitInfo hitInfo;
-    hitInfo.HitPoint = Math::Vector3<float>(-1, -1, -1);
-    // All misses
-    return hitInfo;
+    return closestHit;
 }

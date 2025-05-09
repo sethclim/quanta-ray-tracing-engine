@@ -97,7 +97,7 @@ void Application::Init()
 		scene.materials.push_back(std::make_shared<Materials::Material>(lightMaterial));
 
 		Scene::Shapes::Sphere sphere;
-		sphere.Origin = Math::Vector3<float>(-0.5, -0.17, 1.1);
+		sphere.Origin = Math::Vector3<float>(-0.5, -0.1, 1.2);
 		sphere.Material = scene.materials[1];
 		sphere.Radius = 0.2f;
 		sphere.id = 666;
@@ -109,13 +109,13 @@ void Application::Init()
 		floor.id = 456;
 
 		Scene::Shapes::Sphere sphere2;
-		sphere2.Origin = Math::Vector3<float>(0.0, -0.17, 1.1);
+		sphere2.Origin = Math::Vector3<float>(-0.1, -0.1, 1.2);
 		sphere2.Radius = 0.2f;
 		sphere2.Material = scene.materials[0];
 		sphere2.id = 1;
 
 		Scene::Shapes::Sphere sphere3;
-		sphere3.Origin = Math::Vector3<float>(0.5, -0.17, 1.1);
+		sphere3.Origin = Math::Vector3<float>(0.3, -0.1, 1.2);
 		sphere3.Material = scene.materials[3];
 		sphere3.Radius = 0.2f;
 		sphere3.id = 2;
