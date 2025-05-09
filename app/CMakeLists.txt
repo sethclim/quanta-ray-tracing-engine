@@ -38,3 +38,4 @@ target_include_directories(app PRIVATE ${QUANTA_INCLUDE_DIR})
 
 target_link_libraries(app PRIVATE Vulkan::Vulkan)
 target_link_libraries(app PRIVATE stb_image)
+target_link_libraries(app PRIVATE pugixml)
