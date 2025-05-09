@@ -83,12 +83,12 @@ void Application::Init()
 		floor_mat.EmissionStrength = 0.0f;
 
 		Materials::Lambertian mat3 = Materials::Lambertian("Lambertian 3");
-		mat3.Color = Math::Vector3<float>(1, 0, 0);
+		mat3.Color = Math::Vector3<float>(0, 0, 1);
 
 		Materials::Material lightMaterial = Materials::Material("Light");
 		lightMaterial.Color = Math::Vector3<float>(1, 1, 1);
 		lightMaterial.EmissionColor = Math::Vector3<float>(1, 1, 1);
-		lightMaterial.EmissionStrength = 1.0f;
+		lightMaterial.EmissionStrength = 0.6f;
 
 		scene.materials.push_back(std::make_shared<Materials::Metal>(mat));
 		scene.materials.push_back(std::make_shared<Materials::Lambertian>(mat2));
@@ -97,31 +97,33 @@ void Application::Init()
 		scene.materials.push_back(std::make_shared<Materials::Material>(lightMaterial));
 
 		Scene::Shapes::Sphere sphere;
-		sphere.Origin = Math::Vector3<float>(-0.5, 0.8, -1);
-		sphere.Material = scene.materials[0];
+		sphere.Origin = Math::Vector3<float>(-0.5, -0.17, 1.1);
+		sphere.Material = scene.materials[1];
+		sphere.Radius = 0.2f;
 		sphere.id = 666;
 
 		Scene::Shapes::Sphere floor;
-		floor.Origin = Math::Vector3<float>(0, 12, -4);
+		floor.Origin = Math::Vector3<float>(0, 26, -1);
 		floor.Material = scene.materials[2];
-		floor.Radius = 10.0f;
+		floor.Radius = 26.0f;
 		floor.id = 456;
 
 		Scene::Shapes::Sphere sphere2;
-		sphere2.Origin = Math::Vector3<float>(1, 0, 0);
-		sphere2.Material = scene.materials[1];
+		sphere2.Origin = Math::Vector3<float>(0.0, -0.17, 1.1);
+		sphere2.Radius = 0.2f;
+		sphere2.Material = scene.materials[0];
 		sphere2.id = 1;
 
 		Scene::Shapes::Sphere sphere3;
-		sphere3.Origin = Math::Vector3<float>(-0.2, 0.2, -0.3);
+		sphere3.Origin = Math::Vector3<float>(0.5, -0.17, 1.1);
 		sphere3.Material = scene.materials[3];
-		sphere3.Radius = 0.6f;
+		sphere3.Radius = 0.2f;
 		sphere3.id = 2;
 
 		Scene::Shapes::Sphere sphere4;
-		sphere4.Origin = Math::Vector3<float>(0.5, -0.5, 0.5);
+		sphere4.Origin = Math::Vector3<float>(0.0, -0.5, 1.0);
 		sphere4.Material = scene.materials[4];
-		sphere4.Radius = 1.3f;
+		sphere4.Radius = 2.0f;
 		sphere4.id = 2222;
 
 		scene.ray_targets.push_back(std::make_shared<Scene::Shapes::Sphere>(floor));
@@ -230,6 +232,14 @@ void Application::Run()
 			m_ImageData = new uint32_t[dimensions[0] * dimensions[1]];
 			delete[] m_AccumulationData;
 			m_AccumulationData = new glm::vec4[dimensions[0] * dimensions[1]];
+
+			m_ImageHorizontalIter.resize(dimensions[0]);
+			m_ImageVerticalIter.resize(dimensions[1]);
+
+			for (uint32_t i = 0; i < dimensions[0]; i++)
+				m_ImageHorizontalIter[i] = i;
+			for (uint32_t i = 0; i < dimensions[1]; i++)
+				m_ImageVerticalIter[i] = i;
 		}
 
 		if (m_FrameIndex == 1)
@@ -237,8 +247,58 @@ void Application::Run()
 
 		glm::vec2 mouse = Input::InputManager::GetInstance().GetMousePosition();
 
+		// std::thread::hardwareconcurrency();
+
+		renderer->SetRenderSettings(samples_per_pixel, max_bounces);
+
 		if (useRaytracer)
 		{
+#define MT 1
+#if MT
+			std::for_each(std::execution::par, m_ImageVerticalIter.begin(), m_ImageVerticalIter.end(),
+						  [this, dimensions, accumulate](uint32_t y)
+						  {
+							  std::for_each(std::execution::par, m_ImageHorizontalIter.begin(), m_ImageHorizontalIter.end(),
+											[this, dimensions, accumulate, y](uint32_t x)
+											{
+												float flipped_y = dimensions[1] - y;
+
+												float normalizedX = (float)x / (float)dimensions[0];
+												float normalizedY = (float)flipped_y / (float)dimensions[1];
+
+												uint32_t idx = x + (y * dimensions[0]);
+												bool debug_pixel = false;
+												if (item_current == 0)
+													debug_pixel = (x == debug_trace_coord.x && y == debug_trace_coord.y);
+												else if (item_current == 1)
+													debug_pixel = idx % 1000;
+
+												Math::Vector3<float> color = Math::Vector3<float>(0, 0, 0);
+												/*
+												if (flipped_y < dimensions[1] / 2)
+													color = Math::Vector3<float>(1, 0, 0);*/
+
+												/*	if (x == 535 && y == 318)*/
+												color = renderer->PerPixel(normalizedX, normalizedY, debug_pixel);
+
+												if (accumulate)
+													m_AccumulationData[x + y * m_Image->GetWidth()] += glm::vec4(color.x, color.y, color.z, 1.0f);
+												else
+													m_AccumulationData[x + y * m_Image->GetWidth()] = glm::vec4(color.x, color.y, color.z, 1.0f);
+
+												glm::vec4 accumulatedColor = m_AccumulationData[x + y * m_Image->GetWidth()];
+												accumulatedColor /= (float)m_FrameIndex;
+
+												accumulatedColor = glm::clamp(accumulatedColor, glm::vec4(0.0f), glm::vec4(1.0f));
+
+												// if (x < dimensions[0] / 2)
+												//	accumulatedColor = glm::vec4(1, 0, 0, 1);
+
+												m_ImageData[idx] = Utils::ConvertToRGBA(accumulatedColor);
+											});
+						  });
+#else
+
 			for (uint32_t y = 0; y < dimensions[1]; y++)
 			{
 				for (uint32_t x = 0; x < dimensions[0]; x++)
@@ -280,7 +340,8 @@ void Application::Run()
 					m_ImageData[idx] = Utils::ConvertToRGBA(accumulatedColor);
 				}
 			}
-		}
+#endif
+		} // useRaytracer
 
 		// drawn = true;
 		// std::cout << "image generated " << std::endl;
@@ -330,7 +391,7 @@ void Application::Run()
 			if (sphere)
 			{
 				ImGui::Text("Sphere \n");
-				float* _origin_ptr = &sphere.get()->Origin.x;
+				float *_origin_ptr = &sphere.get()->Origin.x;
 				ImGui::DragFloat3("Origin", _origin_ptr, 0.1f);
 				ImGui::DragFloat("Radius", &sphere.get()->Radius, 1.0f, 0.01f, 100.0f, "%.2f", ImGuiSliderFlags_AlwaysClamp);
 

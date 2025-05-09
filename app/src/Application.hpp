@@ -4,6 +4,7 @@
 #include "StandardIncludes.hpp"
 #include "quanta.hpp"
 #include <GLFW/glfw3.h>
+#include <execution>
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include "WindowController.hpp"
@@ -43,6 +44,8 @@ private:
 	float m_LastFrameTime;
 
 	uint32_t m_FrameIndex = 1;
+
+	std::vector<uint32_t> m_ImageHorizontalIter, m_ImageVerticalIter;
 
 	std::shared_ptr<Image> m_Image;
 	uint32_t *m_ImageData = nullptr;
