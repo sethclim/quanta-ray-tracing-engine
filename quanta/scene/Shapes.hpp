@@ -13,7 +13,7 @@ namespace Scene
         {
         public:
             virtual ~RayTarget() = default;
-            virtual HitInfo hit(Ray ray, Utilities::Interval& ray_t) = 0;
+            virtual HitInfo hit(Ray ray, Utilities::Interval &ray_t) = 0;
         };
 
         class Sphere : public RayTarget
@@ -25,11 +25,11 @@ namespace Scene
 
             ~Sphere() {}
 
-            HitInfo hit(Ray ray, Utilities::Interval& ray_t)
+            HitInfo hit(Ray ray, Utilities::Interval &ray_t)
             {
                 Math::Vector3<float> offsetRayOrigin = (Math::Vector3<float>)ray.Origin - Origin;
 
-                //std::cout << "offsetRayOrigin [x:" << offsetRayOrigin.x << " y: " << offsetRayOrigin.y << " z: " << offsetRayOrigin.z << "]" << std::endl;
+                // std::cout << "offsetRayOrigin [x:" << offsetRayOrigin.x << " y: " << offsetRayOrigin.y << " z: " << offsetRayOrigin.z << "]" << std::endl;
 
                 float a = ray.Direction.LengthSquared();
                 float b = 2.0f * offsetRayOrigin.Dot(ray.Direction);
@@ -37,28 +37,17 @@ namespace Scene
 
                 float discriminant = Math::Sqr(b) - 4.0f * a * c;
                 if (discriminant < 0.0f)
-                {
-                    HitInfo info{};
-                    info.HitPoint = Math::Vector3<float>(-1.0f, -1.0f, -1.0f);
-                    return info;
-                }
+                    return Miss();
 
                 double sqrt_disc = std::sqrt(discriminant);
                 double root = (-b - sqrt_disc) / (2.0f * a);
 
                 if (!ray_t.surrounds(root))
                 {
-          /*          ray_t.max = t1;*/
                     // int ans = (-b + sqrt((b * b) - (4 * a * c))) / (2 * a);
                     root = (-b + std::sqrt(discriminant)) / (2.0f * a);
                     if (!ray_t.surrounds(root))
-                    {
-                    /*    ray_t.max = t0;*/
-
-                        HitInfo info{};
-                        info.HitPoint = Math::Vector3<float>(-1.0f, -1.0f, -1.0f);
-                        return info;
-                    }
+                        return Miss();
                 }
 
                 ray_t.max = root;

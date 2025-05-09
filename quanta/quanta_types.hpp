@@ -1,7 +1,7 @@
 #pragma once
 
 #include "vector3.hpp"
-//#include "scene/Shapes.hpp"
+// #include "scene/Shapes.hpp"
 
 namespace Materials
 {
@@ -21,6 +21,13 @@ struct HitInfo
     std::shared_ptr<Materials::Material> Material;
     int ObjectID;
 };
+
+inline HitInfo Miss()
+{
+    HitInfo info{};
+    info.HitPoint = Math::Vector3<float>(-1.0f, -1.0f, -1.0f);
+    return info;
+}
 
 namespace RayHelpers
 {
