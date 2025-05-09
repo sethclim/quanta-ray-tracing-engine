@@ -25,6 +25,8 @@ add_executable(app
     src/ImGUI.cpp
     src/utils/Utilities.hpp
     src/utils/Utilities.cpp
+    src/SceneManager.hpp
+    src/SceneManager.cpp
 )
 
 target_link_libraries(app PRIVATE quanta)
