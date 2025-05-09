@@ -15,6 +15,6 @@ repo: [github.com/glfw/glfw](https://github.com/glfw/glfw.git)
 
 repo: [github.com/g-truc/glm](https://github.com/g-truc/glm)
 
-### MapleUI
+### ImGui
 
-repo: [github.com/sethclim/MapleUI](https://github.com/sethclim/MapleUI)
+repo: [github.com/ocornut/imgui](https://github.com/ocornut/imgui)

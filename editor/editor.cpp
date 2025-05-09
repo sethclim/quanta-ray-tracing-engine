@@ -1,7 +1,6 @@
 #include "Editor.hpp"
-#include "MapleUI/maple.hpp"
 
-Editor::Editor() : maple(new Maple())
+Editor::Editor()
 {
 
 	// std::cout << "SETUP IMGUI" << std::endl;
