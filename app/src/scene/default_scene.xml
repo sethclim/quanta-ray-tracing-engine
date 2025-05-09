@@ -1,0 +1,52 @@
+<?xml version="1.0"?>
+<scene>
+	<objects>
+		<object name="Some Sphere" type="Sphere">
+			<position x="0" y="26" z="-1" />
+			<radius value="26" />
+		</object>
+		<object name="Some Sphere" type="Sphere">
+			<position x="-0.5" y="-0.100000001" z="1.20000005" />
+			<radius value="0.200000003" />
+		</object>
+		<object name="Some Sphere" type="Sphere">
+			<position x="-0.100000001" y="-0.100000001" z="1.20000005" />
+			<radius value="0.200000003" />
+		</object>
+		<object name="Some Sphere" type="Sphere">
+			<position x="0.300000012" y="-0.100000001" z="1.20000005" />
+			<radius value="0.200000003" />
+		</object>
+		<object name="Some Sphere" type="Sphere">
+			<position x="0" y="-0.5" z="1" />
+			<radius value="2" />
+		</object>
+	</objects>
+	<materials>
+		<material name="Metal 0" type="Metal">
+			<color r="1" g="1" b="1" />
+			<emission_strength value="0" />
+			<emission_color r="1" g="1" b="1" />
+		</material>
+		<material name="Lambertian 1" type="Lambertian">
+			<color r="0" g="1" b="0" />
+			<emission_strength value="0" />
+			<emission_color r="0" g="0" b="0" />
+		</material>
+		<material name="Floor" type="Lambertian">
+			<color r="1" g="1" b="1" />
+			<emission_strength value="0" />
+			<emission_color r="0" g="0" b="0" />
+		</material>
+		<material name="Lambertian 3" type="Lambertian">
+			<color r="0" g="0" b="1" />
+			<emission_strength value="0" />
+			<emission_color r="1" g="1" b="1" />
+		</material>
+		<material name="Light">
+			<color r="1" g="1" b="1" />
+			<emission_strength value="0.600000024" />
+			<emission_color r="1" g="1" b="1" />
+		</material>
+	</materials>
+</scene>

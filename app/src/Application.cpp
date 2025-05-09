@@ -132,6 +132,8 @@ void Application::Init()
 		scene.ray_targets.push_back(std::make_shared<Scene::Shapes::Sphere>(sphere3));
 		scene.ray_targets.push_back(std::make_shared<Scene::Shapes::Sphere>(sphere4));
 
+		sceneManager.SaveScene(scene);
+
 		renderer = std::make_unique<Renderer>(scene);
 	}
 
@@ -141,6 +143,7 @@ void Application::Init()
 		std::cerr << "GLFW: Vulkan not supported!\n";
 		return;
 	}
+
 	uint32_t extensions_count = 0;
 	const char **extensions = glfwGetRequiredInstanceExtensions(&extensions_count);
 
@@ -345,7 +348,6 @@ void Application::Run()
 
 		// drawn = true;
 		// std::cout << "image generated " << std::endl;
-
 		// std::cout << " First pixel: " << std::hex << m_ImageData[0] << std::endl;
 
 		m_Image->SetData(m_ImageData);
@@ -402,7 +404,7 @@ void Application::Run()
 						bool isSelected = (scene.materials[i] == sphere.get()->Material);
 						if (ImGui::Selectable(scene.materials[i]->GetName().c_str(), isSelected))
 						{
-							sphere.get()->Material = scene.materials[i]; // Update shared_ptr
+							sphere.get()->Material = scene.materials[i];
 						}
 						if (isSelected)
 							ImGui::SetItemDefaultFocus();

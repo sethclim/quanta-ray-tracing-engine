@@ -14,8 +14,7 @@ public:
     SceneManager();
     ~SceneManager();
 
-    // Scene::SceneGraph scene
-    void SaveScene();
+    void SaveScene(Scene::SceneGraph scene);
 };
 
 #endif
