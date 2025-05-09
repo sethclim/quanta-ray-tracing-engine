@@ -15,7 +15,7 @@ Raytracing engine written in C++ and Vulkan
 -   [x] Raster debug mode that draws ray traces
 -   [x] ImGUI editor integration
 -   [x] SIMD optimization on Vector Math
--   [ ] Multithreading CPU for render loop
+-   [x] Multithreading CPU for render loop
 -   [ ] Scene XML format and loader
 -   [ ] Triange hit detection
 -   [ ] GPU raytracing
@@ -57,4 +57,4 @@ repo: [github.com/g-truc/glm](https://github.com/g-truc/glm)
 
 repo: [github.com/ocornut/imgui](https://github.com/ocornut/imgui)
 
-### Stbi Image
+### Stb Image

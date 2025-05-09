@@ -19,7 +19,8 @@ const uint32_t BLACK = 0x00000000;
 
 namespace Utilities
 {
-    struct DebugLine {
+    struct DebugLine
+    {
         Math::Vector3<float> start;
         Math::Vector3<float> end;
     };
@@ -33,17 +34,23 @@ public:
         m_Scene = scene;
     }
 
-    Math::Vector3<float> PerPixel(float x, float y, int samples_per_pixel, int max_bounces, bool debug);
+    Math::Vector3<float> PerPixel(float image_x, float image_y, bool debug);
     HitInfo TraceRay(const Ray &ray);
 
     std::vector<Utilities::DebugLine> GetDebugLines() { return debugLines; }
 
+    void SetRenderSettings(uint32_t samplesPerPixel, uint32_t maxBounces);
+
 private:
-    void addDebugLine(Math::Vector3<float> start, Math::Vector3<float> end) {
-        debugLines.push_back({ start, end });
-        //std::cout << "Debug Line Length " << debugLines.size() << std::endl;
+    void addDebugLine(Math::Vector3<float> start, Math::Vector3<float> end)
+    {
+        debugLines.push_back({start, end});
+        // std::cout << "Debug Line Length " << debugLines.size() << std::endl;
     }
 
-    Scene::SceneGraph m_Scene;  
+    Scene::SceneGraph m_Scene;
     std::vector<Utilities::DebugLine> debugLines;
+
+    uint32_t _samplesPerPixel;
+    uint32_t _maxBounces;
 };
