@@ -60,38 +60,26 @@
 	<materials>
 		<material name="Metal 0" type="Metal">
 			<color r="1" g="1" b="1" />
-			<emission_strength value="0" />
-			<emission_color r="1" g="1" b="1" />
 		</material>
 		<material name="Lambertian 1" type="Lambertian">
 			<color r="0" g="1" b="0" />
-			<emission_strength value="0" />
-			<emission_color r="0" g="0" b="0" />
 		</material>
 		<material name="Floor" type="Lambertian">
 			<color r="0.5" g="0.5" b="0.5" />
-			<emission_strength value="0" />
-			<emission_color r="0" g="0" b="0" />
 		</material>
 		<material name="Lambertian 3" type="Lambertian">
 			<color r="0" g="0" b="1" />
-			<emission_strength value="0" />
-			<emission_color r="1" g="1" b="1" />
 		</material>
-		<material name="Light" type="Light">
+		<material name="Light" type="Emissive">
 			<color r="1" g="1" b="1" />
 			<emission_strength value="0.600000024" />
 			<emission_color r="1" g="1" b="1" />
 		</material>
 		<material name="Lambertian 4" type="Lambertian">
 			<color r="0.699999988" g="0.300000012" b="0.300000012" />
-			<emission_strength value="0" />
-			<emission_color r="0" g="0" b="0" />
 		</material>
 		<material name="Red" type="Lambertian">
 			<color r="1" g="0" b="0" />
-			<emission_strength value="0" />
-			<emission_color r="0" g="0" b="0" />
 		</material>
 	</materials>
 </scene>

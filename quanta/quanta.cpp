@@ -55,6 +55,7 @@ Math::Vector3<float> Renderer::PerPixel(float image_x, float image_y, bool debug
                 break;
             }
 
+            //we reached a light on first iteration
             if (i == 0 && info.ObjectID == 2222)
                 break;
             /*
@@ -86,21 +87,27 @@ Math::Vector3<float> Renderer::PerPixel(float image_x, float image_y, bool debug
             Ray ray2;
             if (info.Material->scatter(ray, info, attenuation, ray2))
             {
-                Math::Vector3<float>
-                    emittedLight = info.Material->EmissionColor * info.Material->EmissionStrength;
+                //Math::Vector3<float>
+                //    emittedLight = info.Material->EmissionColor * info.Material->EmissionStrength;
 
                 rayColor *= attenuation;
-
-                incomingLight += rayColor * emittedLight;
+                //incomingLight += rayColor * emittedLight;
+                incomingLight += rayColor;
 
                 ray.Origin = ray2.Origin;
                 ray.Direction = ray2.Direction;
             }
             else
             {
-                Math::Vector3<float>
-                    emittedLight = info.Material->EmissionColor * info.Material->EmissionStrength;
-                incomingLight += rayColor * emittedLight;
+                std::shared_ptr<Materials::Material> mat = info.Material;
+                auto emissive = std::dynamic_pointer_cast<Materials::Emissive>(mat);
+
+                if (emissive)
+                {
+                    Math::Vector3<float>
+                        emittedLight = emissive->EmissionColor * emissive->EmissionStrength;
+                    incomingLight += rayColor * emittedLight;
+                }
             }
         }
 

@@ -48,14 +48,6 @@ void SceneManager::SaveScene(Scene::SceneGraph scene)
         color.append_attribute("g") = mat.get()->Color.y;
         color.append_attribute("b") = mat.get()->Color.z;
 
-        pugi::xml_node emission_strength = material.append_child("emission_strength");
-        emission_strength.append_attribute("value") = mat.get()->EmissionStrength;
-
-        pugi::xml_node emission_color = material.append_child("emission_color");
-        emission_color.append_attribute("r") = mat.get()->EmissionColor.x;
-        emission_color.append_attribute("g") = mat.get()->EmissionColor.y;
-        emission_color.append_attribute("b") = mat.get()->EmissionColor.z;
-
         auto lambertian = std::dynamic_pointer_cast<Materials::Lambertian>(mat);
         if (lambertian)
         {
@@ -70,11 +62,19 @@ void SceneManager::SaveScene(Scene::SceneGraph scene)
             }
             else
             {
-                material.append_attribute("type") = "Light";
+                auto emissive = std::dynamic_pointer_cast<Materials::Emissive>(mat);
+                material.append_attribute("type") = "Emissive";
+
+                pugi::xml_node emission_strength = material.append_child("emission_strength");
+                emission_strength.append_attribute("value") = emissive.get()->EmissionStrength;
+
+                pugi::xml_node emission_color = material.append_child("emission_color");
+                emission_color.append_attribute("r") = emissive.get()->EmissionColor.x;
+                emission_color.append_attribute("g") = emissive.get()->EmissionColor.y;
+                emission_color.append_attribute("b") = emissive.get()->EmissionColor.z;
             }
         }
     }
-
 
     auto folder_path = std::filesystem::path("../../app/src/scene/");
     auto folder_abs = std::filesystem::absolute(folder_path);
@@ -134,45 +134,45 @@ void SceneManager::LoadScene(Scene::SceneGraph &scene, std::string name)
 
             std::cout << "color [" << r.name() << ":" << r.value() << " " << g.name() << ":" << g.value() << " " << b.name() << ":" << b.value() << "]" << std::endl;
 
-            pugi::xml_node emission_strength = color.next_sibling();
-            pugi::xml_attribute emission_strength_value = emission_strength.first_attribute();
-            std::cout << "emission strength " << emission_strength_value.value() << std::endl;
-
-            pugi::xml_node emission_color = emission_strength.next_sibling();
-            pugi::xml_attribute emission_r = emission_color.first_attribute();
-            pugi::xml_attribute emission_g = emission_r.next_attribute();
-            pugi::xml_attribute emission_b = emission_g.next_attribute();
-
-            std::cout << "emission color [" << emission_r.name() << ":" << emission_r.value() << emission_g.name() << ":" << emission_g.value() << emission_b.name() << ":" << emission_b.value() << "]" << std::endl;
-
             float r_fl = std::strtof(r.value(), nullptr);
             float g_fl = std::strtof(g.value(), nullptr);
             float b_fl = std::strtof(b.value(), nullptr);
-            float emission_strength_fl = std::strtof(emission_strength_value.value(), nullptr);
-            float emission_r_fl = std::strtof(emission_r.value(), nullptr);
-            float emission_g_fl = std::strtof(emission_g.value(), nullptr);
-            float emission_b_fl = std::strtof(emission_b.value(), nullptr);
 
             if (std::strcmp(type.value(), "Lambertian") == 0)
             {
                 Materials::Lambertian lambertian = Materials::Lambertian(name.value());
                 lambertian.Color = Math::Vector3<float>(r_fl, g_fl, b_fl);
-                lambertian.EmissionStrength = emission_strength_fl;
-                lambertian.EmissionColor = Math::Vector3<float>(emission_r_fl, emission_g_fl, emission_b_fl);
+                // lambertian.EmissionStrength = emission_strength_fl;
+                // lambertian.EmissionColor = Math::Vector3<float>(emission_r_fl, emission_g_fl, emission_b_fl);
 
                 scene.materials.push_back(std::make_shared<Materials::Lambertian>(lambertian));
             }
             else if (std::strcmp(type.value(), "Metal") == 0)
             {
                 Materials::Metal metal = Materials::Metal(name.value(), {r_fl, g_fl, b_fl});
-                metal.EmissionStrength = emission_strength_fl;
-                metal.EmissionColor = Math::Vector3<float>(emission_r_fl, emission_g_fl, emission_b_fl);
+                // metal.EmissionStrength = emission_strength_fl;
+                // metal.EmissionColor = Math::Vector3<float>(emission_r_fl, emission_g_fl, emission_b_fl);
 
                 scene.materials.push_back(std::make_shared<Materials::Metal>(metal));
             }
-            else if (std::strcmp(type.value(), "Light") == 0)
+            else if (std::strcmp(type.value(), "Emissive") == 0)
             {
-                Materials::Material light = Materials::Material(name.value());
+                pugi::xml_node emission_strength = color.next_sibling();
+                pugi::xml_attribute emission_strength_value = emission_strength.first_attribute();
+                std::cout << "emission strength " << emission_strength_value.value() << std::endl;
+
+                pugi::xml_node emission_color = emission_strength.next_sibling();
+                pugi::xml_attribute emission_r = emission_color.first_attribute();
+                pugi::xml_attribute emission_g = emission_r.next_attribute();
+                pugi::xml_attribute emission_b = emission_g.next_attribute();
+
+                std::cout << "emission color [" << emission_r.name() << ":" << emission_r.value() << emission_g.name() << ":" << emission_g.value() << emission_b.name() << ":" << emission_b.value() << "]" << std::endl;
+                float emission_strength_fl = std::strtof(emission_strength_value.value(), nullptr);
+                float emission_r_fl = std::strtof(emission_r.value(), nullptr);
+                float emission_g_fl = std::strtof(emission_g.value(), nullptr);
+                float emission_b_fl = std::strtof(emission_b.value(), nullptr);
+
+                Materials::Emissive light = Materials::Emissive(name.value());
                 light.Color = Math::Vector3<float>(r_fl, g_fl, b_fl);
                 light.EmissionStrength = emission_strength_fl;
                 light.EmissionColor = Math::Vector3<float>(emission_r_fl, emission_g_fl, emission_b_fl);
@@ -189,7 +189,7 @@ void SceneManager::LoadScene(Scene::SceneGraph &scene, std::string name)
         for (pugi::xml_node object = objects.first_child(); object; object = object.next_sibling())
         {
             pugi::xml_attribute name = object.first_attribute();
-            std::cout << "----" << name.value() << "----" <<  std::endl;
+            std::cout << "----" << name.value() << "----" << std::endl;
 
             pugi::xml_attribute type = name.next_attribute();
             std::cout << type.name() << "=" << type.value() << std::endl;

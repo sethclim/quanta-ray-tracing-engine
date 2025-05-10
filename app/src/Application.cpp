@@ -366,9 +366,15 @@ void Application::Run()
 			float *color_ptr = &material.get()->Color.x;
 			ImGui::ColorEdit3("Color", color_ptr);
 
-			ImGui::DragFloat("Emission Strength", &material.get()->EmissionStrength, 0.05f, 0.0f, 1.0f);
-			float *emission_color_ptr = &material.get()->EmissionColor.x;
-			ImGui::ColorEdit3("Emission Color", emission_color_ptr);
+			auto emissive = std::dynamic_pointer_cast<Materials::Emissive>(material);
+
+			if (emissive)
+			{
+				ImGui::DragFloat("Emission Strength", &emissive.get()->EmissionStrength, 0.05f, 0.0f, 1.0f);
+				float *emission_color_ptr = &emissive.get()->EmissionColor.x;
+				ImGui::ColorEdit3("Emission Color", emission_color_ptr);
+			}
+
 			// ImGui::DragFloat("Roughness", &material.Roughness, 0.05f, 0.0f, 1.0f);
 			// ImGui::DragFloat("Metallic", &material.Metallic, 0.05f, 0.0f, 1.0f);
 
