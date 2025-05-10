@@ -3,6 +3,10 @@
 SceneManager::SceneManager() {}
 SceneManager::~SceneManager() {}
 
+/// <summary>
+/// Saves SceneGraph into XML scene format
+/// </summary>
+/// <param name="scene"></param>
 void SceneManager::SaveScene(Scene::SceneGraph scene)
 {
     pugi::xml_document doc;
@@ -41,7 +45,7 @@ void SceneManager::SaveScene(Scene::SceneGraph scene)
         pugi::xml_node color = material.append_child("color");
         color.append_attribute("r") = mat.get()->Color.x;
         color.append_attribute("g") = mat.get()->Color.y;
-        color.append_attribute("b") = mat.get()->Color.z;
+        color.append_attribute("b") = mat.get()->Color.z;   
 
         pugi::xml_node emission_strength = material.append_child("emission_strength");
         emission_strength.append_attribute("value") = mat.get()->EmissionStrength;
@@ -87,6 +91,10 @@ void SceneManager::SaveScene(Scene::SceneGraph scene)
     }
 }
 
+/// <summary>
+/// Loads a scene from XML into SceneGraph
+/// </summary>
+/// <param name="scene"></param>
 void SceneManager::LoadScene(Scene::SceneGraph &scene)
 {
     scene.ray_targets.clear();

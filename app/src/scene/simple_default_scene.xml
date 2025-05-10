@@ -22,39 +22,9 @@
 			<material value="Lambertian 3" />
 		</object>
 		<object name="Some Sphere" type="Sphere">
-			<position x="0" y="-0.5" z="1.79999995" />
+			<position x="0" y="-0.5" z="1" />
 			<radius value="2" />
 			<material value="Light" />
-		</object>
-		<object name="Some Sphere" type="Sphere">
-			<position x="-0.100000001" y="0.100000001" z="1.70000005" />
-			<radius value="0.0399999991" />
-			<material value="Lambertian 4" />
-		</object>
-		<object name="Some Sphere" type="Sphere">
-			<position x="0" y="0.100000001" z="1.70000005" />
-			<radius value="0.0399999991" />
-			<material value="Lambertian 1" />
-		</object>
-		<object name="Some Sphere" type="Sphere">
-			<position x="0.100000001" y="0.100000001" z="1.70000005" />
-			<radius value="0.0399999991" />
-			<material value="Metal 0" />
-		</object>
-		<object name="Some Sphere" type="Sphere">
-			<position x="0.300000012" y="-0.300000012" z="0.400000006" />
-			<radius value="0.600000024" />
-			<material value="Metal 0" />
-		</object>
-		<object name="Some Sphere" type="Sphere">
-			<position x="-0.300000012" y="0.0799999982" z="1.39999998" />
-			<radius value="0.0500000007" />
-			<material value="Metal 0" />
-		</object>
-		<object name="Some Sphere" type="Sphere">
-			<position x="-0.699999988" y="-0.300000012" z="0.400000006" />
-			<radius value="0.600000024" />
-			<material value="Red" />
 		</object>
 	</objects>
 	<materials>
@@ -69,7 +39,7 @@
 			<emission_color r="0" g="0" b="0" />
 		</material>
 		<material name="Floor" type="Lambertian">
-			<color r="0.5" g="0.5" b="0.5" />
+			<color r="1" g="1" b="1" />
 			<emission_strength value="0" />
 			<emission_color r="0" g="0" b="0" />
 		</material>
@@ -82,16 +52,6 @@
 			<color r="1" g="1" b="1" />
 			<emission_strength value="0.600000024" />
 			<emission_color r="1" g="1" b="1" />
-		</material>
-		<material name="Lambertian 4" type="Lambertian">
-			<color r="0.699999988" g="0.300000012" b="0.300000012" />
-			<emission_strength value="0" />
-			<emission_color r="0" g="0" b="0" />
-		</material>
-		<material name="Red" type="Lambertian">
-			<color r="1" g="0" b="0" />
-			<emission_strength value="0" />
-			<emission_color r="0" g="0" b="0" />
 		</material>
 	</materials>
 </scene>
