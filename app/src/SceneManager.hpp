@@ -18,7 +18,7 @@ public:
     ~SceneManager();
 
     void SaveScene(Scene::SceneGraph scene);
-    void LoadScene(Scene::SceneGraph &scene);
+    void LoadScene(Scene::SceneGraph &scene, std::string name);
 };
 
 #endif

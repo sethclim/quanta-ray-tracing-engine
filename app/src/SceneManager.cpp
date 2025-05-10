@@ -25,6 +25,7 @@ void SceneManager::SaveScene(Scene::SceneGraph scene)
             pugi::xml_node object = objects.append_child("object");
             object.append_attribute("name") = "Some Sphere";
             object.append_attribute("type") = "Sphere";
+            object.append_attribute("id") = sphere->id;
             pugi::xml_node position = object.append_child("position");
             position.append_attribute("x") = sphere->Origin.x;
             position.append_attribute("y") = sphere->Origin.y;
@@ -45,7 +46,7 @@ void SceneManager::SaveScene(Scene::SceneGraph scene)
         pugi::xml_node color = material.append_child("color");
         color.append_attribute("r") = mat.get()->Color.x;
         color.append_attribute("g") = mat.get()->Color.y;
-        color.append_attribute("b") = mat.get()->Color.z;   
+        color.append_attribute("b") = mat.get()->Color.z;
 
         pugi::xml_node emission_strength = material.append_child("emission_strength");
         emission_strength.append_attribute("value") = mat.get()->EmissionStrength;
@@ -74,7 +75,6 @@ void SceneManager::SaveScene(Scene::SceneGraph scene)
         }
     }
 
-    // param.insert_attribute_after("type", param.attribute("name")) = "float";
 
     auto folder_path = std::filesystem::path("../../app/src/scene/");
     auto folder_abs = std::filesystem::absolute(folder_path);
@@ -95,7 +95,7 @@ void SceneManager::SaveScene(Scene::SceneGraph scene)
 /// Loads a scene from XML into SceneGraph
 /// </summary>
 /// <param name="scene"></param>
-void SceneManager::LoadScene(Scene::SceneGraph &scene)
+void SceneManager::LoadScene(Scene::SceneGraph &scene, std::string name)
 {
     scene.ray_targets.clear();
     scene.materials.clear();
@@ -105,23 +105,24 @@ void SceneManager::LoadScene(Scene::SceneGraph &scene)
     auto folder_path = std::filesystem::path("../../app/src/scene/");
     auto folder_abs = std::filesystem::absolute(folder_path);
 
-    std::ifstream file(folder_abs.string() + "default_scene.xml");
+    std::ifstream file(folder_abs.string() + name);
 
     doc.load(file);
 
-    std::cout << "Loaded" << std::endl;
+    std::cout << "Loaded XML" << std::endl;
 
     for (pugi::xml_node scenexml = doc.first_child(); scenexml; scenexml = scenexml.next_sibling())
     {
-        std::cout << "Scene:" << std::endl;
+        std::cout << "Parsing Scene..." << std::endl;
 
         pugi::xml_node objects = scenexml.first_child();
         pugi::xml_node materials = objects.next_sibling();
 
+        std::cout << "Materials--------------------------------" << std::endl;
         for (pugi::xml_node material = materials.first_child(); material; material = material.next_sibling())
         {
             pugi::xml_attribute name = material.first_attribute();
-            std::cout << name.name() << "=" << name.value() << std::endl;
+            std::cout << "----" << name.value() << "----" << std::endl;
 
             pugi::xml_attribute type = name.next_attribute();
             std::cout << type.name() << "=" << type.value() << std::endl;
@@ -135,14 +136,14 @@ void SceneManager::LoadScene(Scene::SceneGraph &scene)
 
             pugi::xml_node emission_strength = color.next_sibling();
             pugi::xml_attribute emission_strength_value = emission_strength.first_attribute();
-            std::cout << emission_strength_value.name() << "=" << emission_strength_value.value() << std::endl;
+            std::cout << "emission strength " << emission_strength_value.value() << std::endl;
 
             pugi::xml_node emission_color = emission_strength.next_sibling();
             pugi::xml_attribute emission_r = emission_color.first_attribute();
             pugi::xml_attribute emission_g = emission_r.next_attribute();
             pugi::xml_attribute emission_b = emission_g.next_attribute();
 
-            std::cout << "color [" << emission_r.name() << ":" << emission_r.value() << emission_g.name() << ":" << emission_g.value() << emission_b.name() << ":" << emission_b.value() << "]" << std::endl;
+            std::cout << "emission color [" << emission_r.name() << ":" << emission_r.value() << emission_g.name() << ":" << emission_g.value() << emission_b.name() << ":" << emission_b.value() << "]" << std::endl;
 
             float r_fl = std::strtof(r.value(), nullptr);
             float g_fl = std::strtof(g.value(), nullptr);
@@ -184,13 +185,19 @@ void SceneManager::LoadScene(Scene::SceneGraph &scene)
             }
         }
 
+        std::cout << "Objects--------------------------------" << std::endl;
         for (pugi::xml_node object = objects.first_child(); object; object = object.next_sibling())
         {
             pugi::xml_attribute name = object.first_attribute();
-            std::cout << name.name() << "=" << name.value() << std::endl;
+            std::cout << "----" << name.value() << "----" <<  std::endl;
 
             pugi::xml_attribute type = name.next_attribute();
             std::cout << type.name() << "=" << type.value() << std::endl;
+            pugi::xml_attribute id = type.next_attribute();
+            std::cout << id.name() << "=" << id.value() << std::endl;
+
+            int identifier = std::stoi(id.value(), nullptr);
+
             pugi::xml_node position = object.first_child();
             pugi::xml_attribute x = position.first_attribute();
             pugi::xml_attribute y = x.next_attribute();
@@ -206,7 +213,6 @@ void SceneManager::LoadScene(Scene::SceneGraph &scene)
 
             if (std::strcmp(type.value(), "Sphere") == 0)
             {
-                std::cout << "Found Sphere" << std::endl;
                 pugi::xml_node radius = position.next_sibling();
                 pugi::xml_attribute radius_value = radius.first_attribute();
                 std::cout << radius_value.name() << "=" << radius_value.value() << std::endl;
@@ -217,23 +223,19 @@ void SceneManager::LoadScene(Scene::SceneGraph &scene)
 
                 std::string material_name = material_value.value();
 
-                std::cout << "material_name: " << material_name << "\n";
-
                 Scene::Shapes::Sphere sphere;
                 float x_fl = std::strtof(x.value(), nullptr);
                 float y_fl = std::strtof(y.value(), nullptr);
                 float z_fl = std::strtof(z.value(), nullptr);
                 sphere.Origin = Math::Vector3<float>(x_fl, y_fl, z_fl);
-
-                if (material_name == "Light")
-                    sphere.id = 2222;
+                sphere.id = identifier;
 
                 auto it = nameToIndex.find(material_name);
 
                 if (it != nameToIndex.end())
                 {
                     size_t index = it->second;
-                    std::cout << material_name << " found at index: " << index << "\n";
+                    std::cout << material_name << " found at material index: " << index << "\n";
                     sphere.Material = scene.materials[index];
                 }
                 else
