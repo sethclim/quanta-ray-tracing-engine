@@ -4,22 +4,27 @@
 		<object name="Some Sphere" type="Sphere">
 			<position x="0" y="26" z="-1" />
 			<radius value="26" />
+			<material value="Floor" />
 		</object>
 		<object name="Some Sphere" type="Sphere">
 			<position x="-0.5" y="-0.100000001" z="1.20000005" />
 			<radius value="0.200000003" />
+			<material value="Lambertian 1" />
 		</object>
 		<object name="Some Sphere" type="Sphere">
 			<position x="-0.100000001" y="-0.100000001" z="1.20000005" />
 			<radius value="0.200000003" />
+			<material value="Metal 0" />
 		</object>
 		<object name="Some Sphere" type="Sphere">
 			<position x="0.300000012" y="-0.100000001" z="1.20000005" />
 			<radius value="0.200000003" />
+			<material value="Lambertian 3" />
 		</object>
 		<object name="Some Sphere" type="Sphere">
 			<position x="0" y="-0.5" z="1" />
 			<radius value="2" />
+			<material value="Light" />
 		</object>
 	</objects>
 	<materials>
@@ -43,7 +48,7 @@
 			<emission_strength value="0" />
 			<emission_color r="1" g="1" b="1" />
 		</material>
-		<material name="Light">
+		<material name="Light" type="Light">
 			<color r="1" g="1" b="1" />
 			<emission_strength value="0.600000024" />
 			<emission_color r="1" g="1" b="1" />

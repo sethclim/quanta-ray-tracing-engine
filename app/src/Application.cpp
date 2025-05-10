@@ -69,70 +69,71 @@ void Application::Init()
 	DrawData drawData = editor->RenderEditor();
 	{
 
-		Materials::Metal mat = Materials::Metal("Metal 0", {1, 1, 1});
-		// mat.Color = Math::Vector3<float>(1, 1, 1);
+		// Materials::Metal mat = Materials::Metal("Metal 0", {1, 1, 1});
+		// // mat.Color = Math::Vector3<float>(1, 1, 1);
 
-		Materials::Lambertian mat2 = Materials::Lambertian("Lambertian 1");
-		mat2.Color = Math::Vector3<float>(0, 1, 0);
-		mat2.EmissionColor = Math::Vector3<float>(0, 0, 0);
-		mat2.EmissionStrength = 0.0f;
+		// Materials::Lambertian mat2 = Materials::Lambertian("Lambertian 1");
+		// mat2.Color = Math::Vector3<float>(0, 1, 0);
+		// mat2.EmissionColor = Math::Vector3<float>(0, 0, 0);
+		// mat2.EmissionStrength = 0.0f;
 
-		Materials::Lambertian floor_mat = Materials::Lambertian("Floor");
-		floor_mat.Color = Math::Vector3<float>(1, 1, 1);
-		floor_mat.EmissionColor = Math::Vector3<float>(0, 0, 0);
-		floor_mat.EmissionStrength = 0.0f;
+		// Materials::Lambertian floor_mat = Materials::Lambertian("Floor");
+		// floor_mat.Color = Math::Vector3<float>(1, 1, 1);
+		// floor_mat.EmissionColor = Math::Vector3<float>(0, 0, 0);
+		// floor_mat.EmissionStrength = 0.0f;
 
-		Materials::Lambertian mat3 = Materials::Lambertian("Lambertian 3");
-		mat3.Color = Math::Vector3<float>(0, 0, 1);
+		// Materials::Lambertian mat3 = Materials::Lambertian("Lambertian 3");
+		// mat3.Color = Math::Vector3<float>(0, 0, 1);
 
-		Materials::Material lightMaterial = Materials::Material("Light");
-		lightMaterial.Color = Math::Vector3<float>(1, 1, 1);
-		lightMaterial.EmissionColor = Math::Vector3<float>(1, 1, 1);
-		lightMaterial.EmissionStrength = 0.6f;
+		// Materials::Material lightMaterial = Materials::Material("Light");
+		// lightMaterial.Color = Math::Vector3<float>(1, 1, 1);
+		// lightMaterial.EmissionColor = Math::Vector3<float>(1, 1, 1);
+		// lightMaterial.EmissionStrength = 0.6f;
 
-		scene.materials.push_back(std::make_shared<Materials::Metal>(mat));
-		scene.materials.push_back(std::make_shared<Materials::Lambertian>(mat2));
-		scene.materials.push_back(std::make_shared<Materials::Lambertian>(floor_mat));
-		scene.materials.push_back(std::make_shared<Materials::Lambertian>(mat3));
-		scene.materials.push_back(std::make_shared<Materials::Material>(lightMaterial));
+		// scene.materials.push_back(std::make_shared<Materials::Metal>(mat));
+		// scene.materials.push_back(std::make_shared<Materials::Lambertian>(mat2));
+		// scene.materials.push_back(std::make_shared<Materials::Lambertian>(floor_mat));
+		// scene.materials.push_back(std::make_shared<Materials::Lambertian>(mat3));
+		// scene.materials.push_back(std::make_shared<Materials::Material>(lightMaterial));
 
-		Scene::Shapes::Sphere sphere;
-		sphere.Origin = Math::Vector3<float>(-0.5, -0.1, 1.2);
-		sphere.Material = scene.materials[1];
-		sphere.Radius = 0.2f;
-		sphere.id = 666;
+		// Scene::Shapes::Sphere sphere;
+		// sphere.Origin = Math::Vector3<float>(-0.5, -0.1, 1.2);
+		// sphere.Material = scene.materials[1];
+		// sphere.Radius = 0.2f;
+		// sphere.id = 666;
 
-		Scene::Shapes::Sphere floor;
-		floor.Origin = Math::Vector3<float>(0, 26, -1);
-		floor.Material = scene.materials[2];
-		floor.Radius = 26.0f;
-		floor.id = 456;
+		// Scene::Shapes::Sphere floor;
+		// floor.Origin = Math::Vector3<float>(0, 26, -1);
+		// floor.Material = scene.materials[2];
+		// floor.Radius = 26.0f;
+		// floor.id = 456;
 
-		Scene::Shapes::Sphere sphere2;
-		sphere2.Origin = Math::Vector3<float>(-0.1, -0.1, 1.2);
-		sphere2.Radius = 0.2f;
-		sphere2.Material = scene.materials[0];
-		sphere2.id = 1;
+		// Scene::Shapes::Sphere sphere2;
+		// sphere2.Origin = Math::Vector3<float>(-0.1, -0.1, 1.2);
+		// sphere2.Radius = 0.2f;
+		// sphere2.Material = scene.materials[0];
+		// sphere2.id = 1;
 
-		Scene::Shapes::Sphere sphere3;
-		sphere3.Origin = Math::Vector3<float>(0.3, -0.1, 1.2);
-		sphere3.Material = scene.materials[3];
-		sphere3.Radius = 0.2f;
-		sphere3.id = 2;
+		// Scene::Shapes::Sphere sphere3;
+		// sphere3.Origin = Math::Vector3<float>(0.3, -0.1, 1.2);
+		// sphere3.Material = scene.materials[3];
+		// sphere3.Radius = 0.2f;
+		// sphere3.id = 2;
 
-		Scene::Shapes::Sphere sphere4;
-		sphere4.Origin = Math::Vector3<float>(0.0, -0.5, 1.0);
-		sphere4.Material = scene.materials[4];
-		sphere4.Radius = 2.0f;
-		sphere4.id = 2222;
+		// Scene::Shapes::Sphere sphere4;
+		// sphere4.Origin = Math::Vector3<float>(0.0, -0.5, 1.0);
+		// sphere4.Material = scene.materials[4];
+		// sphere4.Radius = 2.0f;
+		// sphere4.id = 2222;
 
-		scene.ray_targets.push_back(std::make_shared<Scene::Shapes::Sphere>(floor));
-		scene.ray_targets.push_back(std::make_shared<Scene::Shapes::Sphere>(sphere));
-		scene.ray_targets.push_back(std::make_shared<Scene::Shapes::Sphere>(sphere2));
-		scene.ray_targets.push_back(std::make_shared<Scene::Shapes::Sphere>(sphere3));
-		scene.ray_targets.push_back(std::make_shared<Scene::Shapes::Sphere>(sphere4));
+		// scene.ray_targets.push_back(std::make_shared<Scene::Shapes::Sphere>(floor));
+		// scene.ray_targets.push_back(std::make_shared<Scene::Shapes::Sphere>(sphere));
+		// scene.ray_targets.push_back(std::make_shared<Scene::Shapes::Sphere>(sphere2));
+		// scene.ray_targets.push_back(std::make_shared<Scene::Shapes::Sphere>(sphere3));
+		// scene.ray_targets.push_back(std::make_shared<Scene::Shapes::Sphere>(sphere4));
 
-		sceneManager.SaveScene(scene);
+		// sceneManager.SaveScene(scene);
+		sceneManager.LoadScene(scene);
 
 		renderer = std::make_unique<Renderer>(scene);
 	}
