@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<scene>
+	<objects>
+		<object name="Floor" type="Sphere" id="1">
+			<position x="0" y="26" z="-1" />
+			<radius value="26" />
+			<material value="Floor" />
+		</object>
+		<object name="Lambertian Ball" type="Sphere" id="3">
+			<position x="-0.1" y="-0.1" z="1.2" />
+			<radius value="0.2" />
+			<material value="Lambertian" />
+		</object>
+		<object name="Light" type="Sphere" id="2222">
+			<position x="0" y="-0.5" z="1" />
+			<radius value="2" />
+			<material value="Light" />
+		</object>
+	</objects>
+	<materials>
+		<material name="Floor" type="Lambertian">
+			<color r="1" g="1" b="1" />
+		</material>
+		<material name="Lambertian" type="Lambertian">
+			<color r="1" g="0" b="0" />
+		</material>
+		<material name="Light" type="Emissive">
+			<color r="1" g="1" b="1" />
+			<emission_strength value="0.6" />
+			<emission_color r="1" g="1" b="1" />
+		</material>
+	</materials>
+</scene>

@@ -17,6 +17,7 @@
 #include "imgui.h"
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_vulkan.h"
+#include "SceneManager.hpp"
 
 void check_vk_result(VkResult err);
 
@@ -54,6 +55,7 @@ private:
 	std::unique_ptr<Renderer> renderer;
 	std::unique_ptr<Editor> editor;
 
+	SceneManager sceneManager;
 	Scene::SceneGraph scene;
 
 	bool drawn;

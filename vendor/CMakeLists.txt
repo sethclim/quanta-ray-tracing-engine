@@ -44,3 +44,5 @@ target_include_directories(imgui PUBLIC
 
 # get_target_property(IMGUI_LINK_LIBS imgui INTERFACE_LINK_LIBRARIES)
 # message(STATUS "IMGUI links: ${IMGUI_LINK_LIBS}")`
+
+add_subdirectory(pugixml)
