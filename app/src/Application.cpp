@@ -75,7 +75,7 @@ void Application::Init()
 		renderer = std::make_unique<Renderer>(scene);
 	}
 
-	// Setup Vulkan
+	// Setup Vulkan	
 	if (!glfwVulkanSupported())
 	{
 		std::cerr << "GLFW: Vulkan not supported!\n";
