@@ -59,6 +59,7 @@ void SceneManager::SaveScene(Scene::SceneGraph scene)
             if (metal)
             {
                 material.append_attribute("type") = "Metal";
+                material.append_attribute("fuzz") = metal->fuzz;
             }
             else
             {
@@ -149,7 +150,12 @@ void SceneManager::LoadScene(Scene::SceneGraph &scene, std::string name)
             }
             else if (std::strcmp(type.value(), "Metal") == 0)
             {
-                Materials::Metal metal = Materials::Metal(name.value(), {r_fl, g_fl, b_fl});
+                pugi::xml_attribute fuzz = type.next_attribute();
+                std::cout << fuzz.name() << "=" << fuzz.value() << std::endl;
+
+                float fuzz_fl = std::strtof(fuzz.value(), nullptr);
+
+                Materials::Metal metal = Materials::Metal(name.value(), {r_fl, g_fl, b_fl}, fuzz_fl);
                 // metal.EmissionStrength = emission_strength_fl;
                 // metal.EmissionColor = Math::Vector3<float>(emission_r_fl, emission_g_fl, emission_b_fl);
 

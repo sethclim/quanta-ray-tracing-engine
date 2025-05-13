@@ -72,13 +72,14 @@ namespace Materials
     class Metal : public Material
     {
     public:
-        Metal(const std::string &name, const Math::Vector3<float> &albedo) : Material(name), albedo(albedo) {}
+        Metal(const std::string &name, const Math::Vector3<float> &albedo, float fuzz) : Material(name), albedo(albedo), fuzz(fuzz < 1 ? fuzz : 1) {}
 
         bool scatter(const Ray &r_in, const HitInfo &hit_info, Math::Vector3<float> &attenuation, Ray &scattered)
             const override
         {
             auto r_dir = r_in.Direction;
             auto reflected = RayHelpers::Reflect(r_dir, hit_info.Normal);
+            reflected = reflected.Normalize() + (Utilities::Random::Random_Unit_Vector() * fuzz);
 
             Ray ray_scattered;
             ray_scattered.Origin = hit_info.HitPoint;
@@ -86,8 +87,11 @@ namespace Materials
 
             scattered = ray_scattered;
             attenuation = albedo;
-            return true;
+            return (scattered.Direction.Dot(hit_info.Normal) > 0);
         }
+
+
+        float fuzz;
 
     private:
         Math::Vector3<float> albedo;

@@ -69,13 +69,13 @@ void Application::Init()
 	DrawData drawData = editor->RenderEditor();
 
 	{
-		//sceneManager.SaveScene(scene);
+		// sceneManager.SaveScene(scene);
 		sceneManager.LoadScene(scene, "default_scene.xml");
 
 		renderer = std::make_unique<Renderer>(scene);
 	}
 
-	// Setup Vulkan	
+	// Setup Vulkan
 	if (!glfwVulkanSupported())
 	{
 		std::cerr << "GLFW: Vulkan not supported!\n";
@@ -373,6 +373,13 @@ void Application::Run()
 				ImGui::DragFloat("Emission Strength", &emissive.get()->EmissionStrength, 0.05f, 0.0f, 1.0f);
 				float *emission_color_ptr = &emissive.get()->EmissionColor.x;
 				ImGui::ColorEdit3("Emission Color", emission_color_ptr);
+			}
+			else
+			{
+
+				auto metal = std::dynamic_pointer_cast<Materials::Metal>(material);
+				if (metal)
+					ImGui::DragFloat("Fuzz Amt", &metal.get()->fuzz, 0.05f, 0.0f, 1.0f);
 			}
 
 			// ImGui::DragFloat("Roughness", &material.Roughness, 0.05f, 0.0f, 1.0f);
