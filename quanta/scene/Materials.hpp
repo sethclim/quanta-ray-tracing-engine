@@ -9,8 +9,8 @@ namespace Materials
     {
     public:
         Math::Vector3<float> Color = Math::Vector3<float>(1.0f, 1.0f, 1.0f);
-        //float EmissionStrength = 0.0f;
-        //Math::Vector3<float> EmissionColor = Math::Vector3<float>(1.0f, 1.0f, 1.0f);
+        // float EmissionStrength = 0.0f;
+        // Math::Vector3<float> EmissionColor = Math::Vector3<float>(1.0f, 1.0f, 1.0f);
 
         Material(const std::string &name) : _name(name) {}
 
@@ -35,10 +35,10 @@ namespace Materials
         float EmissionStrength = 1.0f;
         Math::Vector3<float> EmissionColor = Math::Vector3<float>(1.0f, 1.0f, 1.0f);
 
-        Emissive(const std::string& name) : Material(name) {}
+        Emissive(const std::string &name) : Material(name) {}
         virtual ~Emissive() = default;
 
-        virtual bool scatter(const Ray& r_in, const HitInfo& rec, Math::Vector3<float>& attenuation, Ray& scattered) const
+        virtual bool scatter(const Ray &r_in, const HitInfo &rec, Math::Vector3<float> &attenuation, Ray &scattered) const
         {
             return false;
         }
