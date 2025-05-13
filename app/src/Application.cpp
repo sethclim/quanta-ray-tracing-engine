@@ -363,7 +363,7 @@ void Application::Run()
 
 			ImGui::Text(material.get()->GetName().c_str());
 
-			float *color_ptr = &material.get()->Color.x;
+			float *color_ptr = &material.get()->Albedo.x;
 			ImGui::ColorEdit3("Color", color_ptr);
 
 			auto emissive = std::dynamic_pointer_cast<Materials::Emissive>(material);

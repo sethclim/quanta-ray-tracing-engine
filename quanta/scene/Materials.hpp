@@ -8,11 +8,12 @@ namespace Materials
     class Material
     {
     public:
-        Math::Vector3<float> Color = Math::Vector3<float>(1.0f, 1.0f, 1.0f);
+        Math::Vector3<float> Albedo = Math::Vector3<float>(1.0f, 1.0f, 1.0f);
         // float EmissionStrength = 0.0f;
         // Math::Vector3<float> EmissionColor = Math::Vector3<float>(1.0f, 1.0f, 1.0f);
 
         Material(const std::string &name) : _name(name) {}
+        Material(const std::string& name, const Math::Vector3<float>& albedo) : _name(name), Albedo(albedo) {}
 
         const std::string &GetName() const { return _name; }
         void SetName(const std::string &name) { _name = name; }
@@ -31,7 +32,7 @@ namespace Materials
     class Emissive : public Material
     {
     public:
-        Math::Vector3<float> Color = Math::Vector3<float>(1.0f, 1.0f, 1.0f);
+        Math::Vector3<float> Albedo = Math::Vector3<float>(1.0f, 1.0f, 1.0f);
         float EmissionStrength = 1.0f;
         Math::Vector3<float> EmissionColor = Math::Vector3<float>(1.0f, 1.0f, 1.0f);
 
@@ -64,7 +65,7 @@ namespace Materials
             ray.Direction = scatter_direction;
 
             scattered = ray;
-            attenuation = Color;
+            attenuation = Albedo;
             return true;
         }
     };
@@ -72,7 +73,7 @@ namespace Materials
     class Metal : public Material
     {
     public:
-        Metal(const std::string &name, const Math::Vector3<float> &albedo, float fuzz) : Material(name), albedo(albedo), fuzz(fuzz < 1 ? fuzz : 1) {}
+        Metal(const std::string &name, const Math::Vector3<float> &albedo, float fuzz) : Material(name, albedo), fuzz(fuzz < 1 ? fuzz : 1) {}
 
         bool scatter(const Ray &r_in, const HitInfo &hit_info, Math::Vector3<float> &attenuation, Ray &scattered)
             const override
@@ -86,14 +87,11 @@ namespace Materials
             ray_scattered.Direction = reflected;
 
             scattered = ray_scattered;
-            attenuation = albedo;
+            attenuation = Albedo;
             return (scattered.Direction.Dot(hit_info.Normal) > 0);
         }
 
 
         float fuzz;
-
-    private:
-        Math::Vector3<float> albedo;
     };
 }

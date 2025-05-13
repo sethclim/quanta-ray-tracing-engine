@@ -44,9 +44,9 @@ void SceneManager::SaveScene(Scene::SceneGraph scene)
         pugi::xml_node material = materials.append_child("material");
         material.append_attribute("name") = mat.get()->GetName().c_str();
         pugi::xml_node color = material.append_child("color");
-        color.append_attribute("r") = mat.get()->Color.x;
-        color.append_attribute("g") = mat.get()->Color.y;
-        color.append_attribute("b") = mat.get()->Color.z;
+        color.append_attribute("r") = mat.get()->Albedo.x;
+        color.append_attribute("g") = mat.get()->Albedo.y;
+        color.append_attribute("b") = mat.get()->Albedo.z;
 
         auto lambertian = std::dynamic_pointer_cast<Materials::Lambertian>(mat);
         if (lambertian)
@@ -142,7 +142,7 @@ void SceneManager::LoadScene(Scene::SceneGraph &scene, std::string name)
             if (std::strcmp(type.value(), "Lambertian") == 0)
             {
                 Materials::Lambertian lambertian = Materials::Lambertian(name.value());
-                lambertian.Color = Math::Vector3<float>(r_fl, g_fl, b_fl);
+                lambertian.Albedo = Math::Vector3<float>(r_fl, g_fl, b_fl);
                 // lambertian.EmissionStrength = emission_strength_fl;
                 // lambertian.EmissionColor = Math::Vector3<float>(emission_r_fl, emission_g_fl, emission_b_fl);
 
@@ -179,7 +179,7 @@ void SceneManager::LoadScene(Scene::SceneGraph &scene, std::string name)
                 float emission_b_fl = std::strtof(emission_b.value(), nullptr);
 
                 Materials::Emissive light = Materials::Emissive(name.value());
-                light.Color = Math::Vector3<float>(r_fl, g_fl, b_fl);
+                light.Albedo = Math::Vector3<float>(r_fl, g_fl, b_fl);
                 light.EmissionStrength = emission_strength_fl;
                 light.EmissionColor = Math::Vector3<float>(emission_r_fl, emission_g_fl, emission_b_fl);
 
