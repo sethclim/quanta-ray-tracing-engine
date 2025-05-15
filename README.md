@@ -1,7 +1,7 @@
 # quanta-ray-tracing-engine
 
-<img src="https://github.com/user-attachments/assets/da8ad79e-8892-403d-8104-e3a407f57477" alt="editor" width="30%" height="auto">
-<img src="https://github.com/user-attachments/assets/e5225cae-c3ad-44bc-8753-1c21b4dd43ad" alt="editor" width="30%" height="auto">
+<img src="https://github.com/user-attachments/assets/da8ad79e-8892-403d-8104-e3a407f57477" alt="editor" width="45%" height="auto">
+<img src="https://github.com/user-attachments/assets/e5225cae-c3ad-44bc-8753-1c21b4dd43ad" alt="editor" width="45%" height="auto">
 
 Raytracing engine written in C++ and Vulkan
 
