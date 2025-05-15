@@ -44,51 +44,22 @@ Math::Vector3<float> Renderer::PerPixel(float image_x, float image_y, bool debug
         Math::Vector3<float> incomingLight = Math::Vector3<float>(0, 0, 0);
         Math::Vector3<float> rayColor = Math::Vector3<float>(1, 1, 1);
 
-
         for (int i = 0; i < _maxBounces; i++)
         {
             HitInfo info{};
             bool res = TraceRay(ray, info, i == 0);
 
- /*           std::cout << "info.HitPoint: " << info.HitPoint.ToString() << " " << std::endl;*/
             if (!res)
             {
-                //std::cout << "Miss: " << i << " " << std::endl;
                 if (i == 0)
-                {
-         /*           std::cout << "Miss: returning" << std::endl;*/
                     return Math::Vector3<float>(0.337, 0.576, 0.961);
-                }
+
                 break;
             }
 
-            // we reached a light on first iteration
-            if (i == 0 && info.ObjectID == 2222)
-                break;
-            /*
-            if (i == 1)
-            {
-                std::cout << "hit: image_x: " << image_x << " image_y " << image_y << std::endl;
-            }*/
-
-            /*   if (i > 0)
-                   std::cout << "hit: object: " << info.ObjectID << "x: " << info.HitPoint.x << " y " << info.HitPoint.y <<  " z " << info.HitPoint.z << std::endl;*/
 
             if (debug && i > 0 && sample == 0)
-            {
-                // std::cout << "hit: object: " << info.ObjectID << "x: " << info.HitPoint.x << " y " << info.HitPoint.y << " z " << info.HitPoint.z << std::endl;
                 addDebugLine(ray.Origin, info.HitPoint);
-            }
-
-            // if (info.ObjectID == 2222)
-            //     rayColor = Math::Vector3<float>(0, 0.2, 0.4);
-            // else
-            //     rayColor = Math::Vector3<float>(0.2, 0.4, 0.2);
-
-            // ray.Origin = (info.HitPoint + 0.001f);
-            // // ray.Direction = Reflect(info.Normal, ray.Direction);
-            // // ray.Direction = Utilities::Random::Random_On_Hemisphere(info.Normal);
-            // ray.Direction = info.Normal + Utilities::Random::Random_Unit_Vector();
 
             Math::Vector3<float> attenuation;
             Ray ray2;
@@ -126,25 +97,19 @@ Math::Vector3<float> Renderer::PerPixel(float image_x, float image_y, bool debug
     return pixel_color;
 }
 
-bool Renderer::TraceRay(const Ray &ray, HitInfo& hitinfo, bool isCameraRay)
+bool Renderer::TraceRay(const Ray &ray, HitInfo &hitinfo, bool isCameraRay)
 {
     Utilities::Interval ray_t = Utilities::Interval(0.001, std::numeric_limits<double>::infinity());
     HitInfo closestHit = Miss();
 
     bool hit = false;
 
-    //std::cout << "object count " << m_Scene.ray_targets.size() << std::endl;
-
-    int i = 0;
-
     for (const auto &object : m_Scene.ray_targets)
     {
-
         HitInfo info{};
 
         if (!object->hit(ray, ray_t, info))
         {
-  /*          std::cout << "miss! continue " << i << std::endl;*/
             continue;
         }
         else
@@ -157,12 +122,7 @@ bool Renderer::TraceRay(const Ray &ray, HitInfo& hitinfo, bool isCameraRay)
             closestHit = info;
             hit = true;
         }
-
-        i++;
     }
-    //std::cout << "searched all" << std::endl;
-    //if(!hit)
-    //    std::cout << "Never hit any" << std::endl;
 
     hitinfo = closestHit;
     return hit;
