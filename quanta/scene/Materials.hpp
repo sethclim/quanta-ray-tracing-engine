@@ -11,9 +11,11 @@ namespace Materials
         Math::Vector3<float> Albedo = Math::Vector3<float>(1.0f, 1.0f, 1.0f);
         // float EmissionStrength = 0.0f;
         // Math::Vector3<float> EmissionColor = Math::Vector3<float>(1.0f, 1.0f, 1.0f);
+        bool GetIsLight() { return isLight; }
 
-        Material(const std::string &name) : _name(name) {}
-        Material(const std::string& name, const Math::Vector3<float>& albedo) : _name(name), Albedo(albedo) {}
+
+        Material(const std::string &name, bool light = false) : _name(name), isLight(light){}
+        Material(const std::string& name, const Math::Vector3<float>& albedo, bool light = false) : _name(name), Albedo(albedo), isLight(light) {}
 
         const std::string &GetName() const { return _name; }
         void SetName(const std::string &name) { _name = name; }
@@ -27,6 +29,8 @@ namespace Materials
 
     private:
         std::string _name;
+    protected:
+        bool isLight;
     };
 
     class Emissive : public Material
@@ -36,7 +40,7 @@ namespace Materials
         float EmissionStrength = 1.0f;
         Math::Vector3<float> EmissionColor = Math::Vector3<float>(1.0f, 1.0f, 1.0f);
 
-        Emissive(const std::string &name) : Material(name) {}
+        Emissive(const std::string &name) : Material(name, true) {}
         virtual ~Emissive() = default;
 
         virtual bool scatter(const Ray &r_in, const HitInfo &rec, Math::Vector3<float> &attenuation, Ray &scattered) const

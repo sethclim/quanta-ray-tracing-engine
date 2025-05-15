@@ -44,18 +44,25 @@ Math::Vector3<float> Renderer::PerPixel(float image_x, float image_y, bool debug
         Math::Vector3<float> incomingLight = Math::Vector3<float>(0, 0, 0);
         Math::Vector3<float> rayColor = Math::Vector3<float>(1, 1, 1);
 
+
         for (int i = 0; i < _maxBounces; i++)
         {
-            HitInfo info = TraceRay(ray);
+            HitInfo info{};
+            bool res = TraceRay(ray, info, i == 0);
 
-            if (info.HitPoint == Math::Vector3<float>(-1, -1, -1))
+ /*           std::cout << "info.HitPoint: " << info.HitPoint.ToString() << " " << std::endl;*/
+            if (!res)
             {
+                //std::cout << "Miss: " << i << " " << std::endl;
                 if (i == 0)
-                    rayColor = Math::Vector3<float>(0, 0, 0);
+                {
+         /*           std::cout << "Miss: returning" << std::endl;*/
+                    return Math::Vector3<float>(0.337, 0.576, 0.961);
+                }
                 break;
             }
 
-            //we reached a light on first iteration
+            // we reached a light on first iteration
             if (i == 0 && info.ObjectID == 2222)
                 break;
             /*
@@ -87,11 +94,11 @@ Math::Vector3<float> Renderer::PerPixel(float image_x, float image_y, bool debug
             Ray ray2;
             if (info.Material->scatter(ray, info, attenuation, ray2))
             {
-                //Math::Vector3<float>
-                //    emittedLight = info.Material->EmissionColor * info.Material->EmissionStrength;
+                // Math::Vector3<float>
+                //     emittedLight = info.Material->EmissionColor * info.Material->EmissionStrength;
 
                 rayColor *= attenuation;
-                //incomingLight += rayColor * emittedLight;
+                // incomingLight += rayColor * emittedLight;
                 incomingLight += rayColor;
 
                 ray.Origin = ray2.Origin;
@@ -119,21 +126,44 @@ Math::Vector3<float> Renderer::PerPixel(float image_x, float image_y, bool debug
     return pixel_color;
 }
 
-HitInfo Renderer::TraceRay(const Ray &ray)
+bool Renderer::TraceRay(const Ray &ray, HitInfo& hitinfo, bool isCameraRay)
 {
     Utilities::Interval ray_t = Utilities::Interval(0.001, std::numeric_limits<double>::infinity());
     HitInfo closestHit = Miss();
 
+    bool hit = false;
+
+    //std::cout << "object count " << m_Scene.ray_targets.size() << std::endl;
+
+    int i = 0;
+
     for (const auto &object : m_Scene.ray_targets)
     {
 
-        HitInfo info = object->hit(ray, ray_t);
+        HitInfo info{};
 
-        if (info.HitPoint == Math::Vector3<float>(-1, -1, -1))
+        if (!object->hit(ray, ray_t, info))
+        {
+  /*          std::cout << "miss! continue " << i << std::endl;*/
             continue;
+        }
+        else
+        {
+            Materials::Material mat = *info.Material.get();
+            if (isCameraRay && mat.GetIsLight())
+            {
+                continue;
+            }
+            closestHit = info;
+            hit = true;
+        }
 
-        closestHit = info;
+        i++;
     }
+    //std::cout << "searched all" << std::endl;
+    //if(!hit)
+    //    std::cout << "Never hit any" << std::endl;
 
-    return closestHit;
+    hitinfo = closestHit;
+    return hit;
 }

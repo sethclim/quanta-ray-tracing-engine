@@ -221,23 +221,32 @@ void Application::Run()
 
 												/*	if (x == 535 && y == 318)*/
 												color = renderer->PerPixel(normalizedX, normalizedY, debug_pixel);
+										
+
+												glm::vec4 finalColor = glm::vec4(color.x, color.y, color.z, 1.0f);
 
 												if (accumulate)
+												{
 													m_AccumulationData[x + y * m_Image->GetWidth()] += glm::vec4(color.x, color.y, color.z, 1.0f);
-												else
-													m_AccumulationData[x + y * m_Image->GetWidth()] = glm::vec4(color.x, color.y, color.z, 1.0f);
+													finalColor = m_AccumulationData[x + y * m_Image->GetWidth()];
+													finalColor /= (float)m_FrameIndex;
+												}
+						/*						else
+												{
+													glm::vec4 accumulatedColor = glm::vec4(color.x, color.y, color.z, 1.0f);
+												}*/
 
-												glm::vec4 accumulatedColor = m_AccumulationData[x + y * m_Image->GetWidth()];
-												accumulatedColor /= (float)m_FrameIndex;
 
-												accumulatedColor = glm::clamp(accumulatedColor, glm::vec4(0.0f), glm::vec4(1.0f));
+								/*				accumulatedColor = glm::clamp(finalColor, glm::vec4(0.0f), glm::vec4(1.0f));*/
 
 												// if (x < dimensions[0] / 2)
 												//	accumulatedColor = glm::vec4(1, 0, 0, 1);
 
-												m_ImageData[idx] = Utils::ConvertToRGBA(accumulatedColor);
+												m_ImageData[idx] = Utils::ConvertToRGBA(finalColor);
 											});
 						  });
+			//std::cout << "DONE DONE DONE!" << std::endl;
+			//useRaytracer = false;
 #else
 
 			for (uint32_t y = 0; y < dimensions[1]; y++)
@@ -262,23 +271,30 @@ void Application::Run()
 					if (flipped_y < dimensions[1] / 2)
 						color = Math::Vector3<float>(1, 0, 0);*/
 
-					/*	if (x == 535 && y == 318)*/
-					color = renderer->PerPixel(normalizedX, normalizedY, samples_per_pixel, max_bounces, debug_pixel);
+						/*	if (x == 535 && y == 318)*/
+					color = renderer->PerPixel(normalizedX, normalizedY, debug_pixel);
+
+
+					glm::vec4 finalColor = glm::vec4(color.x, color.y, color.z, 1.0f);
 
 					if (accumulate)
+					{
 						m_AccumulationData[x + y * m_Image->GetWidth()] += glm::vec4(color.x, color.y, color.z, 1.0f);
-					else
-						m_AccumulationData[x + y * m_Image->GetWidth()] = glm::vec4(color.x, color.y, color.z, 1.0f);
+						finalColor = m_AccumulationData[x + y * m_Image->GetWidth()];
+						finalColor /= (float)m_FrameIndex;
+					}
+					/*						else
+											{
+												glm::vec4 accumulatedColor = glm::vec4(color.x, color.y, color.z, 1.0f);
+											}*/
 
-					glm::vec4 accumulatedColor = m_AccumulationData[x + y * m_Image->GetWidth()];
-					accumulatedColor /= (float)m_FrameIndex;
 
-					accumulatedColor = glm::clamp(accumulatedColor, glm::vec4(0.0f), glm::vec4(1.0f));
+											/*				accumulatedColor = glm::clamp(finalColor, glm::vec4(0.0f), glm::vec4(1.0f));*/
 
-					// if (x < dimensions[0] / 2)
-					//	accumulatedColor = glm::vec4(1, 0, 0, 1);
+															// if (x < dimensions[0] / 2)
+															//	accumulatedColor = glm::vec4(1, 0, 0, 1);
 
-					m_ImageData[idx] = Utils::ConvertToRGBA(accumulatedColor);
+					m_ImageData[idx] = Utils::ConvertToRGBA(finalColor);
 				}
 			}
 #endif
