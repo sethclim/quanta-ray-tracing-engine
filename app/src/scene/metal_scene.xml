@@ -16,18 +16,26 @@
 			<radius value="2" />
 			<material value="Light" />
 		</object>
+		<object name="Some Sphere" type="Sphere" id="13">
+			<position x="0" y="0.100000001" z="1.70000005" />
+			<radius value="0.0399999991" />
+			<material value="Lambertian 1" />
+		</object>
 	</objects>
 	<materials>
 		<material name="Floor" type="Lambertian">
 			<color r="1" g="1" b="1" />
 		</material>
-		<material name="Metal" type="Metal">
+		<material name="Metal" type="Metal" fuzz="0">
 			<color r="1" g="1" b="1" />
 		</material>
 		<material name="Light" type="Emissive">
 			<color r="1" g="1" b="1" />
 			<emission_strength value="0.6" />
 			<emission_color r="1" g="1" b="1" />
+		</material>
+		<material name="Lambertian 1" type="Lambertian">
+			<color r="0" g="1" b="0" />
 		</material>
 	</materials>
 </scene>

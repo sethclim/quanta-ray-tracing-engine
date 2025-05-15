@@ -8,11 +8,14 @@ namespace Materials
     class Material
     {
     public:
-        Math::Vector3<float> Color = Math::Vector3<float>(1.0f, 1.0f, 1.0f);
-        //float EmissionStrength = 0.0f;
-        //Math::Vector3<float> EmissionColor = Math::Vector3<float>(1.0f, 1.0f, 1.0f);
+        Math::Vector3<float> Albedo = Math::Vector3<float>(1.0f, 1.0f, 1.0f);
+        // float EmissionStrength = 0.0f;
+        // Math::Vector3<float> EmissionColor = Math::Vector3<float>(1.0f, 1.0f, 1.0f);
+        bool GetIsLight() { return isLight; }
 
-        Material(const std::string &name) : _name(name) {}
+
+        Material(const std::string &name, bool light = false) : _name(name), isLight(light){}
+        Material(const std::string& name, const Math::Vector3<float>& albedo, bool light = false) : _name(name), Albedo(albedo), isLight(light) {}
 
         const std::string &GetName() const { return _name; }
         void SetName(const std::string &name) { _name = name; }
@@ -26,19 +29,21 @@ namespace Materials
 
     private:
         std::string _name;
+    protected:
+        bool isLight;
     };
 
     class Emissive : public Material
     {
     public:
-        Math::Vector3<float> Color = Math::Vector3<float>(1.0f, 1.0f, 1.0f);
+        Math::Vector3<float> Albedo = Math::Vector3<float>(1.0f, 1.0f, 1.0f);
         float EmissionStrength = 1.0f;
         Math::Vector3<float> EmissionColor = Math::Vector3<float>(1.0f, 1.0f, 1.0f);
 
-        Emissive(const std::string& name) : Material(name) {}
+        Emissive(const std::string &name) : Material(name, true) {}
         virtual ~Emissive() = default;
 
-        virtual bool scatter(const Ray& r_in, const HitInfo& rec, Math::Vector3<float>& attenuation, Ray& scattered) const
+        virtual bool scatter(const Ray &r_in, const HitInfo &rec, Math::Vector3<float> &attenuation, Ray &scattered) const
         {
             return false;
         }
@@ -64,7 +69,7 @@ namespace Materials
             ray.Direction = scatter_direction;
 
             scattered = ray;
-            attenuation = Color;
+            attenuation = Albedo;
             return true;
         }
     };
@@ -72,24 +77,25 @@ namespace Materials
     class Metal : public Material
     {
     public:
-        Metal(const std::string &name, const Math::Vector3<float> &albedo) : Material(name), albedo(albedo) {}
+        Metal(const std::string &name, const Math::Vector3<float> &albedo, float fuzz) : Material(name, albedo), fuzz(fuzz < 1 ? fuzz : 1) {}
 
         bool scatter(const Ray &r_in, const HitInfo &hit_info, Math::Vector3<float> &attenuation, Ray &scattered)
             const override
         {
             auto r_dir = r_in.Direction;
             auto reflected = RayHelpers::Reflect(r_dir, hit_info.Normal);
+            reflected = reflected.Normalize() + (Utilities::Random::Random_Unit_Vector() * fuzz);
 
             Ray ray_scattered;
             ray_scattered.Origin = hit_info.HitPoint;
             ray_scattered.Direction = reflected;
 
             scattered = ray_scattered;
-            attenuation = albedo;
-            return true;
+            attenuation = Albedo;
+            return (scattered.Direction.Dot(hit_info.Normal) > 0);
         }
 
-    private:
-        Math::Vector3<float> albedo;
+
+        float fuzz;
     };
 }

@@ -46,52 +46,30 @@ Math::Vector3<float> Renderer::PerPixel(float image_x, float image_y, bool debug
 
         for (int i = 0; i < _maxBounces; i++)
         {
-            HitInfo info = TraceRay(ray);
+            HitInfo info{};
+            bool res = TraceRay(ray, info, i == 0);
 
-            if (info.HitPoint == Math::Vector3<float>(-1, -1, -1))
+            if (!res)
             {
                 if (i == 0)
-                    rayColor = Math::Vector3<float>(0, 0, 0);
+                    return Math::Vector3<float>(0.337, 0.576, 0.961);
+
                 break;
             }
 
-            //we reached a light on first iteration
-            if (i == 0 && info.ObjectID == 2222)
-                break;
-            /*
-            if (i == 1)
-            {
-                std::cout << "hit: image_x: " << image_x << " image_y " << image_y << std::endl;
-            }*/
-
-            /*   if (i > 0)
-                   std::cout << "hit: object: " << info.ObjectID << "x: " << info.HitPoint.x << " y " << info.HitPoint.y <<  " z " << info.HitPoint.z << std::endl;*/
 
             if (debug && i > 0 && sample == 0)
-            {
-                // std::cout << "hit: object: " << info.ObjectID << "x: " << info.HitPoint.x << " y " << info.HitPoint.y << " z " << info.HitPoint.z << std::endl;
                 addDebugLine(ray.Origin, info.HitPoint);
-            }
-
-            // if (info.ObjectID == 2222)
-            //     rayColor = Math::Vector3<float>(0, 0.2, 0.4);
-            // else
-            //     rayColor = Math::Vector3<float>(0.2, 0.4, 0.2);
-
-            // ray.Origin = (info.HitPoint + 0.001f);
-            // // ray.Direction = Reflect(info.Normal, ray.Direction);
-            // // ray.Direction = Utilities::Random::Random_On_Hemisphere(info.Normal);
-            // ray.Direction = info.Normal + Utilities::Random::Random_Unit_Vector();
 
             Math::Vector3<float> attenuation;
             Ray ray2;
             if (info.Material->scatter(ray, info, attenuation, ray2))
             {
-                //Math::Vector3<float>
-                //    emittedLight = info.Material->EmissionColor * info.Material->EmissionStrength;
+                // Math::Vector3<float>
+                //     emittedLight = info.Material->EmissionColor * info.Material->EmissionStrength;
 
                 rayColor *= attenuation;
-                //incomingLight += rayColor * emittedLight;
+                // incomingLight += rayColor * emittedLight;
                 incomingLight += rayColor;
 
                 ray.Origin = ray2.Origin;
@@ -119,21 +97,33 @@ Math::Vector3<float> Renderer::PerPixel(float image_x, float image_y, bool debug
     return pixel_color;
 }
 
-HitInfo Renderer::TraceRay(const Ray &ray)
+bool Renderer::TraceRay(const Ray &ray, HitInfo &hitinfo, bool isCameraRay)
 {
     Utilities::Interval ray_t = Utilities::Interval(0.001, std::numeric_limits<double>::infinity());
     HitInfo closestHit = Miss();
 
+    bool hit = false;
+
     for (const auto &object : m_Scene.ray_targets)
     {
+        HitInfo info{};
 
-        HitInfo info = object->hit(ray, ray_t);
-
-        if (info.HitPoint == Math::Vector3<float>(-1, -1, -1))
+        if (!object->hit(ray, ray_t, info))
+        {
             continue;
-
-        closestHit = info;
+        }
+        else
+        {
+            Materials::Material mat = *info.Material.get();
+            if (isCameraRay && mat.GetIsLight())
+            {
+                continue;
+            }
+            closestHit = info;
+            hit = true;
+        }
     }
 
-    return closestHit;
+    hitinfo = closestHit;
+    return hit;
 }

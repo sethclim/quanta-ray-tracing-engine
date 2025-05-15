@@ -69,13 +69,13 @@ void Application::Init()
 	DrawData drawData = editor->RenderEditor();
 
 	{
-		//sceneManager.SaveScene(scene);
+		// sceneManager.SaveScene(scene);
 		sceneManager.LoadScene(scene, "default_scene.xml");
 
 		renderer = std::make_unique<Renderer>(scene);
 	}
 
-	// Setup Vulkan	
+	// Setup Vulkan
 	if (!glfwVulkanSupported())
 	{
 		std::cerr << "GLFW: Vulkan not supported!\n";
@@ -221,23 +221,32 @@ void Application::Run()
 
 												/*	if (x == 535 && y == 318)*/
 												color = renderer->PerPixel(normalizedX, normalizedY, debug_pixel);
+										
+
+												glm::vec4 finalColor = glm::vec4(color.x, color.y, color.z, 1.0f);
 
 												if (accumulate)
+												{
 													m_AccumulationData[x + y * m_Image->GetWidth()] += glm::vec4(color.x, color.y, color.z, 1.0f);
-												else
-													m_AccumulationData[x + y * m_Image->GetWidth()] = glm::vec4(color.x, color.y, color.z, 1.0f);
+													finalColor = m_AccumulationData[x + y * m_Image->GetWidth()];
+													finalColor /= (float)m_FrameIndex;
+												}
+						/*						else
+												{
+													glm::vec4 accumulatedColor = glm::vec4(color.x, color.y, color.z, 1.0f);
+												}*/
 
-												glm::vec4 accumulatedColor = m_AccumulationData[x + y * m_Image->GetWidth()];
-												accumulatedColor /= (float)m_FrameIndex;
 
-												accumulatedColor = glm::clamp(accumulatedColor, glm::vec4(0.0f), glm::vec4(1.0f));
+								/*				accumulatedColor = glm::clamp(finalColor, glm::vec4(0.0f), glm::vec4(1.0f));*/
 
 												// if (x < dimensions[0] / 2)
 												//	accumulatedColor = glm::vec4(1, 0, 0, 1);
 
-												m_ImageData[idx] = Utils::ConvertToRGBA(accumulatedColor);
+												m_ImageData[idx] = Utils::ConvertToRGBA(finalColor);
 											});
 						  });
+			//std::cout << "DONE DONE DONE!" << std::endl;
+			//useRaytracer = false;
 #else
 
 			for (uint32_t y = 0; y < dimensions[1]; y++)
@@ -262,23 +271,30 @@ void Application::Run()
 					if (flipped_y < dimensions[1] / 2)
 						color = Math::Vector3<float>(1, 0, 0);*/
 
-					/*	if (x == 535 && y == 318)*/
-					color = renderer->PerPixel(normalizedX, normalizedY, samples_per_pixel, max_bounces, debug_pixel);
+						/*	if (x == 535 && y == 318)*/
+					color = renderer->PerPixel(normalizedX, normalizedY, debug_pixel);
+
+
+					glm::vec4 finalColor = glm::vec4(color.x, color.y, color.z, 1.0f);
 
 					if (accumulate)
+					{
 						m_AccumulationData[x + y * m_Image->GetWidth()] += glm::vec4(color.x, color.y, color.z, 1.0f);
-					else
-						m_AccumulationData[x + y * m_Image->GetWidth()] = glm::vec4(color.x, color.y, color.z, 1.0f);
+						finalColor = m_AccumulationData[x + y * m_Image->GetWidth()];
+						finalColor /= (float)m_FrameIndex;
+					}
+					/*						else
+											{
+												glm::vec4 accumulatedColor = glm::vec4(color.x, color.y, color.z, 1.0f);
+											}*/
 
-					glm::vec4 accumulatedColor = m_AccumulationData[x + y * m_Image->GetWidth()];
-					accumulatedColor /= (float)m_FrameIndex;
 
-					accumulatedColor = glm::clamp(accumulatedColor, glm::vec4(0.0f), glm::vec4(1.0f));
+											/*				accumulatedColor = glm::clamp(finalColor, glm::vec4(0.0f), glm::vec4(1.0f));*/
 
-					// if (x < dimensions[0] / 2)
-					//	accumulatedColor = glm::vec4(1, 0, 0, 1);
+															// if (x < dimensions[0] / 2)
+															//	accumulatedColor = glm::vec4(1, 0, 0, 1);
 
-					m_ImageData[idx] = Utils::ConvertToRGBA(accumulatedColor);
+					m_ImageData[idx] = Utils::ConvertToRGBA(finalColor);
 				}
 			}
 #endif
@@ -363,7 +379,7 @@ void Application::Run()
 
 			ImGui::Text(material.get()->GetName().c_str());
 
-			float *color_ptr = &material.get()->Color.x;
+			float *color_ptr = &material.get()->Albedo.x;
 			ImGui::ColorEdit3("Color", color_ptr);
 
 			auto emissive = std::dynamic_pointer_cast<Materials::Emissive>(material);
@@ -373,6 +389,13 @@ void Application::Run()
 				ImGui::DragFloat("Emission Strength", &emissive.get()->EmissionStrength, 0.05f, 0.0f, 1.0f);
 				float *emission_color_ptr = &emissive.get()->EmissionColor.x;
 				ImGui::ColorEdit3("Emission Color", emission_color_ptr);
+			}
+			else
+			{
+
+				auto metal = std::dynamic_pointer_cast<Materials::Metal>(material);
+				if (metal)
+					ImGui::DragFloat("Fuzz Amt", &metal.get()->fuzz, 0.05f, 0.0f, 1.0f);
 			}
 
 			// ImGui::DragFloat("Roughness", &material.Roughness, 0.05f, 0.0f, 1.0f);

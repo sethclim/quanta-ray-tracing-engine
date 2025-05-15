@@ -13,7 +13,7 @@ namespace Scene
         {
         public:
             virtual ~RayTarget() = default;
-            virtual HitInfo hit(Ray ray, Utilities::Interval &ray_t) = 0;
+            virtual bool hit(Ray ray, Utilities::Interval &ray_t, HitInfo& hitInfo) = 0;
         };
 
         class Sphere : public RayTarget
@@ -25,7 +25,7 @@ namespace Scene
 
             ~Sphere() {}
 
-            HitInfo hit(Ray ray, Utilities::Interval &ray_t)
+            bool hit(Ray ray, Utilities::Interval &ray_t, HitInfo& hitInfo)
             {
                 Math::Vector3<float> offsetRayOrigin = (Math::Vector3<float>)ray.Origin - Origin;
 
@@ -37,7 +37,10 @@ namespace Scene
 
                 float discriminant = Math::Sqr(b) - 4.0f * a * c;
                 if (discriminant < 0.0f)
-                    return Miss();
+                {
+                    hitInfo = Miss();
+                    return false;
+                }
 
                 double sqrt_disc = std::sqrt(discriminant);
                 double root = (-b - sqrt_disc) / (2.0f * a);
@@ -47,19 +50,22 @@ namespace Scene
                     // int ans = (-b + sqrt((b * b) - (4 * a * c))) / (2 * a);
                     root = (-b + std::sqrt(discriminant)) / (2.0f * a);
                     if (!ray_t.surrounds(root))
-                        return Miss();
+                    {
+                        hitInfo = Miss();
+                        return false;
+                    }
                 }
 
                 ray_t.max = root;
 
-                HitInfo hitInfo{};
+                /*HitInfo hitInfo{};*/
 
                 hitInfo.HitPoint = (Math::Vector3<float>)ray.Origin + (Math::Vector3<float>)ray.Direction * root;
                 hitInfo.Normal = (hitInfo.HitPoint - Origin).Normalize();
                 hitInfo.Material = Material;
                 hitInfo.ObjectID = id;
 
-                return hitInfo;
+                return true;
             }
 
             std::shared_ptr<Materials::Material> Material;

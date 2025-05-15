@@ -34,6 +34,6 @@ namespace RayHelpers
     inline Math::Vector3<float> Reflect(Math::Vector3<float> &v, const Math::Vector3<float> &n)
     {
         // TODO make subtract work on const
-        return (v - 2) * 2 * v.Dot(n);
+        return v - (n * 2 * v.Dot(n));
     }
 }

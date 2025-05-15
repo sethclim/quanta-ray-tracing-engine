@@ -136,6 +136,13 @@ namespace Math
                 // Check if the first three bits (x, y, z) are all 1 (equal)
                 return (mask & 0b0111) == 0b0111;
             }
+
+            std::string ToString()
+            {
+                std::ostringstream os;
+                os << "{x: " << x << " y: " << y << " z: " << z << " }\n";
+                return os.str();
+            }
         };
     }
 

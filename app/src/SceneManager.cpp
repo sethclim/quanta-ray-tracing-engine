@@ -44,9 +44,9 @@ void SceneManager::SaveScene(Scene::SceneGraph scene)
         pugi::xml_node material = materials.append_child("material");
         material.append_attribute("name") = mat.get()->GetName().c_str();
         pugi::xml_node color = material.append_child("color");
-        color.append_attribute("r") = mat.get()->Color.x;
-        color.append_attribute("g") = mat.get()->Color.y;
-        color.append_attribute("b") = mat.get()->Color.z;
+        color.append_attribute("r") = mat.get()->Albedo.x;
+        color.append_attribute("g") = mat.get()->Albedo.y;
+        color.append_attribute("b") = mat.get()->Albedo.z;
 
         auto lambertian = std::dynamic_pointer_cast<Materials::Lambertian>(mat);
         if (lambertian)
@@ -59,6 +59,7 @@ void SceneManager::SaveScene(Scene::SceneGraph scene)
             if (metal)
             {
                 material.append_attribute("type") = "Metal";
+                material.append_attribute("fuzz") = metal->fuzz;
             }
             else
             {
@@ -141,7 +142,7 @@ void SceneManager::LoadScene(Scene::SceneGraph &scene, std::string name)
             if (std::strcmp(type.value(), "Lambertian") == 0)
             {
                 Materials::Lambertian lambertian = Materials::Lambertian(name.value());
-                lambertian.Color = Math::Vector3<float>(r_fl, g_fl, b_fl);
+                lambertian.Albedo = Math::Vector3<float>(r_fl, g_fl, b_fl);
                 // lambertian.EmissionStrength = emission_strength_fl;
                 // lambertian.EmissionColor = Math::Vector3<float>(emission_r_fl, emission_g_fl, emission_b_fl);
 
@@ -149,7 +150,12 @@ void SceneManager::LoadScene(Scene::SceneGraph &scene, std::string name)
             }
             else if (std::strcmp(type.value(), "Metal") == 0)
             {
-                Materials::Metal metal = Materials::Metal(name.value(), {r_fl, g_fl, b_fl});
+                pugi::xml_attribute fuzz = type.next_attribute();
+                std::cout << fuzz.name() << "=" << fuzz.value() << std::endl;
+
+                float fuzz_fl = std::strtof(fuzz.value(), nullptr);
+
+                Materials::Metal metal = Materials::Metal(name.value(), {r_fl, g_fl, b_fl}, fuzz_fl);
                 // metal.EmissionStrength = emission_strength_fl;
                 // metal.EmissionColor = Math::Vector3<float>(emission_r_fl, emission_g_fl, emission_b_fl);
 
@@ -173,7 +179,7 @@ void SceneManager::LoadScene(Scene::SceneGraph &scene, std::string name)
                 float emission_b_fl = std::strtof(emission_b.value(), nullptr);
 
                 Materials::Emissive light = Materials::Emissive(name.value());
-                light.Color = Math::Vector3<float>(r_fl, g_fl, b_fl);
+                light.Albedo = Math::Vector3<float>(r_fl, g_fl, b_fl);
                 light.EmissionStrength = emission_strength_fl;
                 light.EmissionColor = Math::Vector3<float>(emission_r_fl, emission_g_fl, emission_b_fl);
 

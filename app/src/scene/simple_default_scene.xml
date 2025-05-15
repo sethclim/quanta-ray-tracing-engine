@@ -28,7 +28,7 @@
 		</object>
 	</objects>
 	<materials>
-		<material name="Metal 0" type="Metal">
+		<material name="Metal 0" type="Metal" fuzz="0.2">
 			<color r="1" g="1" b="1" />
 		</material>
 		<material name="Lambertian 1" type="Lambertian">

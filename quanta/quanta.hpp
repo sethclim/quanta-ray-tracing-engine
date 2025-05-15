@@ -35,7 +35,7 @@ public:
     }
 
     Math::Vector3<float> PerPixel(float image_x, float image_y, bool debug);
-    HitInfo TraceRay(const Ray &ray);
+    bool TraceRay(const Ray &ray, HitInfo& hitinfo, bool isCameraRay);
 
     std::vector<Utilities::DebugLine> GetDebugLines() { return debugLines; }
 
