@@ -1,6 +1,7 @@
 # quanta-ray-tracing-engine
 
-<img src="https://github.com/user-attachments/assets/d49e5040-cf2b-42ee-a908-df0891c432c1" alt="editor" width="50%" height="auto">
+<img src="https://github.com/user-attachments/assets/da8ad79e-8892-403d-8104-e3a407f57477" alt="editor" width="30%" height="auto">
+<img src="https://github.com/user-attachments/assets/e5225cae-c3ad-44bc-8753-1c21b4dd43ad" alt="editor" width="30%" height="auto">
 
 Raytracing engine written in C++ and Vulkan
 
@@ -15,7 +16,7 @@ Raytracing engine written in C++ and Vulkan
 -   [x] ImGUI editor integration
 -   [x] SIMD optimization on Vector Math
 -   [x] Multithreading CPU for render loop
--   [ ] Scene XML format and loader
+-   [x] Scene XML format and loader
 -   [ ] Triange hit detection
 -   [ ] GPU raytracing
 -   [ ] Object Loader integration
