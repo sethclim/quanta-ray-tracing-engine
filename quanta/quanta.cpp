@@ -99,6 +99,11 @@ void Renderer::Render(float *accumulationData, uint32_t *imageData, uint32_t fra
                                         // if (x < dimensions[0] / 2)
                                         //	accumulatedColor = glm::vec4(1, 0, 0, 1);
 
+                                        finalColor[0] = std::clamp(finalColor[0], 0.0f, 1.0f);
+                                        finalColor[1] = std::clamp(finalColor[1], 0.0f, 1.0f);
+                                        finalColor[2] = std::clamp(finalColor[2], 0.0f, 1.0f);
+                                        finalColor[3] = std::clamp(finalColor[3], 0.0f, 1.0f);
+
                                         imageData[idx] = Utilities::Color::ConvertToRGBA(finalColor[0], finalColor[1], finalColor[2], finalColor[3]);
                                     });
                   });
