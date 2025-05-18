@@ -46,8 +46,6 @@ private:
 
 	uint32_t m_FrameIndex = 1;
 
-	std::vector<uint32_t> m_ImageHorizontalIter, m_ImageVerticalIter;
-
 	std::shared_ptr<Image> m_Image;
 	uint32_t *m_ImageData = nullptr;
 	glm::vec4 *m_AccumulationData = nullptr;

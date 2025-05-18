@@ -183,7 +183,7 @@ void SceneManager::LoadScene(Scene::SceneGraph &scene, std::string name)
                 light.EmissionStrength = emission_strength_fl;
                 light.EmissionColor = Math::Vector3<float>(emission_r_fl, emission_g_fl, emission_b_fl);
 
-                scene.materials.push_back(std::make_shared<Materials::Material>(light));
+                scene.materials.push_back(std::make_shared<Materials::Emissive>(light));
             }
             else
             {
