@@ -6,32 +6,45 @@
 #include <glm/glm.hpp>
 #include "Resolution.hpp"
 #include "StandardIncludes.hpp"
-#include "VulkanBackend.hpp"
 
-class WindowController : public Singleton<WindowController>
+class VulkanBackend;
+
+namespace Window
 {
-public:
-    WindowController();
-    virtual ~WindowController();
-
-    GLFWwindow *GetWindow()
+    class WindowController
     {
-        return m_WindowHandle;
-    }
+    public:
+        static WindowController &GetInstance();
+        static void Init(VulkanBackend &vkBackend);
+        static void ShutDown();
 
-    void NewWindow();
-    Resolution GetResolution();
-    glm::vec2 GetSize();
+        WindowController(const WindowController &) = delete;
+        WindowController &operator=(const WindowController &) = delete;
 
-private:
-    GLFWwindow *m_WindowHandle;
+        GLFWwindow *GetWindow()
+        {
+            return m_WindowHandle;
+        }
 
-    void UpdateFrameBufferResized();
+        void NewWindow();
+        Resolution GetResolution();
+        glm::vec2 GetSize();
 
-    static void framebufferResizeCallback(GLFWwindow* window, int width, int height) {
-        auto windowController = reinterpret_cast<WindowController*>(glfwGetWindowUserPointer(window));
-        windowController->UpdateFrameBufferResized();
-    }
-};
+    private:
+        WindowController(VulkanBackend &vkBackend);
+        ~WindowController();
+        GLFWwindow *m_WindowHandle;
+
+        void UpdateFrameBufferResized();
+
+        static void framebufferResizeCallback(GLFWwindow *window, int width, int height)
+        {
+            auto windowController = reinterpret_cast<WindowController *>(glfwGetWindowUserPointer(window));
+            windowController->UpdateFrameBufferResized();
+        }
+
+        VulkanBackend &m_VKBackend;
+    };
+}
 
 #endif

@@ -39,9 +39,6 @@ target_link_libraries(core PRIVATE Vulkan::Vulkan)
 target_link_libraries(core PRIVATE stb_image)
 target_link_libraries(core PRIVATE pugixml)
 
-
 target_include_directories(core PRIVATE ${QUANTA_INCLUDE_DIR})
-
-
 
 target_include_directories(core PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src/")

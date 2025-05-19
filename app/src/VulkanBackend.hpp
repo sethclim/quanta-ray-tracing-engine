@@ -56,7 +56,7 @@ class Image;
 // const std::vector<uint16_t> indices = {
 //     0, 1, 2, 2, 3, 0};
 
-class VulkanBackend : public Singleton<VulkanBackend>
+class VulkanBackend
 {
 public:
     void SetupVulkan(const char **extensions, uint32_t extensions_count, const std::vector<Vertex> vertices, const std::vector<uint16_t> indices, int debugBufferSize, bool debug);

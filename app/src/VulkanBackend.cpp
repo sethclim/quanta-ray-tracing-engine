@@ -88,7 +88,7 @@ void VulkanBackend::init_imgui()
     // this initializes imgui for SDL
     // ImGui_ImplSDL2_InitForVulkan(_window);
 
-    ImGui_ImplGlfw_InitForVulkan(WindowController::GetInstance().GetWindow(), false);
+    ImGui_ImplGlfw_InitForVulkan(Window::WindowController::GetInstance().GetWindow(), false);
 
     // this initializes imgui for Vulkan
     ImGui_ImplVulkan_InitInfo init_info = {};
@@ -291,10 +291,10 @@ void VulkanBackend::createDescriptorSets(VkSampler &sampler, VkImageView &image_
 void VulkanBackend::recreateSwapChain()
 {
     int width = 0, height = 0;
-    glfwGetFramebufferSize(WindowController::GetInstance().GetWindow(), &width, &height);
+    glfwGetFramebufferSize(Window::WindowController::GetInstance().GetWindow(), &width, &height);
     while (width == 0 || height == 0)
     {
-        glfwGetFramebufferSize(WindowController::GetInstance().GetWindow(), &width, &height);
+        glfwGetFramebufferSize(Window::WindowController::GetInstance().GetWindow(), &width, &height);
         glfwWaitEvents();
     }
 
@@ -371,7 +371,7 @@ void VulkanBackend::createInstance(const char **glfwExtensions, uint32_t extensi
 void VulkanBackend::createSurface()
 {
     // Create Window Surface
-    VkResult err = glfwCreateWindowSurface(g_Instance, WindowController::GetInstance().GetWindow(), g_Allocator, &context.Surface);
+    VkResult err = glfwCreateWindowSurface(g_Instance, Window::WindowController::GetInstance().GetWindow(), g_Allocator, &context.Surface);
     check_vk_result(err);
 }
 

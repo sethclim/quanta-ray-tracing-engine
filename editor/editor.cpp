@@ -38,6 +38,11 @@ Editor::Editor()
 	Init(dd);
 }
 
+void Editor::RenderLoop(double t, double fpsLimit)
+{
+	Application::RenderLoop(t, fpsLimit);
+}
+
 // std::vector<int> Editor::CalculateLayout(int width, int height)
 //{
 //	dimensions.emplace_back(width);

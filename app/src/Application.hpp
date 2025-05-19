@@ -34,6 +34,7 @@ public:
 	~Application();
 
 	void Run();
+	virtual void RenderLoop(double t, double fpsLimit);
 	void Close();
 
 	static VkInstance GetInstance();
@@ -63,12 +64,21 @@ protected:
 	SceneManager sceneManager;
 	Scene::SceneGraph scene;
 
+	VulkanBackend vulkanBackend;
+
 	bool drawn;
 	bool debug;
 	glm::vec2 debug_trace_coord;
 
 	Utils::Timer m_Timer;
 	float m_LastRenderTime = 0.0f;
+
+	bool useRaytracer = false;
+	const char* items[3];
+	int item_current = 2;
+	int samples_per_pixel = 6;
+	int max_bounces = 3;
+	bool accumulate = false;
 };
 
 #endif

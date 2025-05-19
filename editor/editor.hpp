@@ -23,9 +23,10 @@ class Editor : public Application
 
 public:
     Editor();
+    void RenderLoop(double t, double fpsLimit) override;
 
-   /* std::vector<int> CalculateLayout(int width, int height);
-    DrawData RenderEditor();
+    /* std::vector<int> CalculateLayout(int width, int height);
+     DrawData RenderEditor();
 
-    std::vector<int> dimensions;*/
+     std::vector<int> dimensions;*/
 };

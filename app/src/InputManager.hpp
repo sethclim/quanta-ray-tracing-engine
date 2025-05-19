@@ -13,7 +13,8 @@
 
 namespace Input
 {
-    struct MouseEvent {
+    struct MouseEvent
+    {
         float x, y;
         float button;
     };
@@ -31,20 +32,19 @@ namespace Input
         void SetPosition(double x, double y);
         glm::vec2 GetMousePosition();
 
-        void AddCallback(std::function<void(const MouseEvent&)> callback);
-        void QueueEvent(const MouseEvent& event);
+        void AddCallback(std::function<void(const MouseEvent &)> callback);
+        void QueueEvent(const MouseEvent &event);
         void ProcessEvents();
 
     private:
         InputManager();
         ~InputManager();
 
-
     private:
         double xpos;
         double ypos;
 
-        std::vector<std::function<void(const MouseEvent&)>> callbacks;
+        std::vector<std::function<void(const MouseEvent &)>> callbacks;
         std::queue<MouseEvent> eventQueue;
     };
 
@@ -58,10 +58,10 @@ namespace Input
     static void mouse_button_callback(GLFWwindow *window, int button, int action, int mods)
     {
         ImGui_ImplGlfw_MouseButtonCallback(window, button, action, mods);
-        InputManager& inputManager = InputManager::GetInstance();
+        InputManager &inputManager = InputManager::GetInstance();
         glm::vec2 mouse = inputManager.GetMousePosition();
         if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS)
-            inputManager.QueueEvent({ mouse.x, mouse.y, GLFW_MOUSE_BUTTON_LEFT });
+            inputManager.QueueEvent({mouse.x, mouse.y, GLFW_MOUSE_BUTTON_LEFT});
     }
 
 }
