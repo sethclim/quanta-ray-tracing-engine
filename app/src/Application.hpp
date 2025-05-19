@@ -12,12 +12,18 @@
 #include "Random.hpp"
 #include "image.hpp"
 #include "InputManager.hpp"
-#include "../../editor/editor.hpp"
+// #include "../../editor/editor.hpp"
 
 #include "imgui.h"
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_vulkan.h"
 #include "SceneManager.hpp"
+
+struct DrawData
+{
+	std::vector<Vertex> vertices;
+	std::vector<uint16_t> indices;
+};
 
 void check_vk_result(VkResult err);
 
@@ -37,8 +43,8 @@ public:
 
 	static void SubmitResourceFree(std::function<void()> &&func);
 
-private:
-	void Init();
+protected:
+	void Init(DrawData drawData);
 	void Shutdown();
 
 	bool m_Running = false;
@@ -51,7 +57,8 @@ private:
 	glm::vec4 *m_AccumulationData = nullptr;
 
 	std::unique_ptr<Renderer> renderer;
-	std::unique_ptr<Editor> editor;
+	// std::unique_ptr<Editor> editor;
+	DrawData m_DrawData;
 
 	SceneManager sceneManager;
 	Scene::SceneGraph scene;

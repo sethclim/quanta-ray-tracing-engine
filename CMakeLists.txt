@@ -19,8 +19,8 @@ add_subdirectory(quanta)
 add_subdirectory(editor)
 add_subdirectory(app)
 
-target_compile_features(app PRIVATE cxx_std_17)
+target_compile_features(core PRIVATE cxx_std_17)
 target_compile_features(quanta PRIVATE cxx_std_17)
 target_compile_features(editor PRIVATE cxx_std_17)
 
-set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT app)
+set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT editor)

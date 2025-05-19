@@ -27,7 +27,7 @@ namespace Utils
 
 Application::Application()
 {
-	Init();
+	// Init();
 }
 
 Application::~Application()
@@ -35,10 +35,12 @@ Application::~Application()
 	Shutdown();
 }
 
-void Application::Init()
+void Application::Init(DrawData drawData)
 {
 	debug = false;
 	debug_trace_coord = glm::vec2(-1, -1);
+
+	m_DrawData = drawData;
 
 	// Setup GLFW window
 	glfwSetErrorCallback(glfw_error_callback);
@@ -62,11 +64,11 @@ void Application::Init()
 	GLFWwindow *glfwWindow = WindowController::GetInstance().GetWindow();
 	// ImGui_ImplGlfw_InitForVulkan(glfwWindow, false);
 
-	editor = std::make_unique<Editor>();
+	/*editor = std::make_unique<Editor>();*/
 	glm::vec2 size = WindowController::GetInstance().GetSize();
-	editor->CalculateLayout(size.x, size.y);
+	// editor->CalculateLayout(size.x, size.y);
 
-	DrawData drawData = editor->RenderEditor();
+	// DrawData drawData = editor->RenderEditor();
 
 	{
 		// sceneManager.SaveScene(scene);
@@ -154,9 +156,9 @@ void Application::Run()
 		// glfwSwapBuffers(WindowController::GetInstance().GetWindow());
 
 		glfwPollEvents();
-		std::vector<int> dimensions = editor->CalculateLayout(
-			VulkanBackend::GetInstance().GetRenderContext().Width,
-			VulkanBackend::GetInstance().GetRenderContext().Height);
+		int width = VulkanBackend::GetInstance().GetRenderContext().Width;
+		int height = VulkanBackend::GetInstance().GetRenderContext().Height;
+
 
 		std::vector<Utilities::DebugLine> d_lines;
 
@@ -164,17 +166,17 @@ void Application::Run()
 
 		// if (!drawn)
 		//{
-		if (!m_Image || dimensions[0] != m_Image->GetWidth() || dimensions[1] != m_Image->GetHeight())
+		if (!m_Image || width != m_Image->GetWidth() || height != m_Image->GetHeight())
 		{
-			std::cout << "[dimensions x: " << dimensions[0] << " y: " << dimensions[1] << std::endl;
+			std::cout << "[dimensions x: " << width << " y: " << height << std::endl;
 
-			m_Image = std::make_shared<Image>(dimensions[0], dimensions[1], ImageFormat::RGBA);
+			m_Image = std::make_shared<Image>(width, height, ImageFormat::RGBA);
 			delete[] m_ImageData;
-			m_ImageData = new uint32_t[dimensions[0] * dimensions[1]];
+			m_ImageData = new uint32_t[width * height];
 			delete[] m_AccumulationData;
-			m_AccumulationData = new glm::vec4[dimensions[0] * dimensions[1]];
+			m_AccumulationData = new glm::vec4[width * height];
 
-			renderer->UpdateImageDimensions(dimensions[0], dimensions[1]);
+			renderer->UpdateImageDimensions(width, height);
 		}
 
 		if (m_FrameIndex == 1)
@@ -204,8 +206,8 @@ void Application::Run()
 		}
 
 		glm::vec2 size = WindowController::GetInstance().GetSize();
-		editor->CalculateLayout(size.x, size.y);
-		DrawData drawData = editor->RenderEditor();
+		// editor->CalculateLayout(size.x, size.y);
+		/*DrawData drawData = editor->RenderEditor();*/
 
 		// imgui new frame
 		ImGui_ImplVulkan_NewFrame();
@@ -307,7 +309,7 @@ void Application::Run()
 
 		//----------------------------------------------------------------------------
 
-		VulkanBackend::GetInstance().drawFrame(drawData.indices, d_lines.size());
+		VulkanBackend::GetInstance().drawFrame(m_DrawData.indices, d_lines.size());
 
 		m_FrameIndex++;
 

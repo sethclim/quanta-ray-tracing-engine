@@ -1,13 +1,13 @@
-// #include <iostream>
+// // #include <iostream>
 
-#include "application.hpp"
+// #include "application.hpp"
 
-#include "SceneManager.hpp"
+// #include "SceneManager.hpp"
 
-int main()
-{
-    auto app = Application();
-    app.Run();
+// int main()
+// {
+//     auto app = Application();
+//     app.Run();
 
-    return 0;
-}
+//     return 0;
+// }

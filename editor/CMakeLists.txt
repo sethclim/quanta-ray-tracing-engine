@@ -1,9 +1,10 @@
-add_library(editor
+add_executable(editor
+            main.cpp
             editor.cpp
             editor.hpp)
 
 
-target_link_libraries(editor PRIVATE  app)
+target_link_libraries(editor PRIVATE  core)
 target_link_libraries(editor PRIVATE glm::glm-header-only)
 
 find_package(Vulkan REQUIRED)
@@ -14,6 +15,17 @@ target_link_libraries(editor PRIVATE glfw)
 target_link_libraries(editor PRIVATE RenderData)
 
 target_link_libraries(editor PRIVATE imgui)
+
+# added
+target_link_libraries(editor PRIVATE quanta)
+target_link_libraries(editor PRIVATE glfw)
+# target_link_libraries(core PUBLIC editor)
+target_link_libraries(editor PRIVATE glm::glm-header-only)
+target_link_libraries(editor PRIVATE imgui)
+
+target_link_libraries(editor PRIVATE Vulkan::Vulkan)
+target_link_libraries(editor PRIVATE stb_image)
+target_link_libraries(editor PRIVATE pugixml)
 
 # target_include_directories(editor PRIVATE
 #     ${IMGUI_SOURCE_DIR}/
