@@ -18,7 +18,7 @@ add_subdirectory(render_data)
 add_subdirectory(quanta)
 add_subdirectory(editor)
 add_subdirectory(runtime)
-add_subdirectory(app)
+add_subdirectory(core)
 
 target_compile_features(core PRIVATE cxx_std_17)
 target_compile_features(quanta PRIVATE cxx_std_17)

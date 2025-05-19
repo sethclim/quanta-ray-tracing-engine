@@ -521,7 +521,7 @@ void VulkanBackend::createDescriptorSetLayout()
 void VulkanBackend::createGraphicsPipeline()
 {
     PipelineBuilder _pipelineBuilder = PipelineBuilder();
-    auto folder_path = std::filesystem::path("../../app/src/shaders/");
+    auto folder_path = std::filesystem::path("../../core/src/shaders/");
     auto folder_abs = std::filesystem::absolute(folder_path);
 
     VkShaderModule vertShaderModule;
@@ -547,7 +547,7 @@ void VulkanBackend::createGraphicsPipeline()
 void VulkanBackend::createDebugPipeline()
 {
     PipelineBuilder _pipelineBuilder = PipelineBuilder();
-    auto folder_path = std::filesystem::path("../../app/src/shaders/");
+    auto folder_path = std::filesystem::path("../../core/src/shaders/");
     auto folder_abs = std::filesystem::absolute(folder_path);
 
     VkShaderModule vertShaderModule;
@@ -704,9 +704,10 @@ void VulkanBackend::recordCommandBuffer(VkCommandBuffer commandBuffer, const std
     if (debug)
         drawDebugRays(commandBuffer, debugLinesCount);
 
-    //draw_imgui(commandBuffer);
+    // draw_imgui(commandBuffer);
 
-    if (recordCallback) recordCallback(commandBuffer);
+    if (recordCallback)
+        recordCallback(commandBuffer);
 
     vkCmdEndRenderPass(commandBuffer);
 

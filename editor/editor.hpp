@@ -2,7 +2,7 @@
 
 #include <vector>
 
-#include "../app/src/InputManager.hpp"
+#include "../core/src/InputManager.hpp"
 #include "../render_data/render_data.hpp"
 
 #include <imgui.h>

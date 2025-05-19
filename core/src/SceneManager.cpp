@@ -77,7 +77,7 @@ void SceneManager::SaveScene(Scene::SceneGraph scene)
         }
     }
 
-    auto folder_path = std::filesystem::path("../../app/src/scene/");
+    auto folder_path = std::filesystem::path("../../core/src/scene/");
     auto folder_abs = std::filesystem::absolute(folder_path);
 
     std::ofstream file(folder_abs.string() + "default_scene.xml");
@@ -103,7 +103,7 @@ void SceneManager::LoadScene(Scene::SceneGraph &scene, std::string name)
 
     pugi::xml_document doc;
 
-    auto folder_path = std::filesystem::path("../../app/src/scene/");
+    auto folder_path = std::filesystem::path("../../core/src/scene/");
     auto folder_abs = std::filesystem::absolute(folder_path);
 
     std::ifstream file(folder_abs.string() + name);
