@@ -37,13 +37,13 @@ Editor::Editor()
 	dd.indices = indices;
 	Init(dd);
 
-	GLFWwindow* glfwWindow = Window::WindowController::GetInstance().GetWindow();
+	GLFWwindow *glfwWindow = Window::WindowController::GetInstance().GetWindow();
 
 	glfwSetCursorPosCallback(glfwWindow, QuantaEditor::Input::cursor_position_callback);
 	glfwSetMouseButtonCallback(glfwWindow, QuantaEditor::Input::mouse_button_callback);
 
 	Core::Input::InputManager::GetInstance().AddCallback([this](const Core::Input::MouseEvent &e)
-												   {
+														 {
 		debug_trace_coord = glm::vec2(e.x, e.y);
 		drawn = false; });
 
@@ -53,6 +53,13 @@ Editor::Editor()
 	{
 		this->OnRecordCommandBuffer(cmd);
 	};
+
+	drawn = false;
+	useRaytracer = false;
+	item_current = 2;
+	samples_per_pixel = 6;
+	max_bounces = 3;
+	accumulate = false;
 }
 
 void Editor::RenderLoop(double t, double fpsLimit)

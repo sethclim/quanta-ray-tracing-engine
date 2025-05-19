@@ -17,10 +17,12 @@ add_subdirectory(vendor)
 add_subdirectory(render_data)
 add_subdirectory(quanta)
 add_subdirectory(editor)
+add_subdirectory(runtime)
 add_subdirectory(app)
 
 target_compile_features(core PRIVATE cxx_std_17)
 target_compile_features(quanta PRIVATE cxx_std_17)
 target_compile_features(editor PRIVATE cxx_std_17)
+target_compile_features(runtime PRIVATE cxx_std_17)
 
 set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT editor)

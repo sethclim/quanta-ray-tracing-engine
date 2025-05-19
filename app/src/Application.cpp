@@ -87,8 +87,8 @@ void Application::Init(DrawData drawData)
 
 	vulkanBackend.SetupVulkan(extensions, extensions_count, drawData.vertices, drawData.indices, debugBufferSize, debug);
 
-	glfwSetCursorPosCallback(glfwWindow, Core::Input::cursor_position_callback);
-	glfwSetMouseButtonCallback(glfwWindow, Core::Input::mouse_button_callback);
+	// glfwSetCursorPosCallback(glfwWindow, Core::Input::cursor_position_callback);
+	// glfwSetMouseButtonCallback(glfwWindow, Core::Input::mouse_button_callback);
 
 	// Input::InputManager::GetInstance().AddCallback([this](const Input::MouseEvent &e)
 	// 											   {
@@ -116,12 +116,6 @@ void Application::Run()
 
 	m_Running = true;
 
-	drawn = false;
-	useRaytracer = false;
-	item_current = 2;
-	samples_per_pixel = 6;
-	max_bounces = 3;
-	accumulate = false;
 
 	while (glfwWindowShouldClose(Window::WindowController::GetInstance().GetWindow()) == 0 && m_Running)
 	{
