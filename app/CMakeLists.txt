@@ -21,8 +21,6 @@ add_library(core
     src/VK_Types.cpp
     src/VK_Initializers.cpp
     src/VK_Initializers.hpp
-    src/ImGUI.hpp
-    src/ImGUI.cpp
     src/utils/Utilities.hpp
     src/utils/Utilities.cpp
     src/SceneManager.hpp
@@ -33,7 +31,7 @@ target_link_libraries(core PRIVATE quanta)
 target_link_libraries(core PRIVATE glfw)
 # target_link_libraries(core PUBLIC editor)
 target_link_libraries(core PRIVATE glm::glm-header-only)
-target_link_libraries(core PRIVATE imgui)
+# target_link_libraries(core PRIVATE imgui)
 
 target_link_libraries(core PRIVATE Vulkan::Vulkan)
 target_link_libraries(core PRIVATE stb_image)

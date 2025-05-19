@@ -1,8 +1,9 @@
 add_executable(editor
             main.cpp
             editor.cpp
-            editor.hpp)
-
+            editor.hpp
+            ImGuiHelpers.cpp
+            ImGuiHelpers.hpp)
 
 target_link_libraries(editor PRIVATE  core)
 target_link_libraries(editor PRIVATE glm::glm-header-only)
@@ -26,6 +27,9 @@ target_link_libraries(editor PRIVATE imgui)
 target_link_libraries(editor PRIVATE Vulkan::Vulkan)
 target_link_libraries(editor PRIVATE stb_image)
 target_link_libraries(editor PRIVATE pugixml)
+# end added ----------------------------------------
+
+target_link_libraries(editor PRIVATE imgui)
 
 # target_include_directories(editor PRIVATE
 #     ${IMGUI_SOURCE_DIR}/

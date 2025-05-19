@@ -9,9 +9,9 @@
 
 #include <queue>
 
-#include "backends/imgui_impl_glfw.h"
+// #include "backends/imgui_impl_glfw.h"
 
-namespace Input
+namespace Core::Input
 {
     struct MouseEvent
     {
@@ -50,14 +50,14 @@ namespace Input
 
     static void cursor_position_callback(GLFWwindow *window, double xpos, double ypos)
     {
-        ImGui_ImplGlfw_CursorPosCallback(window, xpos, ypos);
+        // ImGui_ImplGlfw_CursorPosCallback(window, xpos, ypos);
         // std::cout << "XPos " << xpos << " ypos " << ypos << std::endl;
         InputManager::GetInstance().SetPosition(xpos, ypos);
     }
 
     static void mouse_button_callback(GLFWwindow *window, int button, int action, int mods)
     {
-        ImGui_ImplGlfw_MouseButtonCallback(window, button, action, mods);
+        // ImGui_ImplGlfw_MouseButtonCallback(window, button, action, mods);
         InputManager &inputManager = InputManager::GetInstance();
         glm::vec2 mouse = inputManager.GetMousePosition();
         if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS)
