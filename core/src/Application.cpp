@@ -61,7 +61,7 @@ void Application::Init(DrawData drawData)
 
 	{
 		// sceneManager.SaveScene(scene);
-		sceneManager.LoadScene(scene, "default_scene.xml");
+		sceneManager.LoadScene(scene, "simple_default_scene.xml");
 
 		renderer = std::make_unique<Renderer>(scene);
 	}
@@ -115,7 +115,6 @@ void Application::Run()
 	const double fpsLimit = 1.0 / 60.0;
 
 	m_Running = true;
-
 
 	while (glfwWindowShouldClose(Window::WindowController::GetInstance().GetWindow()) == 0 && m_Running)
 	{
