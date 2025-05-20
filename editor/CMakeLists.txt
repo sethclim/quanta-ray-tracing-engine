@@ -7,6 +7,7 @@ add_executable(editor
 
 target_link_libraries(editor PRIVATE  core)
 target_link_libraries(editor PRIVATE glm::glm-header-only)
+target_link_libraries(quanta PRIVATE vmath)
 
 find_package(Vulkan REQUIRED)
 target_link_libraries(editor PRIVATE Vulkan::Vulkan)
