@@ -1,7 +1,7 @@
 #include "InputManager.hpp"
 
 
-namespace Input
+namespace Core::Input
 {
 
     static InputManager* s_Instance = nullptr;

@@ -1,5 +1,5 @@
-add_executable(app 
-    src/main.cpp 
+add_library(core 
+    # src/main.cpp 
     src/Application.cpp   
     src/Application.hpp
     src/WindowController.cpp   
@@ -21,23 +21,23 @@ add_executable(app
     src/VK_Types.cpp
     src/VK_Initializers.cpp
     src/VK_Initializers.hpp
-    src/ImGUI.hpp
-    src/ImGUI.cpp
     src/utils/Utilities.hpp
     src/utils/Utilities.cpp
     src/SceneManager.hpp
     src/SceneManager.cpp
 )
 
-target_link_libraries(app PRIVATE quanta)
-target_link_libraries(app PRIVATE glfw)
-target_link_libraries(app PUBLIC editor)
-target_link_libraries(app PRIVATE glm::glm-header-only)
-target_link_libraries(app PRIVATE imgui)
+target_link_libraries(core PRIVATE quanta)
+target_link_libraries(core PRIVATE glfw)
+# target_link_libraries(core PUBLIC editor)
+target_link_libraries(core PRIVATE glm::glm-header-only)
+target_link_libraries(quanta PRIVATE vmath)
+# target_link_libraries(core PRIVATE imgui)
 
-target_include_directories(app PRIVATE ${QUANTA_INCLUDE_DIR})
+target_link_libraries(core PRIVATE Vulkan::Vulkan)
+target_link_libraries(core PRIVATE stb_image)
+target_link_libraries(core PRIVATE pugixml)
 
+target_include_directories(core PRIVATE ${QUANTA_INCLUDE_DIR})
 
-target_link_libraries(app PRIVATE Vulkan::Vulkan)
-target_link_libraries(app PRIVATE stb_image)
-target_link_libraries(app PRIVATE pugixml)
+target_include_directories(core PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src/")

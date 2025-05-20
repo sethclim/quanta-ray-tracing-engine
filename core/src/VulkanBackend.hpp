@@ -13,13 +13,13 @@
 #include "WindowController.hpp"
 #include "VK_Pipeline.hpp"
 #include "VK_Types.hpp"
+//
+//#include "imgui.h"
+//#include <imconfig.h>
+//#define IMGUI_IMPL_VULKAN_SHADER
+//#include "imgui_impl_glfw.h"
+//#include "imgui_impl_vulkan.h"
 
-#include "imgui.h"
-#include <imconfig.h>
-#define IMGUI_IMPL_VULKAN_SHADER
-#include "imgui_impl_glfw.h"
-#include "imgui_impl_vulkan.h"
-#include "ImGUI.hpp"
 
 const int MAX_FRAMES_IN_FLIGHT = 2;
 
@@ -56,7 +56,7 @@ class Image;
 // const std::vector<uint16_t> indices = {
 //     0, 1, 2, 2, 3, 0};
 
-class VulkanBackend : public Singleton<VulkanBackend>
+class VulkanBackend
 {
 public:
     void SetupVulkan(const char **extensions, uint32_t extensions_count, const std::vector<Vertex> vertices, const std::vector<uint16_t> indices, int debugBufferSize, bool debug);
@@ -64,6 +64,8 @@ public:
     void drawFrame(const std::vector<uint16_t> indices, int debugLinesCount);
     VkPhysicalDevice &GetPhysicalDevice();
     VkDevice &GetDevice();
+    VkQueue &GetGraphicsQueue() { return g_GraphicsQueue; }
+    VkInstance &GetVkInstance() { return g_Instance; }
     void createDescriptorSets(VkSampler &sampler, VkImageView &image_view);
     VkImageView createImageView(VkImage &image, VkFormat format);
 
@@ -130,16 +132,13 @@ private:
 
     void drawDebugRays(VkCommandBuffer commandBuffer, int numLines);
 
-    void init_imgui();
-
-    void draw_imgui(VkCommandBuffer cmd);
-
 public:
     void updateDebugBuffer(std::vector<Utilities::DebugLine> &newLines);
     void createBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer &buffer, VkDeviceMemory &bufferMemory);
     uint32_t findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties);
     VkCommandBuffer beginSingleTimeCommands();
     void endSingleTimeCommands(VkCommandBuffer commandBuffer);
+    std::function<void(VkCommandBuffer)> recordCallback;
 
 private:
     bool checkValidationLayerSupport();
@@ -197,6 +196,7 @@ private:
 
     // draw resources
     AllocatedImage _drawImage;
+  
 };
 
 #endif

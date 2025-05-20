@@ -77,7 +77,7 @@ void SceneManager::SaveScene(Scene::SceneGraph scene)
         }
     }
 
-    auto folder_path = std::filesystem::path("../../app/src/scene/");
+    auto folder_path = std::filesystem::path("../../core/src/scene/");
     auto folder_abs = std::filesystem::absolute(folder_path);
 
     std::ofstream file(folder_abs.string() + "default_scene.xml");
@@ -103,7 +103,7 @@ void SceneManager::LoadScene(Scene::SceneGraph &scene, std::string name)
 
     pugi::xml_document doc;
 
-    auto folder_path = std::filesystem::path("../../app/src/scene/");
+    auto folder_path = std::filesystem::path("../../core/src/scene/");
     auto folder_abs = std::filesystem::absolute(folder_path);
 
     std::ifstream file(folder_abs.string() + name);
@@ -183,7 +183,7 @@ void SceneManager::LoadScene(Scene::SceneGraph &scene, std::string name)
                 light.EmissionStrength = emission_strength_fl;
                 light.EmissionColor = Math::Vector3<float>(emission_r_fl, emission_g_fl, emission_b_fl);
 
-                scene.materials.push_back(std::make_shared<Materials::Material>(light));
+                scene.materials.push_back(std::make_shared<Materials::Emissive>(light));
             }
             else
             {

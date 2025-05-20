@@ -6,10 +6,10 @@
 namespace Utils
 {
 
-    static uint32_t GetVulkanMemoryType(VkMemoryPropertyFlags properties, uint32_t type_bits)
+    static uint32_t GetVulkanMemoryType(VkMemoryPropertyFlags properties, uint32_t type_bits, VkPhysicalDevice physicalDevice)
     {
         VkPhysicalDeviceMemoryProperties prop;
-        vkGetPhysicalDeviceMemoryProperties(VulkanBackend::GetInstance().GetPhysicalDevice(), &prop);
+        vkGetPhysicalDeviceMemoryProperties(physicalDevice, &prop);
         for (uint32_t i = 0; i < prop.memoryTypeCount; i++)
         {
             if ((prop.memoryTypes[i].propertyFlags & properties) == properties && type_bits & (1 << i))
@@ -45,8 +45,8 @@ namespace Utils
 
 }
 
-Image::Image(std::string_view path)
-    : m_Filepath(path)
+Image::Image(std::string_view path, VulkanBackend& vkBackend)
+    : m_Filepath(path), m_VKBackend(vkBackend)
 {
     int width, height, channels;
     uint8_t *data = nullptr;
@@ -66,16 +66,16 @@ Image::Image(std::string_view path)
     m_Height = height;
 
     AllocateMemory(m_Width * m_Height * Utils::BytesPerPixel(m_Format));
-    SetData(data);
+    SetData(vkBackend, data);
     stbi_image_free(data);
 }
 
-Image::Image(uint32_t width, uint32_t height, ImageFormat format, const void *data)
-    : m_Width(width), m_Height(height), m_Format(format)
+Image::Image(uint32_t width, uint32_t height, ImageFormat format, VulkanBackend& vkBackend, const void* data)
+    : m_Width(width), m_Height(height), m_Format(format), m_VKBackend(vkBackend)
 {
     AllocateMemory(m_Width * m_Height * Utils::BytesPerPixel(m_Format));
     if (data)
-        SetData(data);
+        SetData(vkBackend, data);
 }
 
 Image::~Image()
@@ -83,7 +83,7 @@ Image::~Image()
     Release();
 }
 
-void Image::AllocateMemory(uint64_t size)
+void Image::AllocateMemory( uint64_t size)
 {
     VkFormat vulkanFormat = Utils::WalnutFormatToVulkanFormat(m_Format);
 
@@ -92,9 +92,9 @@ void Image::AllocateMemory(uint64_t size)
                 VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT,
                 VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
 
-    m_ImageView = VulkanBackend::GetInstance().createImageView(m_Image, vulkanFormat);
+    m_ImageView = m_VKBackend.createImageView(m_Image, vulkanFormat);
     createTextureSampler();
-    VulkanBackend::GetInstance().createDescriptorSets(m_Sampler, m_ImageView);
+    m_VKBackend.createDescriptorSets(m_Sampler, m_ImageView);
 }
 
 void Image::Release()
@@ -103,7 +103,7 @@ void Image::Release()
     // Application::SubmitResourceFree([sampler = m_Sampler, imageView = m_ImageView, image = m_Image,
     //                                  memory = m_Memory, stagingBuffer = m_StagingBuffer, stagingBufferMemory = m_StagingBufferMemory]()
     //                                 {
-    VkDevice &device = VulkanBackend::GetInstance().GetDevice();
+    VkDevice &device = m_VKBackend.GetDevice();
 
     vkDestroySampler(device, m_Sampler, nullptr);
     vkDestroyImageView(device, m_ImageView, nullptr);
@@ -120,9 +120,9 @@ void Image::Release()
     m_StagingBufferMemory = nullptr;
 }
 
-void Image::SetData(const void *pixels)
+void Image::SetData(VulkanBackend vkBackend, const void *pixels)
 {
-    VkDevice &device = VulkanBackend::GetInstance().GetDevice();
+    VkDevice &device = vkBackend.GetDevice();
 
     size_t upload_size = m_Width * m_Height * Utils::BytesPerPixel(m_Format);
 
@@ -130,7 +130,7 @@ void Image::SetData(const void *pixels)
 
     if (!m_StagingBuffer)
     {
-        VulkanBackend::GetInstance().createBuffer(upload_size, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, m_StagingBuffer, m_StagingBufferMemory);
+        vkBackend.createBuffer(upload_size, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, m_StagingBuffer, m_StagingBufferMemory);
     }
 
     // Upload to Buffer
@@ -147,7 +147,7 @@ void Image::SetData(const void *pixels)
     transitionImageLayout(VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 }
 
-void Image::Resize(uint32_t width, uint32_t height)
+void Image::Resize(VulkanBackend vkBackend, uint32_t width, uint32_t height)
 {
     if (m_Image && m_Width == width && m_Height == height)
         return;
@@ -178,30 +178,30 @@ void Image::createImage(VkFormat format, VkImageTiling tiling, VkImageUsageFlags
     imageInfo.samples = VK_SAMPLE_COUNT_1_BIT;
     imageInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
 
-    if (vkCreateImage(VulkanBackend::GetInstance().GetDevice(), &imageInfo, nullptr, &m_Image) != VK_SUCCESS)
+    if (vkCreateImage(m_VKBackend.GetDevice(), &imageInfo, nullptr, &m_Image) != VK_SUCCESS)
     {
         throw std::runtime_error("failed to create image!");
     }
 
     VkMemoryRequirements memRequirements;
-    vkGetImageMemoryRequirements(VulkanBackend::GetInstance().GetDevice(), m_Image, &memRequirements);
+    vkGetImageMemoryRequirements(m_VKBackend.GetDevice(), m_Image, &memRequirements);
 
     VkMemoryAllocateInfo allocInfo{};
     allocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
     allocInfo.allocationSize = memRequirements.size;
-    allocInfo.memoryTypeIndex = VulkanBackend::GetInstance().findMemoryType(memRequirements.memoryTypeBits, properties);
+    allocInfo.memoryTypeIndex = m_VKBackend.findMemoryType(memRequirements.memoryTypeBits, properties);
 
-    if (vkAllocateMemory(VulkanBackend::GetInstance().GetDevice(), &allocInfo, nullptr, &m_Memory) != VK_SUCCESS)
+    if (vkAllocateMemory(m_VKBackend.GetDevice(), &allocInfo, nullptr, &m_Memory) != VK_SUCCESS)
     {
         throw std::runtime_error("failed to allocate image memory!");
     }
 
-    vkBindImageMemory(VulkanBackend::GetInstance().GetDevice(), m_Image, m_Memory, 0);
+    vkBindImageMemory(m_VKBackend.GetDevice(), m_Image, m_Memory, 0);
 }
 
 void Image::copyBufferToImage()
 {
-    VkCommandBuffer commandBuffer = VulkanBackend::GetInstance().beginSingleTimeCommands();
+    VkCommandBuffer commandBuffer = m_VKBackend.beginSingleTimeCommands();
 
     VkBufferImageCopy region{};
     region.bufferOffset = 0;
@@ -219,12 +219,12 @@ void Image::copyBufferToImage()
 
     vkCmdCopyBufferToImage(commandBuffer, m_StagingBuffer, m_Image, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &region);
 
-    VulkanBackend::GetInstance().endSingleTimeCommands(commandBuffer);
+    m_VKBackend.endSingleTimeCommands(commandBuffer);
 }
 
 void Image::transitionImageLayout(VkImageLayout oldLayout, VkImageLayout newLayout)
 {
-    VkCommandBuffer commandBuffer = VulkanBackend::GetInstance().beginSingleTimeCommands();
+    VkCommandBuffer commandBuffer = m_VKBackend.beginSingleTimeCommands();
 
     VkImageMemoryBarrier barrier{};
     barrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
@@ -271,13 +271,13 @@ void Image::transitionImageLayout(VkImageLayout oldLayout, VkImageLayout newLayo
         0, nullptr,
         1, &barrier);
 
-    VulkanBackend::GetInstance().endSingleTimeCommands(commandBuffer);
+    m_VKBackend.endSingleTimeCommands(commandBuffer);
 }
 
 void Image::createTextureSampler()
 {
     VkPhysicalDeviceProperties properties{};
-    vkGetPhysicalDeviceProperties(VulkanBackend::GetInstance().GetPhysicalDevice(), &properties);
+    vkGetPhysicalDeviceProperties(m_VKBackend.GetPhysicalDevice(), &properties);
 
     VkSamplerCreateInfo samplerInfo{};
     samplerInfo.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
@@ -294,7 +294,7 @@ void Image::createTextureSampler()
     samplerInfo.compareOp = VK_COMPARE_OP_ALWAYS;
     samplerInfo.mipmapMode = VK_SAMPLER_MIPMAP_MODE_LINEAR;
 
-    if (vkCreateSampler(VulkanBackend::GetInstance().GetDevice(), &samplerInfo, nullptr, &m_Sampler) != VK_SUCCESS)
+    if (vkCreateSampler(m_VKBackend.GetDevice(), &samplerInfo, nullptr, &m_Sampler) != VK_SUCCESS)
     {
         throw std::runtime_error("failed to create texture sampler!");
     }

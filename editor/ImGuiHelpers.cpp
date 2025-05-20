@@ -1,11 +1,12 @@
-#include "ImGUI.hpp"
 
-namespace ImGUI
+#include "ImGuiHelpers.hpp"
+
+namespace ImGuiH
 {
     //--------------------------------------------------------------------------------------------------
-    //
-    // If GLFW has been initialized, returns the DPI scale of the primary monitor. Otherwise, returns 1.
-    //
+//
+// If GLFW has been initialized, returns the DPI scale of the primary monitor. Otherwise, returns 1.
+//
     float getDPIScale()
     {
         // Cached DPI scale, so that this doesn't change after the first time code calls getDPIScale.
@@ -18,7 +19,7 @@ namespace ImGUI
             // set in the NVPRO_DPI_SCALE variable.
             cached_dpi_scale = 1.0f;
 
-            GLFWmonitor *monitor = glfwGetPrimaryMonitor();
+            GLFWmonitor* monitor = glfwGetPrimaryMonitor();
             assert(monitor);
             if (monitor != nullptr)
             {
@@ -29,7 +30,7 @@ namespace ImGUI
             // (Note that this code assumes all samples use GLFW.)
 
             // Multiply by the value of the NVPRO_DPI_SCALE environment variable.
-            const char *dpi_env = getenv("NVPRO_DPI_SCALE");
+            const char* dpi_env = getenv("NVPRO_DPI_SCALE");
             if (dpi_env)
             {
                 const float parsed_dpi_env = strtof(dpi_env, nullptr);
@@ -216,5 +217,6 @@ namespace ImGUI
 
         ImGui::SetColorEditOptions(ImGuiColorEditFlags_Float | ImGuiColorEditFlags_PickerHueWheel);
     }
+
 
 }

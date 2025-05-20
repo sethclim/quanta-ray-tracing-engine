@@ -17,15 +17,15 @@ enum class ImageFormat
 class Image
 {
 public:
-    Image(std::string_view path);
-    Image(uint32_t width, uint32_t height, ImageFormat format, const void *data = nullptr);
+    Image(std::string_view path, VulkanBackend &vkBackend);
+    Image(uint32_t width, uint32_t height, ImageFormat format, VulkanBackend &vkBackend, const void *data = nullptr);
     ~Image();
 
-    void SetData(const void *data);
+    void SetData(VulkanBackend vkBackend, const void *data);
 
     VkDescriptorSet GetDescriptorSet() const { return m_DescriptorSet; }
 
-    void Resize(uint32_t width, uint32_t height);
+    void Resize(VulkanBackend vkBackend, uint32_t width, uint32_t height);
 
     uint32_t GetWidth() const { return m_Width; }
     uint32_t GetHeight() const { return m_Height; }
@@ -57,6 +57,8 @@ private:
     VkDescriptorSet m_DescriptorSet = nullptr;
 
     std::string m_Filepath;
+
+    VulkanBackend &m_VKBackend;
 };
 
 #endif
