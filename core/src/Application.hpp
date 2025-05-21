@@ -12,11 +12,13 @@
 #include "Random.hpp"
 #include "image.hpp"
 #include "InputManager.hpp"
+
+#include "vector4.hpp"
 // #include "../../editor/editor.hpp"
 
-//#include "imgui.h"
-//#include "imgui_impl_glfw.h"
-//#include "imgui_impl_vulkan.h"
+// #include "imgui.h"
+// #include "imgui_impl_glfw.h"
+// #include "imgui_impl_vulkan.h"
 #include "SceneManager.hpp"
 
 struct DrawData
@@ -55,7 +57,7 @@ protected:
 
 	std::shared_ptr<Image> m_Image;
 	uint32_t *m_ImageData = nullptr;
-	glm::vec4 *m_AccumulationData = nullptr;
+	Math::Vector4<float> *m_AccumulationData = nullptr;
 
 	std::unique_ptr<Renderer> renderer;
 	// std::unique_ptr<Editor> editor;
@@ -74,7 +76,7 @@ protected:
 	float m_LastRenderTime = 0.0f;
 
 	bool useRaytracer = false;
-	const char* items[3];
+	const char *items[3];
 	int item_current = 2;
 	int samples_per_pixel = 6;
 	int max_bounces = 3;

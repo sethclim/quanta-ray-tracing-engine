@@ -7,12 +7,12 @@ namespace Utilities
 {
     namespace Color
     {
-        static uint32_t ConvertToRGBA(float _r, float _g, float _b, float _a)
+        static uint32_t ConvertToRGBA(const Math::Vector4<float> &color)
         {
-            uint8_t r = (_r * 255.0f);
-            uint8_t g = (_g * 255.0f);
-            uint8_t b = (_b * 255.0f);
-            uint8_t a = (_a * 255.0f);
+            uint8_t r = (color.x * 255.0f);
+            uint8_t g = (color.y * 255.0f);
+            uint8_t b = (color.z * 255.0f);
+            uint8_t a = (color.w * 255.0f);
 
             return (a << 24) | (b << 16) | (g << 8) | r;
         }

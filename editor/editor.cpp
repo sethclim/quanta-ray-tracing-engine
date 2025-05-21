@@ -103,7 +103,7 @@ void Editor::RenderLoop(double t, double fpsLimit)
 		delete[] m_ImageData;
 		m_ImageData = new uint32_t[width * height];
 		delete[] m_AccumulationData;
-		m_AccumulationData = new glm::vec4[width * height];
+		m_AccumulationData = new Math::Vector4<float>[width * height];
 
 		renderer->UpdateImageDimensions(width, height);
 	}
@@ -119,7 +119,7 @@ void Editor::RenderLoop(double t, double fpsLimit)
 
 	if (useRaytracer)
 	{
-		renderer->Render(reinterpret_cast<float *>(m_AccumulationData), m_ImageData, m_FrameIndex);
+		renderer->Render(m_AccumulationData, m_ImageData, m_FrameIndex);
 	} // useRaytracer
 
 	// drawn = true;

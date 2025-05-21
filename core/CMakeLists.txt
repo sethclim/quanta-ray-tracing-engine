@@ -31,7 +31,7 @@ target_link_libraries(core PRIVATE quanta)
 target_link_libraries(core PRIVATE glfw)
 # target_link_libraries(core PUBLIC editor)
 target_link_libraries(core PRIVATE glm::glm-header-only)
-target_link_libraries(quanta PRIVATE vmath)
+target_link_libraries(core PRIVATE vmath)
 # target_link_libraries(core PRIVATE imgui)
 
 target_link_libraries(core PRIVATE Vulkan::Vulkan)

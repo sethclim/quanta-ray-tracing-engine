@@ -33,7 +33,7 @@ void Renderer::UpdateImageDimensions(uint32_t width, uint32_t height)
         m_ImageVerticalIter[i] = i;
 }
 
-void Renderer::Render(float *accumulationData, uint32_t *imageData, uint32_t frameIndex)
+void Renderer::Render(Math::Vector4<float> *accumulationData, uint32_t *imageData, uint32_t frameIndex)
 {
 #define MT 1
 #if MT
@@ -67,24 +67,14 @@ void Renderer::Render(float *accumulationData, uint32_t *imageData, uint32_t fra
                                         /*	if (x == 535 && y == 318)*/
                                         color = PerPixel(normalizedX, normalizedY, false); // debug_pixel
 
-                                        float finalColor[4];
-
-                                        finalColor[0] = color.x;
-                                        finalColor[1] = color.y;
-                                        finalColor[2] = color.z;
-                                        finalColor[3] = 1.0f;
+                                        Math::Vector4<float> finalColor = Math::Vector4<float>(color.x, color.y, color.z, 1.0f);
 
                                         if (_accumulate)
                                         {
-                                            accumulationData[idx * 4 + 0] += finalColor[0]; // R
-                                            accumulationData[idx * 4 + 1] += finalColor[1]; // G
-                                            accumulationData[idx * 4 + 2] += finalColor[2]; // B
-                                            accumulationData[idx * 4 + 3] += finalColor[3]; // A
+                                            accumulationData[idx] += finalColor;
 
-                                            finalColor[0] = (accumulationData[idx * 4 + 0] / frameIndex);
-                                            finalColor[1] = (accumulationData[idx * 4 + 1] / frameIndex);
-                                            finalColor[2] = (accumulationData[idx * 4 + 2] / frameIndex);
-                                            finalColor[3] = (accumulationData[idx * 4 + 3] / frameIndex);
+                                            finalColor = accumulationData[idx];
+                                            finalColor /= frameIndex;
 
                                             // finalColor = m_AccumulationData[x + y * m_Image->GetWidth()];
                                             // finalColor /= (float)m_FrameIndex;
@@ -99,12 +89,9 @@ void Renderer::Render(float *accumulationData, uint32_t *imageData, uint32_t fra
                                         // if (x < dimensions[0] / 2)
                                         //	accumulatedColor = glm::vec4(1, 0, 0, 1);
 
-                                        finalColor[0] = std::clamp(finalColor[0], 0.0f, 1.0f);
-                                        finalColor[1] = std::clamp(finalColor[1], 0.0f, 1.0f);
-                                        finalColor[2] = std::clamp(finalColor[2], 0.0f, 1.0f);
-                                        finalColor[3] = std::clamp(finalColor[3], 0.0f, 1.0f);
+                                        finalColor = Math::Clamp(finalColor, 0.0f, 1.0f);
 
-                                        imageData[idx] = Utilities::Color::ConvertToRGBA(finalColor[0], finalColor[1], finalColor[2], finalColor[3]);
+                                        imageData[idx] = Utilities::Color::ConvertToRGBA(finalColor);
                                     });
                   });
     // std::cout << "DONE DONE DONE!" << std::endl;

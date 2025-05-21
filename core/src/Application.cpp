@@ -116,7 +116,6 @@ void Application::Run()
 
 	m_Running = true;
 
-
 	while (glfwWindowShouldClose(Window::WindowController::GetInstance().GetWindow()) == 0 && m_Running)
 	{
 		RenderLoop(t, fpsLimit);
@@ -166,13 +165,13 @@ void Application::RenderLoop(double t, double fpsLimit)
 		delete[] m_ImageData;
 		m_ImageData = new uint32_t[width * height];
 		delete[] m_AccumulationData;
-		m_AccumulationData = new glm::vec4[width * height];
+		m_AccumulationData = new Math::Vector4<float>[width * height];
 
 		renderer->UpdateImageDimensions(width, height);
 	}
 
 	if (m_FrameIndex == 1)
-		memset(m_AccumulationData, 0, static_cast<size_t>(m_Image->GetWidth()) * static_cast<size_t>(m_Image->GetHeight()) * sizeof(glm::vec4));
+		memset(m_AccumulationData, 0, static_cast<size_t>(m_Image->GetWidth()) * static_cast<size_t>(m_Image->GetHeight()) * sizeof(Math::Vector4<float>));
 
 	glm::vec2 mouse = Core::Input::InputManager::GetInstance().GetMousePosition();
 
@@ -182,7 +181,7 @@ void Application::RenderLoop(double t, double fpsLimit)
 
 	if (useRaytracer)
 	{
-		renderer->Render(reinterpret_cast<float *>(m_AccumulationData), m_ImageData, m_FrameIndex);
+		renderer->Render(m_AccumulationData, m_ImageData, m_FrameIndex);
 	} // useRaytracer
 
 	// drawn = true;
