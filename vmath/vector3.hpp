@@ -1,22 +1,25 @@
-#pragma once
+#ifndef VECTOR3_H
+#define VECTOR3_H
 
 #include <xmmintrin.h> // SSE
 #include <string>
 #include <pmmintrin.h>
 
+#include "types.hpp"
+
 namespace Math
 {
-    template <typename T>
-    struct TupleLength
-    {
-        using type = float;
-    };
+    // template <typename T>
+    // struct TupleLength
+    // {
+    //     using type = float;
+    // };
 
-    template <>
-    struct TupleLength<double>
-    {
-        using type = double;
-    };
+    // template <>
+    // struct TupleLength<double>
+    // {
+    //     using type = double;
+    // };
 
     namespace detail
     {
@@ -294,3 +297,5 @@ namespace Math
         return v.Dot(v) < 1e-16f;
     }*/
 }
+
+#endif
