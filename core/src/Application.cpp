@@ -61,7 +61,7 @@ void Application::Init(DrawData drawData)
 
 	{
 		// sceneManager.SaveScene(scene);
-		sceneManager.LoadScene(scene, "simple_default_scene.xml");
+		sceneManager.LoadScene(scene, "default_scene.xml");
 
 		renderer = std::make_unique<Renderer>(scene);
 	}
@@ -171,7 +171,7 @@ void Application::RenderLoop(double t, double fpsLimit)
 	}
 
 	if (m_FrameIndex == 1)
-		memset(m_AccumulationData, 0, static_cast<size_t>(m_Image->GetWidth()) * static_cast<size_t>(m_Image->GetHeight()) * sizeof(glm::vec4));
+		memset(m_AccumulationData, 0, static_cast<size_t>(m_Image->GetWidth()) * static_cast<size_t>(m_Image->GetHeight()) * sizeof(Math::Vector4<float>));
 
 	glm::vec2 mouse = Core::Input::InputManager::GetInstance().GetMousePosition();
 
