@@ -9,18 +9,6 @@
 
 namespace Math
 {
-    // template <typename T>
-    // struct TupleLength
-    // {
-    //     using type = float;
-    // };
-
-    // template <>
-    // struct TupleLength<double>
-    // {
-    //     using type = double;
-    // };
-
     namespace detail
     {
         struct alignas(16) Vector3Simd
